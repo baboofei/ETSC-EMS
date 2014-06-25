@@ -145,6 +145,17 @@ class Salelog < ActiveRecord::Base
                 #然后往寄出产品|日志的关联表里加上数据
                 #TODO 这里将来如果有样品表的话，应该就是“样品|日志的关联表”，可能此表还得有额外的属性，比如个案号
                 ExpressSheet.add_from_salelog(:product, params, user_id)
+            when "quote"
+                #新增一个报价
+                #传参数过去的时候会自动生成一条日志，这里就不加了
+                form_data = JSON.parse(params['form_data'])
+                form_data['customer_unit_id'] = Customer.find(form_data['customer_id']).customer_unit_id
+
+                form_data['event'] = "sale_save"
+                form_data['sale>id'] = user_id
+                form_data['salelog>salecase>id'] = params['salecase_id']
+
+                Quote.create_or_update_with(form_data, user_id)
             when "contract"
                 #新增一条“预签合同”的日志
                 #binding.pry

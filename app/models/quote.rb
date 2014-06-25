@@ -155,7 +155,7 @@ class Quote < ActiveRecord::Base
         #“number”也不要，因为外面没地方传过来
         #“sale_user_id”和“business_user_id”也不要，下面单独赋值
         #“ salecase_id”也不要，根本就是无用的字段
-        fields_to_be_updated = %w(customer_unit_id customer_id salelog_id currency_id total_discount fif_currency_id
+        fields_to_be_updated = %w(customer_unit_id customer_id currency_id total_discount fif_currency_id
             fif vat other_cost total work_task_id language request quote_format our_company_id term comment quote_type
             pdf summary rmb final_price declaration_fee max_custom_tax does_count_ctvat x_discount group_id
         )

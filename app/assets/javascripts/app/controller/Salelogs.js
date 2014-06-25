@@ -19,18 +19,18 @@ Ext.define('EIM.controller.Salelogs', {
         var me = this;
 
         me.control({
-            //当激活标签为“报价”时，下面的提交灰掉，而由上面的表格细节处理
-            'salelog_form>container>tabpanel': {
-                tabchange: function(tabPanel, newCard, oldCard, eOpts) {
-                    var dialog = newCard.up("salelog_form");
-                    var extra_info = dialog.down("salelog_extra_info", false);
-                    if(newCard.xtype == "quote_tab") {
-                        extra_info.disable();
-                    }else{
-                        extra_info.enable();
-                    }
-                }
-            },
+//            //当激活标签为“报价”时，下面的提交灰掉，而由上面的表格细节处理
+//            'salelog_form>container>tabpanel': {
+//                tabchange: function(tabPanel, newCard, oldCard, eOpts) {
+//                    var dialog = newCard.up("salelog_form");
+//                    var extra_info = dialog.down("salelog_extra_info", false);
+//                    if(newCard.xtype == "quote_tab") {
+//                        extra_info.disable();
+//                    }else{
+//                        extra_info.enable();
+//                    }
+//                }
+//            },
             //“确定”按钮的提交行为，要判断当前激活的是哪个标签
             'button[action=saveSalelog]': {
                 click: this.validate
@@ -196,20 +196,18 @@ Ext.define('EIM.controller.Salelogs', {
             }
             //“报价”标签的提交
             case "quote_tab": {
-                if(Ext.getStore("SalelogQuotedItems").getCount() === 0){
-                    Ext.example.msg("错误", "表格中还没有数据！");
-                }else{
+                var tab = Ext.ComponentQuery.query("quote_tab")[0];
+                if(tab.form.isValid()) {
                     //防双击
                     button.disable();
 
-                    //不管是“新增报价”还是“修改报价”，都是生成一个新的报价。二者的区别在于“修改”时可以依照以前的数据来对比
-                    var grid_data = Ext.encode(Ext.pluck(Ext.getStore("SalelogQuotedItems").data.items, "data"));
-                    var form_data = Ext.encode(Ext.ComponentQuery.query("salelog_quote_form form")[0].form.getValues());
-                    Ext.ComponentQuery.query("salelog_quote_form salelog_extra_info")[0].submit({
-                        url: 'ABC',
+                    var form_data = Ext.encode(tab.getValues());
+                    Ext.ComponentQuery.query("salelog_extra_info")[0].submit({
+                        url: 'salelogs/add_salelog_from_form',
                         params: {
-                            grid_data: grid_data,
-                            form_data: form_data
+                            "type": "quote",
+                            "form_data": form_data,
+                            "salecase_id": Ext.ComponentQuery.query("salecase_grid")[0].getSelectionModel().getSelection()[0].get("id")
                         },
                         success: me.closeAndRefresh
                     });
