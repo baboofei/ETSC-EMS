@@ -174,7 +174,7 @@ class ExpressSheet < ActiveRecord::Base
             #long_addr = receiver.send("#{params[:receiver_type]}_unit").city.prvc.name + receiver.send("#{params[:receiver_type]}_unit").city.name + receiver_addr
 
             new_sheet['unit_receivable_id'] = receiver.send("#{params['receiver_type']}_unit_id")
-            new_sheet['unit_receivable_type'] = "#{params['receiver_type'].camelcase}Unit"
+            new_sheet['unit_receivable_type'] = "#{params['receiver_type'].split("_")[0].camelcase}Unit"
             new_sheet['person_receivable_id'] = single_record['receiver_id']
             new_sheet['person_receivable_type'] = params['receiver_type'].camelcase
             #new_sheet['vestable_id'] = params["salecase_id"]

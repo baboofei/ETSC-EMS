@@ -9,44 +9,69 @@
   <!--<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">-->
   <thead>
   <tr style="background-color: #038; color: #FFF;">
-    <th>客户单位</th>
-    <th>客户</th>
-    <th>销售</th>
-    <th>工厂转入时间</th>
-    <th>初始情况</th>
-    <th>个案描述</th>
+    <th style="width: 185px;" >客户单位</th>
+    <th style="width: 55px;">客户</th>
+    <th style="width: 55px;">销售</th>
+    <th style="width: 80px;">工厂转入时间</th>
+    <th style="width: 300px;">初始情况</th>
+    <th style="width: 100px;">个案描述</th>
     <th>末次联系进展</th>
-    <th>末次联系时间</th>
-    <th>成案率</th>
+    <th style="width: 80px;">末次联系时间</th>
+    <th style="width: 30px;">成案率</th>
   </tr>
   </thead>
   <tbody>
-  <% @inquire_array.each do |inquire| %>
+  <% @inquire_array.each_with_index do |inquire, o_index| %>
       <% if inquire.customer %>
           <% salecases = inquire.customer.salecases %>
           <% salecases.each_with_index do |salecase, index| %>
               <% last_salelog = salecase.salelogs.sort_by { |p| p.contact_at }[-1] %>
-              <tr>
-                <% if index == 0 %>
-                    <% salecase_size = salecases.size %>
-                    <td rowspan=<%= salecase_size %>><%= inquire.customer.customer_unit.name %></td>
-                    <td rowspan=<%= salecase_size %>><%= inquire.customer.name %></td>
-                    <td rowspan=<%= salecase_size %>><%= inquire.customer.user.name %></td>
-                    <td rowspan=<%= salecase_size %>><%= inquire.created_at.strftime("%Y-%m-%d") %></td>
+              <tr style="border:solid #999;border-width:0 1px 1px 0;">
+                <% if o_index % 2 == 0 %>
+                    <% if index == 0 %>
+                        <% salecase_size = salecases.size %>
+                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= inquire.customer.customer_unit.name %></td>
+                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= inquire.customer.name %></td>
+                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= inquire.customer.user.name %></td>
+                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= inquire.created_at.strftime("%Y-%m-%d") %></td>
+                    <% end %>
+                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= inquire.detail %></td>
+                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= salecase.comment %></td>
+                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= raw strip_links(last_salelog['natural_language']) %><%= last_salelog['comment'].blank? ? "" : last_salelog['comment'] %></td>
+                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= last_salelog.blank? ? "有问题" : last_salelog['contact_at'].strftime("%Y-%m-%d") %></td>
+                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= salecase['feasible'] %></td>
+                <% else %>
+                    <% if index == 0 %>
+                        <% salecase_size = salecases.size %>
+                        <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= inquire.customer.customer_unit.name %></td>
+                        <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= inquire.customer.name %></td>
+                        <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= inquire.customer.user.name %></td>
+                        <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= inquire.created_at.strftime("%Y-%m-%d") %></td>
+                    <% end %>
+                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= inquire.detail %></td>
+                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= salecase.comment %></td>
+                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= raw strip_links(last_salelog['natural_language']) %><%= last_salelog['comment'].blank? ? "" : last_salelog['comment'] %></td>
+                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= last_salelog.blank? ? "有问题" : last_salelog['contact_at'].strftime("%Y-%m-%d") %></td>
+                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= salecase['feasible'] %></td>
                 <% end %>
-                <td><%= inquire.detail %></td>
-                <td><%= salecase.comment %></td>
-                <td><%= raw strip_links(last_salelog['natural_language']) %><%= last_salelog['comment'].blank? ? "" : last_salelog['comment'] %></td>
-                <td><%= last_salelog.blank? ? "有问题" : last_salelog['contact_at'].strftime("%Y-%m-%d") %></td>
-                <td><%= salecase['feasible'] %></td>
               </tr>
           <% end %>
       <% else %>
-          <td><%= inquire.customer_unit_name %></td>
-          <td><%= inquire.name %></td>
-          <td><%= inquire.user.name %></td>
-          <td><%= inquire.created_at.strftime("%Y-%m-%d") %></td>
-          <td colspan="5">未处理</td>
+          <tr style="border:solid #999;border-width:0 1px 1px 0;">
+            <% if o_index % 2 == 0 %>
+                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= inquire.customer_unit_name %></td>
+                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= inquire.name %></td>
+                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= inquire.user.name %></td>
+                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= inquire.created_at.strftime("%Y-%m-%d") %></td>
+                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" colspan="5">未处理</td>
+            <% else %>
+                <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= inquire.customer_unit_name %></td>
+                <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= inquire.name %></td>
+                <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= inquire.user.name %></td>
+                <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= inquire.created_at.strftime("%Y-%m-%d") %></td>
+                <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" colspan="5">未处理</td>
+            <% end %>
+          </tr>
       <% end %>
   <% end %>
   </tbody>

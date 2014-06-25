@@ -3,6 +3,7 @@ class CreateFunctions < ActiveRecord::Migration
         create_table :functions do |t|
             t.integer :block_id #按现在的三块权限应该就没有这一项了，先预留吧
             t.string :name
+            t.string :description
             t.string :icon_class #20120223
             t.integer :parent_function_id #假如分树形就要用这个了
             t.string :controller #要加载的Ext controller

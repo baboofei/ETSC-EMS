@@ -11,6 +11,13 @@ class BusinessContact < ActiveRecord::Base
 
     belongs_to :user
 
+    alias_method :business_contact_unit, :business_unit
+    #alias_method :business_contact_unit_id, 'business_unit_id'
+
+    def business_contact_unit_id
+        business_unit_id
+    end
+
     def self.in_unit(business_unit_id)
         where("business_unit_id = ?", "#{business_unit_id}")
     end
@@ -65,7 +72,7 @@ class BusinessContact < ActiveRecord::Base
 
     #自定义提交。因为模型复杂，估计是不可能公用了
     def self.create_or_update_with(params, user_id)
-        item = "进出口公司联系人"
+        item = "商务相关联系人"
         if params[:id] != ""
             business_contact = BusinessContact.find(params[:id])
             message = $etsc_update_ok

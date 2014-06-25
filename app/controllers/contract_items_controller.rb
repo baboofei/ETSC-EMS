@@ -20,7 +20,8 @@ class ContractItemsController < ApplicationController
     end
 
     def save_contract_item
-        result = ContractItem.create_or_update_with(params, session[:user_id])
+        is_local = judge_ip
+        result = ContractItem.create_or_update_with(params, session[:user_id], is_local)
         render :json => {:success => result[:success], :message => result[:message]}
     end
 
@@ -35,7 +36,8 @@ class ContractItemsController < ApplicationController
     end
 
     def batch_edit_contract_item
-        result = ContractItem.batch_edit_with(params, session[:user_id])
+        is_local = judge_ip
+        result = ContractItem.batch_edit_with(params, session[:user_id], is_local)
         render :json => {:success => result[:success], :message => result[:message]}
     end
 

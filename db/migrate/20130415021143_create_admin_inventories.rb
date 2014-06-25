@@ -28,6 +28,7 @@ class CreateAdminInventories < ActiveRecord::Migration
             t.integer :in_stock_source #库存物品分一部分领用或者租借时，分出那一部分的“库存源”物品
             t.integer :out_stock_source #领用或者租借的物品分一部分归还时，分出那一部分的“出库源”物品
             t.datetime :expire_at #失效日期
+            t.datetime :expire_warranty_at #过保日期
             t.integer :user_id #经手人。填写表单的人，从session里取
 
             t.timestamps

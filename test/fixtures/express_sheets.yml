@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  number: MyString
+  sender: 1
+  description: MyString
+  cost: 9.99
+  send_at: 2014-01-20
+  pdf_url: MyString
+
+two:
+  number: MyString
+  sender: 1
+  description: MyString
+  cost: 9.99
+  send_at: 2014-01-20
+  pdf_url: MyString

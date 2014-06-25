@@ -18,7 +18,7 @@ class BusinessUnitAlias < ActiveRecord::Base
     end
 
     def self.create_or_update_with(params, user_id)
-        item = "进出口公司别称"
+        item = "商务相关单位别称"
         if !params[:id].blank?
             message = $etsc_update_ok
         else

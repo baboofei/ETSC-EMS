@@ -1,6 +1,18 @@
+GIT
+  remote: https://github.com/prawnpdf/prawn.git
+  revision: 8028ca0cd2aae8c72df9fc4bf16388948423bcb2
+  ref: 8028ca0cd2
+  specs:
+    prawn (1.0.0.rc2)
+      afm
+      pdf-reader (~> 1.2)
+      ruby-rc4
+      ttfunk (~> 1.0.3)
+
 GEM
   remote: http://ruby.taobao.org/
   specs:
+    Ascii85 (1.0.2)
     actionmailer (3.2.8)
       actionpack (= 3.2.8)
       mail (~> 2.4.4)
@@ -28,6 +40,7 @@ GEM
     activesupport (3.2.8)
       i18n (~> 0.6)
       multi_json (~> 1.0)
+    afm (0.2.0)
     arel (3.0.2)
     builder (3.0.4)
     chronic (0.9.1)
@@ -44,6 +57,7 @@ GEM
     eventmachine (1.0.1)
     execjs (1.4.0)
       multi_json (~> 1.0)
+    hashery (2.1.0)
     hike (1.2.1)
     i18n (0.6.4)
     journey (1.0.4)
@@ -63,6 +77,12 @@ GEM
     mysql2 (0.3.11)
     nokogiri (1.6.0)
       mini_portile (~> 0.5.0)
+    pdf-reader (1.3.3)
+      Ascii85 (~> 1.0.0)
+      afm (~> 0.2.0)
+      hashery (~> 2.0)
+      ruby-rc4
+      ttfunk
     polyglot (0.3.3)
     pry (0.9.10)
       coderay (~> 1.0.5)
@@ -96,6 +116,7 @@ GEM
       json (~> 1.4)
     ref (1.0.2)
     ruby-ole (1.2.11.7)
+    ruby-rc4 (0.1.5)
     sass (3.2.6)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
@@ -121,6 +142,7 @@ GEM
     treetop (1.4.12)
       polyglot
       polyglot (>= 0.3.1)
+    ttfunk (1.0.3)
     tzinfo (0.3.36)
     uglifier (1.3.0)
       execjs (>= 0.3.0)
@@ -137,6 +159,7 @@ DEPENDENCIES
   jquery-rails
   mysql2 (= 0.3.11)
   nokogiri (= 1.6.0)
+  prawn!
   pry (= 0.9.10)
   rails (= 3.2.8)
   rb-readline (= 0.4.2)

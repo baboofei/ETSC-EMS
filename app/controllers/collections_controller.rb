@@ -20,7 +20,8 @@ class CollectionsController < ApplicationController
     end
 
     def save_collection
-        result = Collection.create_or_update_with(params, session[:user_id])
+        is_local = judge_ip
+        result = Collection.create_or_update_with(params, session[:user_id], is_local)
         render :json => {:success => result[:success], :message => result[:message], :total_collection => result[:total_collection]}
     end
 

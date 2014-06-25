@@ -1,0 +1,47 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  name: MyString
+  model: MyString
+  sn: MyText
+  number: MyString
+  inventory_type: 1
+  inventory_level: 1
+  keep_at: 1
+  current_quantity: 9.99
+  count_unit: MyString
+  buy_price: 9.99
+  financial_price: 9.99
+  currency_id: 1
+  rmb: 9.99
+  status: 1
+  project: MyString
+  keeper: 1
+  buyer: 1
+  ownership: 1
+  vendor_unit_id: 1
+  vendor_id: 1
+  comment: MyText
+
+two:
+  name: MyString
+  model: MyString
+  sn: MyText
+  number: MyString
+  inventory_type: 1
+  inventory_level: 1
+  keep_at: 1
+  current_quantity: 9.99
+  count_unit: MyString
+  buy_price: 9.99
+  financial_price: 9.99
+  currency_id: 1
+  rmb: 9.99
+  status: 1
+  project: MyString
+  keeper: 1
+  buyer: 1
+  ownership: 1
+  vendor_unit_id: 1
+  vendor_id: 1
+  comment: MyText

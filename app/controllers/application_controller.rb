@@ -15,4 +15,8 @@ class ApplicationController < ActionController::Base
         file = "#{Rails.root}/public/#{params[:file_type]}/#{params[:file_name]}.#{params[:format]}"
         send_file(file,:disposition => "attachment")
     end
+
+    def judge_ip
+        return request.remote_ip == "127.0.0.1"
+    end
 end

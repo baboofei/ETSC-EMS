@@ -18,6 +18,8 @@ class CreateProducts < ActiveRecord::Migration
             t.decimal :price_in_site, :precision => 12, :scale => 2
             t.integer :serial_id
             t.integer :user_id
+            t.integer :comment
+            t.boolean :is_obsolete
 
             t.timestamps
         end

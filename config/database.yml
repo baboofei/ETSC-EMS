@@ -12,12 +12,12 @@ development:
   adapter: mysql2
   encoding: utf8
   reconnect: false
-  database: ETSC_development
-  hostname: localhost
-  port: 3306
+#  database: EIMV4_production
+  database: EIMV5_development
+#  host: 172.18.10.88
   pool: 5
-  username: root
-  password: BC995625472BD
+  username: terry
+  password: etsclaser1997
   socket: /var/run/mysqld/mysqld.sock
 
 # Warning: The database defined as "test" will be erased and
@@ -28,11 +28,9 @@ test:
   encoding: utf8
   reconnect: false
   database: EIMV5_test
-  hostname: localhost
-  port: 3306
   pool: 5
-  username: terry
-  password: etsclaser1997
+  username: root
+  password:
   socket: /var/run/mysqld/mysqld.sock
 
 production:
@@ -40,9 +38,9 @@ production:
   encoding: utf8
   reconnect: false
   database: EIMV5_development
-  hostname: localhost
-  port: 3306
   pool: 5
-  username: root
-  password: 1 2 3 *#)^#
+  username: terry
+  password: etsclaser1997
   socket: /var/run/mysqld/mysqld.sock
+
+

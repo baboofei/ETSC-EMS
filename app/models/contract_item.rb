@@ -31,7 +31,7 @@ class ContractItem < ActiveRecord::Base
     end
 
     #自定义提交。因为模型复杂，估计是不可能公用了
-    def self.create_or_update_with(params, user_id)
+    def self.create_or_update_with(params, user_id, is_local)
         item = "合同项"
         fields_to_be_updated = %w(product_id serial_number quantity send_status check_and_accept_status expected_leave_factory_at
             appointed_leave_factory_at actually_leave_factory_at leave_etsc_at reach_customer_at contract_id warranty_term_id
@@ -102,24 +102,28 @@ class ContractItem < ActiveRecord::Base
                             modify_detail_array << "发货状态从#{old_contract_item[field].blank? ? "无" : Dictionary.where("data_type = ? and value = ?", field, old_contract_item[field]).first.display}修改为#{contract_item[field].blank? ? "无" : Dictionary.where("data_type = ? and value = ?", field, contract_item[field]).first.display}"
                             #签署后的改动才发消息
                             if %w(d_progressing e_complete f_cancelled).include?(contract_item.contract.state)
-                                #发已发货的消息给：
-                                #负责销售、销售经理、负责BA、BA经理、货运
-                                #在发货状态为：国际运输、货代、ETSC香港、清关中、国内运输时再额外发送给会计、财务经理--20140312。
-                                #又不要了，改为判断实际发货时间、离开东隆时间、验收时间--20140430
-                                contract = contract_item.contract
-                                target_ids = []
-                                target_ids << contract.signer.id
-                                target_ids << contract.signer.get_direct_manager_id
-                                #if [5, 6, 7, 8, 10].include?(contract_item[field].to_i)
-                                #    target_ids << User.accounting.map(&:id)
-                                #    target_ids << Department.find(2).manager_id
-                                #end
-                                target_ids << contract.dealer.id
-                                target_ids << contract.dealer.get_direct_manager_id
-                                target_ids << Role.find(18).user_ids
-                                target_ids = target_ids.flatten.uniq
+                                if is_local
+                                    #在本机上调试时只发给Terry
+                                    target_ids = [5]
+                                else
+                                    #发已发货的消息给：
+                                    #负责销售、销售经理、负责BA、BA经理、货运
+                                    #在发货状态为：国际运输、货代、ETSC香港、清关中、国内运输时再额外发送给会计、财务经理--20140312。
+                                    #又不要了，改为判断实际发货时间、离开东隆时间、验收时间--20140430
+                                    contract = contract_item.contract
+                                    target_ids = []
+                                    target_ids << contract.signer.id
+                                    target_ids << contract.signer.get_direct_manager_id
+                                    #if [5, 6, 7, 8, 10].include?(contract_item[field].to_i)
+                                    #    target_ids << User.accounting.map(&:id)
+                                    #    target_ids << Department.find(2).manager_id
+                                    #end
+                                    target_ids << contract.dealer.id
+                                    target_ids << contract.dealer.get_direct_manager_id
+                                    target_ids << Role.find(18).user_ids
+                                    target_ids = target_ids.flatten.uniq
+                                end
 
-                                #target_ids = [5] #测试用
                                 target_ids.each do |target_id|
                                     #消息通知
                                     sn = (Time.now.to_f*1000).ceil
@@ -143,12 +147,16 @@ class ContractItem < ActiveRecord::Base
                         if old_contract_item[field].to_s != contract_item[field].to_s
                             modify_detail_array << "实际发货时间从#{old_contract_item[field].blank? ? "无" : old_contract_item[field].strftime("%Y-%m-%d")}修改为#{contract_item[field].blank? ? "无" : contract_item[field].strftime("%Y-%m-%d")}"
                             contract = contract_item.contract
-                            target_ids = []
-                            target_ids << User.accounting.map(&:id)
-                            target_ids << Department.find(2).manager_id
-                            target_ids = target_ids.flatten.uniq
+                            if is_local
+                                #在本机上调试时只发给Terry
+                                target_ids = [5]
+                            else
+                                target_ids = []
+                                target_ids << User.accounting.map(&:id)
+                                target_ids << Department.find(2).manager_id
+                                target_ids = target_ids.flatten.uniq
+                            end
 
-                            #target_ids = [5] #测试用
                             target_ids.each do |target_id|
                                 #消息通知
                                 sn = (Time.now.to_f*1000).ceil
@@ -165,12 +173,16 @@ class ContractItem < ActiveRecord::Base
                         if old_contract_item[field].to_s != contract_item[field].to_s
                             modify_detail_array << "离开东隆时间从#{old_contract_item[field].blank? ? "无" : old_contract_item[field].strftime("%Y-%m-%d")}修改为#{contract_item[field].blank? ? "无" : contract_item[field].strftime("%Y-%m-%d")}"
                             contract = contract_item.contract
-                            target_ids = []
-                            target_ids << User.accounting.map(&:id)
-                            target_ids << Department.find(2).manager_id
-                            target_ids = target_ids.flatten.uniq
+                            if is_local
+                                #在本机上调试时只发给Terry
+                                target_ids = [5]
+                            else
+                                target_ids = []
+                                target_ids << User.accounting.map(&:id)
+                                target_ids << Department.find(2).manager_id
+                                target_ids = target_ids.flatten.uniq
+                            end
 
-                            #target_ids = [5] #测试用
                             target_ids.each do |target_id|
                                 #消息通知
                                 sn = (Time.now.to_f*1000).ceil
@@ -197,12 +209,16 @@ class ContractItem < ActiveRecord::Base
                             end
                             modify_detail_array << "客户验收时间从#{old_contract_item['check_and_accept_at'].blank? ? "无" : old_contract_item['check_and_accept_at'].strftime("%Y-%m-%d")}修改为#{contract_item['check_and_accept_at'].blank? ? "无" : contract_item['check_and_accept_at'].strftime("%Y-%m-%d")}"
                             contract = contract_item.contract
-                            target_ids = []
-                            target_ids << User.accounting.map(&:id)
-                            target_ids << Department.find(2).manager_id
-                            target_ids = target_ids.flatten.uniq
+                            if is_local
+                                #在本机上调试时只发给Terry
+                                target_ids = [5]
+                            else
+                                target_ids = []
+                                target_ids << User.accounting.map(&:id)
+                                target_ids << Department.find(2).manager_id
+                                target_ids = target_ids.flatten.uniq
+                            end
 
-                            #target_ids = [5] #测试用
                             target_ids.each do |target_id|
                                 #消息通知
                                 sn = (Time.now.to_f*1000).ceil
@@ -294,7 +310,7 @@ class ContractItem < ActiveRecord::Base
         return {:success => true, :message => "合同项拆分成功"}
     end
 
-    def self.batch_edit_with(params, user_id)
+    def self.batch_edit_with(params, user_id, is_local)
         #binding.pry
         contract_item_id_array = params['select_ids'].split('|')
 
@@ -357,23 +373,26 @@ class ContractItem < ActiveRecord::Base
             end
             #签署后的改动才发消息
             if %w(d_progressing e_complete f_cancelled).include?(ContractItem.find(contract_item_id_array[0]).contract.state)
-                #发已发货的消息给：
-                #负责销售、销售经理、负责BA、BA经理、货运
-                #在发货状态为：国际运输、货代、ETSC香港、清关中、国内运输时再额外发送给会计、财务经理
-                contract = ContractItem.find(contract_item_id_array[0]).contract
-                target_ids = []
-                target_ids << contract.signer.id
-                target_ids << contract.signer.get_direct_manager_id
-                if params['item'] == 'send_status' && [5, 6, 7, 8, 10].include?(params['value'].to_i)
-                    target_ids << User.accounting.map(&:id)
-                    target_ids << Department.find(2).manager_id
+                if is_local
+                    #在本机上调试时只发给Terry
+                    target_ids = [5]
+                else
+                    #发已发货的消息给：
+                    #负责销售、销售经理、负责BA、BA经理、货运
+                    #在发货状态为：国际运输、货代、ETSC香港、清关中、国内运输时再额外发送给会计、财务经理
+                    contract = ContractItem.find(contract_item_id_array[0]).contract
+                    target_ids = []
+                    target_ids << contract.signer.id
+                    target_ids << contract.signer.get_direct_manager_id
+                    if params['item'] == 'send_status' && [5, 6, 7, 8, 10].include?(params['value'].to_i)
+                        target_ids << User.accounting.map(&:id)
+                        target_ids << Department.find(2).manager_id
+                    end
+                    target_ids << contract.dealer.id
+                    target_ids << contract.dealer.get_direct_manager_id
+                    target_ids << Role.find(18).user_ids
+                    target_ids = target_ids.flatten.uniq
                 end
-                target_ids << contract.dealer.id
-                target_ids << contract.dealer.get_direct_manager_id
-                target_ids << Role.find(18).user_ids
-                target_ids = target_ids.flatten.uniq
-
-                #target_ids = [5] #测试用
 
                 target_ids.each do |target_id|
                     #消息通知

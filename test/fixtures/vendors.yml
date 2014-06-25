@@ -1,0 +1,33 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  vendor_unit_id: 1
+  name: MyString
+  en_name: MyString
+  department: MyString
+  position: MyString
+  phone: MyString
+  mobile: MyString
+  im: MyString
+  fax: MyString
+  email: MyString
+  comment: MyString
+  addr: MyString
+  postcode: MyString
+  en_addr: MyString
+
+two:
+  vendor_unit_id: 1
+  name: MyString
+  en_name: MyString
+  department: MyString
+  position: MyString
+  phone: MyString
+  mobile: MyString
+  im: MyString
+  fax: MyString
+  email: MyString
+  comment: MyString
+  addr: MyString
+  postcode: MyString
+  en_addr: MyString

@@ -63,7 +63,8 @@ class UserMailer < ActionMailer::Base
         vendor_units = VendorUnit.where("contracts.id = ? and contract_items.is_history is null", contract.id).includes(:products => {:contract_items => :contract})
         @vendor_unit_names = vendor_units.map(&:name).join("、")
         @contract_type = Dictionary.where("data_type = 'contract_type' and value = ?", contract.contract_type).first.display
-        mail(:to => User.find(to_user).etsc_email,
+
+        mail(:to => to_user.map{|p| User.find(p).etsc_email},
             :subject => "#{contract.number}-合同签署"
         )
     end
@@ -71,7 +72,7 @@ class UserMailer < ActionMailer::Base
     #签署合同时如果需要安装的邮件提醒
     def contract_install_email(contract, to_user)
         @contract = contract
-        mail(:to => User.find(to_user).etsc_email,
+        mail(:to => to_user.map{|p| User.find(p).etsc_email},
             :subject => "#{contract.number}-需要安装"
         )
     end
@@ -80,8 +81,8 @@ class UserMailer < ActionMailer::Base
     def contract_change_email(contract, to_user)
         @contract = contract
         @natural_language = ContractHistory.where("item = 'contract' and old_id = ?", contract.id).last.natural_language
-        mail(:to => User.find(to_user).etsc_email,
-            :subject => "#{contract.number}-合同变更"
+        mail(:to => to_user.map{|p| User.find(p).etsc_email},
+                  :subject => "#{contract.number}-合同变更"
         )
     end
 
@@ -199,11 +200,12 @@ class UserMailer < ActionMailer::Base
     def lead_updating_from_vendor_unit_email(inquire, to_user)
         @vendor_unit = VendorUnit.find(inquire[0])
         @inquire_array = inquire[1]
-        start_at = 2.weeks.ago.strftime("%Y-%m-%d")
-        end_at = 0.weeks.ago.strftime("%Y-%m-%d")
+        start_at = 3.weeks.ago.strftime("%Y-%m-%d")
+        #end_at = 1.weeks.ago.strftime("%Y-%m-%d")
+        real_end_at = (1.weeks.ago.strftime("%Y-%m-%d").to_date - 1).strftime("%Y-%m-%d")
         #mail(:to => "terrych@etsc-tech.com",#测试用
         mail(:to => to_user.map{|p| User.find(p).etsc_email},
-             :subject => "#{@vendor_unit.name} 需求反馈情况#{start_at}~#{end_at}"
+             :subject => "#{@vendor_unit.name} 需求反馈情况#{start_at}~#{real_end_at}"
         )
         sleep 3
     end
@@ -212,11 +214,12 @@ class UserMailer < ActionMailer::Base
     def lead_updating_from_user_email(inquire, to_user, from_user)
         @to_user = to_user
         @inquire_array = inquire
-        start_at = 2.weeks.ago.strftime("%Y-%m-%d")
-        end_at = 0.weeks.ago.strftime("%Y-%m-%d")
+        start_at = 3.weeks.ago.strftime("%Y-%m-%d")
+        #end_at = 1.weeks.ago.strftime("%Y-%m-%d")
+        real_end_at = (1.weeks.ago.strftime("%Y-%m-%d").to_date - 1).strftime("%Y-%m-%d")
         #mail(:to => "terrych@etsc-tech.com",#测试用
         mail(:to => to_user.map{|p| User.find(p).etsc_email},
-            :subject => "转给 #{from_user.name} 的需求反馈情况#{start_at}~#{end_at}"
+            :subject => "转给 #{from_user.name} 的需求反馈情况#{start_at}~#{real_end_at}"
         )
         sleep 3
     end

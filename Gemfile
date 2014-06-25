@@ -46,4 +46,4 @@ gem 'jquery-rails'
 gem 'pry', '0.9.10', :group => :development
 #gem "prawn", :path => 'vendor/prawn'
 #gem 'prawn', '0.12.0'
-#gem 'prawn', :git => "https://github.com/prawnpdf/prawn.git", :ref => '8028ca0cd2'
+gem 'prawn', :git => "https://github.com/prawnpdf/prawn.git", :ref => '8028ca0cd2'

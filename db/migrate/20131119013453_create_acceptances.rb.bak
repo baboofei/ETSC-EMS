@@ -1,0 +1,18 @@
+class CreateAcceptances < ActiveRecord::Migration
+    def change
+        create_table :acceptances do |t|
+            t.integer :flow_sheet_id
+            t.integer :product_id
+            t.string :sn
+            t.string :breakdown #故障描述
+            t.date :accepted_at #收货日期
+            t.boolean :is_in_warranty
+            t.string :collect_account_number
+            t.boolean :is_packaged
+            t.boolean :is_sent_back
+            t.string :comment
+
+            t.timestamps
+        end
+    end
+end

@@ -3,7 +3,6 @@ class CreateVendorUnits < ActiveRecord::Migration
         create_table :vendor_units do |t|
             t.string :name
             t.string :en_name
-            t.string :short_name
             t.string :short_code
             t.datetime :established_at #创立时间
             t.integer :scale #企业人数
@@ -32,6 +31,9 @@ class CreateVendorUnits < ActiveRecord::Migration
             t.string :product_quality #产品质量
             t.string :service_quality #服务品质
             t.string :delivery_quality #发货速度
+            t.string :price_quality #价格贵贱
+            t.integer :parent_id
+            t.boolean :does_inherit
             t.timestamps
         end
     end

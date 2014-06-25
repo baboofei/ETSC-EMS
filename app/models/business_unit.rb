@@ -49,7 +49,7 @@ class BusinessUnit < ActiveRecord::Base
     #自定义提交。因为模型复杂，估计是不可能公用了
     def self.create_or_update_with(params, user_id)
         #binding.pry
-        item = "进出口公司"
+        item = "商务相关单位"
         if !params[:id].blank?
             #修改时判断重名要看name和id
             if BusinessUnit.where("name = ? and id != ?", params['name|en_name|unit_aliases>unit_alias'], params[:id]).size > 0

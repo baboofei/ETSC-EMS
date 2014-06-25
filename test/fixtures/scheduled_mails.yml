@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  sender: 1
+  receiver: 1
+  mailed_at: 2013-04-11
+  mail_type: MyString
+
+two:
+  sender: 1
+  receiver: 1
+  mailed_at: 2013-04-11
+  mail_type: MyString

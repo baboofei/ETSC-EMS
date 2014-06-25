@@ -1,0 +1,39 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  number: MyString
+  flow_sheet_type: 1
+  support_user_id: 1
+  duration: MyString
+  customer_unit_id: 1
+  customer_id: 1
+  description: MyString
+  state: MyString
+  priority: 1
+  is_in_warranty: false
+  contract_id: 1
+  comment: MyString
+  deliver_by: 1
+  deal_requirement: 1
+  Delivery: MyString
+  according: MyString
+  to: MyString
+
+two:
+  number: MyString
+  flow_sheet_type: 1
+  support_user_id: 1
+  duration: MyString
+  customer_unit_id: 1
+  customer_id: 1
+  description: MyString
+  state: MyString
+  priority: 1
+  is_in_warranty: false
+  contract_id: 1
+  comment: MyString
+  deliver_by: 1
+  deal_requirement: 1
+  Delivery: MyString
+  according: MyString
+  to: MyString

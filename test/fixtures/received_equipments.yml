@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  flow_sheet_id: 1
+  product_id: 1
+  sn: MyString
+  breakdown_description: MyString
+  symptom: MyString
+  accepted_at: 2013-11-28
+  is_in_warranty: false
+  collect_account_number: MyString
+  is_packaged: false
+  is_sent_back: false
+  comment: MyString
+
+two:
+  flow_sheet_id: 1
+  product_id: 1
+  sn: MyString
+  breakdown_description: MyString
+  symptom: MyString
+  accepted_at: 2013-11-28
+  is_in_warranty: false
+  collect_account_number: MyString
+  is_packaged: false
+  is_sent_back: false
+  comment: MyString

@@ -9,6 +9,7 @@ class CreateOurCompanies < ActiveRecord::Migration
       t.string :fax
       t.string :site
       t.text :bank_info #银行信息，因为还挺复杂的，可能将来要拆成几个字段
+      t.text :vat_info #增值税信息
       t.boolean :use_for_contract
 
       t.timestamps

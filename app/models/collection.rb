@@ -21,7 +21,7 @@ class Collection < ActiveRecord::Base
     end
 
     #自定义提交。因为模型复杂，估计是不可能公用了
-    def self.create_or_update_with(params, user_id)
+    def self.create_or_update_with(params, user_id, is_local)
         item = "实收款项"
         #因为要存历史，所以每个都是新增
         #binding.pry
@@ -54,28 +54,32 @@ class Collection < ActiveRecord::Base
 
             #签署后的改动才发消息
             if %w(d_progressing e_complete f_cancelled).include?(contract.state)
-                #发已收到款项的消息给：
-                target_ids = []
-                #负责BA、BA经理、货运、会计、出纳、财务经理，这些是公共的
-                target_ids << contract.dealer.id
-                target_ids << contract.dealer.get_direct_manager_id
-                target_ids << User.freighter.map(&:id)
-                target_ids << User.accounting.map(&:id)
-                target_ids << User.cashier.map(&:id)
-                target_ids << Department.find(2).manager_id
-                if [1, 3].include? contract['contract_type'].to_i
-                    #合同类型是“销售合同”或者“租借/试用合同”时→负责工程师、负责经理，如果负责工程师是TSD的则加上技术助理
-                    target_ids << contract.signer.id
-                    target_ids << contract.signer.get_direct_manager_id
-                    target_ids << User.supporter_assistant.map(&:id) if User.supporter.map(&:id).include? (contract.signer.id)
+                if is_local
+                    #在本机上调试时只发给Terry
+                    target_ids = [5]
                 else
-                    #合同类型是“服务合同”时→技术经理、技术助理
-                    target_ids << Department.find(4).manager_id
-                    target_ids << User.supporter_assistant.map(&:id)
+                    #发已收到款项的消息给：
+                    target_ids = []
+                    #负责BA、BA经理、货运、会计、出纳、财务经理，这些是公共的
+                    target_ids << contract.dealer.id
+                    target_ids << contract.dealer.get_direct_manager_id
+                    target_ids << User.freighter.map(&:id)
+                    target_ids << User.accounting.map(&:id)
+                    target_ids << User.cashier.map(&:id)
+                    target_ids << Department.find(2).manager_id
+                    if [1, 3].include? contract['contract_type'].to_i
+                        #合同类型是“销售合同”或者“租借/试用合同”时→负责工程师、负责经理，如果负责工程师是TSD的则加上技术助理
+                        target_ids << contract.signer.id
+                        target_ids << contract.signer.get_direct_manager_id
+                        target_ids << User.supporter_assistant.map(&:id) if User.supporter.map(&:id).include? (contract.signer.id)
+                    else
+                        #合同类型是“服务合同”时→技术经理、技术助理
+                        target_ids << Department.find(4).manager_id
+                        target_ids << User.supporter_assistant.map(&:id)
+                    end
+                    target_ids = target_ids.flatten.uniq
                 end
-                target_ids = target_ids.flatten.uniq
 
-                #target_ids = [5] #测试用
                 target_ids.each do |target_id|
                     #消息通知
                     sn = (Time.now.to_f*1000).ceil

@@ -9,6 +9,8 @@ class CreateBusinessContacts < ActiveRecord::Migration
             t.string :fax
             t.string :email
             t.string :addr
+            t.string :en_addr
+            t.string :postcode
             t.string :im
             t.string :department
             t.string :position

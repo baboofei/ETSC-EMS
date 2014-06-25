@@ -43,7 +43,8 @@ class ContractsController < ApplicationController
     end
 
     def process_workflow
-        result = Contract.create_or_update_with(params, session[:user_id])
+        is_local = judge_ip
+        result = Contract.create_or_update_with(params, session[:user_id], is_local)
         render :json => {:success => result[:success], :message => result[:message]}
     end
 
@@ -63,7 +64,8 @@ class ContractsController < ApplicationController
     end
 
     def update_contract_info
-        result = Contract.update_contract_info_with(params, session[:user_id])
+        is_local = judge_ip
+        result = Contract.update_contract_info_with(params, session[:user_id], is_local)
         render :json => {:success => result[:success], :message => result[:message]}
     end
 

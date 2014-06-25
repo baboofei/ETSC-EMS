@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  date: 2013-07-10
+  eur: 9.99
+  gbp: 9.99
+  usd: 9.99
+  cad: 9.99
+  jpy: 
+
+two:
+  date: 2013-07-10
+  eur: 9.99
+  gbp: 9.99
+  usd: 9.99
+  cad: 9.99
+  jpy: 

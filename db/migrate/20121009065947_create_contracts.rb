@@ -28,11 +28,13 @@ class CreateContracts < ActiveRecord::Migration
             t.decimal :total_collection, :precision => 10, :scale => 2
             t.text :comment
             t.integer :quote_id
-            t.integer :salelog_id
+            t.integer :salelog_id #TODO 用多态，这个可以干掉
             t.integer :contract_type
             t.integer :group_id
             t.datetime :signed_at #签署时间，和填写时间不一定一样
             t.datetime :invoiced_at #开票时间
+
+            t.references :contractable, :polymorphic => true
 
             t.timestamps
         end

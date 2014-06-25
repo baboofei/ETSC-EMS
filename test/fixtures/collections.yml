@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  received_at: 2013-07-19
+  amount: 9.99
+  contract_id: 1
+  reason: MyText
+  user_id: 1
+
+two:
+  received_at: 2013-07-19
+  amount: 9.99
+  contract_id: 1
+  reason: MyText
+  user_id: 1

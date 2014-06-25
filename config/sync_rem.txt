@@ -1,0 +1,40 @@
+
+admin_inventory.rb文件里的
+        #to_user = User.find(data[0]["buyer>id"])
+        #UserMailer.stock_in_pdf_email(to_user, "#{Date.today.strftime("%Y-%m-%d")}入库单PDF", attachment_array).deliver
+去掉注释
+有两处，入库和退货的
+
+--------------
+从log里“捞”丢失的报价项
+
+1.找到POST里带"tree"的一段
+2.把 \" 替换成 "
+3.把 : 替换成 =>
+4.把 null 替换成 "null"
+5.这时应该得到一个Hash数组
+6.执行下面程序
+
+z = [{"id"=>1,"quote_id"=>1601,"inner_id"=>"1","description"=>"FM120 for high power applications The FM120HP has a rotation unit (7500 rpm) for the measurement tip as 2 linear axis (8 mm and 120 mm). This results in a measurement range for beams of 0.1 to 5 mm with Rayleigh length up to 25 mm.","product_id"=>3104,"product_model"=>"FM120HP \\u6fc0\\u5149\\u7126\\u70b9\\u5206\\u6790\\u4eea [101-000-004]","product_name"=>"","vendor_unit_id"=>100,"vendor_unit_name"=>"PRIMES GmbH","quantity"=>1,"quantity_2"=>0,"original_unit_price"=>20980,"original_currency_id"=>12,"original_currency_name"=>"EUR","original_exchange_rate"=>830,"times_1"=>2,"divide_1"=>0,"currency_id"=>12,"currency_name"=>"EUR","exchange_rate"=>830,"unit_price"=>41960,"discount"=>0,"discount_to"=>41960,"custom_tax"=>0.1,"total"=>41960,"is_leaf"=>false,"leaf"=>true,"times_2"=>0,"divide_2"=>0,"system_price"=>0,"system_discount"=>0,"item_total_amount"=>0,"item_total_currency_id"=>0,"parent_id"=>0,"parentId"=>"null","index"=>0,"depth"=>1,"expanded"=>false,"expandable"=>true,"checked"=>"null","cls"=>"","iconCls"=>"","icon"=>"","root"=>false,"isLast"=>false,"isFirst"=>true,"allowDrop"=>true,"allowDrag"=>true,"loaded"=>false,"loading"=>false,"href"=>"","hrefTarget"=>"","qtip"=>"","qtitle"=>""},{"id"=>2,"quote_id"=>1601,"inner_id"=>"2","description"=>"Detector unit for the analysis of NIR/VIS-radiation with photodiode, magnification 1 and\\n15, wavelength range 0.4 to 1.1 \\u03bcm","product_id"=>3100,
+    "product_model"=>"Detector unit DFY-2 \\u6fc0\\u5149\\u7126\\u70b9\\u5206\\u6790\\u4eea\\u914d\\u4ef6 [101-001-021]","product_name"=>"","vendor_unit_id"=>100,"vendor_unit_name"=>"PRIMES GmbH","quantity"=>1,"quantity_2"=>0,"original_unit_price"=>1395,"original_currency_id"=>12,"original_currency_name"=>"EUR","original_exchange_rate"=>830,"times_1"=>2,"divide_1"=>0,"currency_id"=>12,"currency_name"=>"EUR","exchange_rate"=>830,"unit_price"=>2790,"discount"=>0,"discount_to"=>2790,"custom_tax"=>0.1,"total"=>2790,"is_leaf"=>false,"leaf"=>true,"times_2"=>0,"divide_2"=>0,"system_price"=>0,"system_discount"=>0,"item_total_amount"=>0,"item_total_currency_id"=>0,"parent_id"=>0,"parentId"=>"null","index"=>1,"depth"=>1,"expanded"=>false,"expandable"=>true,"checked"=>"null","cls"=>"","iconCls"=>"","icon"=>"","root"=>false,"isLast"=>false,"isFirst"=>false,"allowDrop"=>true,"allowDrag"=>true,"loaded"=>false,"loading"=>false,"href"=>"","hrefTarget"=>"","qtip"=>"",
+    "qtitle"=>""},{"id"=>3,"quote_id"=>1601,"inner_id"=>"3","description"=>"Tip FM highdiv YAG Tip for the analysis of high power solid state-lasers, damage threshold up to 10 MW/cm2 (7500 rpm and He shielding gas, power up to 5 kW)","product_id"=>3095,"product_model"=>"Tip FM YAG \\u6fc0\\u5149\\u7126\\u70b9\\u5206\\u6790\\u4eea\\u914d\\u4ef6 [101-002-202]","product_name"=>"","vendor_unit_id"=>100,"vendor_unit_name"=>"PRIMES GmbH","quantity"=>1,"quantity_2"=>0,"original_unit_price"=>998,"original_currency_id"=>12,"original_currency_name"=>"EUR","original_exchange_rate"=>830,"times_1"=>2,"divide_1"=>0,"currency_id"=>12,"currency_name"=>"EUR","exchange_rate"=>830,"unit_price"=>2000,"discount"=>0,"discount_to"=>2000,"custom_tax"=>0.1,"total"=>2000,"is_leaf"=>false,"leaf"=>true,"times_2"=>0,"divide_2"=>0,"system_price"=>0,"system_discount"=>0,"item_total_amount"=>0,"item_total_currency_id"=>0,"parent_id"=>0,"parentId"=>"null","index"=>2,"depth"=>1,"expanded"=> false,"expandable"=>true,"checked"=>"null","cls"=>"","iconCls"=>"","icon"=>"","root"=>false,"isLast"=>false,"isFirst"=>false,"allowDrop"=>true,"allowDrag"=>true,"loaded"=>false,"loading"=>false,"href"=>"","hrefTarget"=>"","qtip"=>"","qtitle"=>""},{"id"=>4,"quote_id"=>1601,"inner_id"=>"4","description"=>"Travel case FM120","product_id"=>3088,"product_model"=>"FM120-TC \\u6fc0\\u5149\\u7126\\u70b9\\u5206\\u6790\\u4eea\\u914d\\u4ef6 [101-003-002]","product_name"=>"","vendor_unit_id"=>100,"vendor_unit_name"=>"PRIMES GmbH","quantity"=>1,"quantity_2"=>0,"original_unit_price"=>630,"original_currency_id"=>12,"original_currency_name"=>"EUR","original_exchange_rate"=>830,"times_1"=>2,"divide_1"=>0,"currency_id"=>12,"currency_name"=>"EUR","exchange_rate"=>830,"unit_price"=>1260,"discount"=>0,"discount_to"=>1260,"custom_tax"=>0.1,"total"=>1260,"is_leaf"=>false,"leaf"=>true,"times_2"=>0,"divide_2"=>0,"system_price"=>0,"system_discount"=>0,
+    "item_total_amount"=>0,"item_total_currency_id"=>0,"parent_id"=>0,"parentId"=>"null","index"=>3,"depth"=>1,"expanded"=>false,"expandable"=>true,"checked"=>"null","cls"=>"","iconCls"=>"","icon"=>"","root"=>false,"isLast"=>false,"isFirst"=>false,"allowDrop"=>true,"allowDrag"=>true,"loaded"=>false,"loading"=>false,"href"=>"","hrefTarget"=>"","qtip"=>"","qtitle"=>""},{"id"=>5,"quote_id"=>1601,"inner_id"=>"5","description"=>"Power supply + converter for FM","product_id"=>3081,"product_model"=>"FM PS-CV \\u6fc0\\u5149\\u7126\\u70b9\\u5206\\u6790\\u4eea\\u914d\\u4ef6 [101-005-002]","product_name"=>"","vendor_unit_id"=>100,"vendor_unit_name"=>"PRIMES GmbH","quantity"=>1,"quantity_2"=>0,"original_unit_price"=>1050,"original_currency_id"=>12,"original_currency_name"=>"EUR","original_exchange_rate"=>830,"times_1"=>2,"divide_1"=>0,"currency_id"=>12,"currency_name"=>"EUR","exchange_rate"=>830,"unit_price"=>2100,"discount"=>0,"discount_to"=>2100,"custom_tax"=>0.1,
+    "total"=>2100,"is_leaf"=>false,"leaf"=>true,"times_2"=>0,"divide_2"=>0,"system_price"=>0,"system_discount"=>0,"item_total_amount"=>0,"item_total_currency_id"=>0,"parent_id"=>0,"parentId"=>"null","index"=>4,"depth"=>1,"expanded"=>false,"expandable"=>true,"checked"=>"null","cls"=>"","iconCls"=>"","icon"=>"","root"=>false,"isLast"=>false,"isFirst"=>false,"allowDrop"=>true,"allowDrag"=>true,"loaded"=>false,"loading"=>false,"href"=>"","hrefTarget"=>"","qtip"=>"","qtitle"=>""},{"id"=>6,"quote_id"=>1601,"inner_id"=>"6","description"=>"10 m RS485 bus cable for FM","product_id"=>3080,"product_model"=>"FM RS485 \\u6fc0\\u5149\\u7126\\u70b9\\u5206\\u6790\\u4eea\\u914d\\u4ef6 [101-005-004]","product_name"=>"","vendor_unit_id"=>100,"vendor_unit_name"=>"PRIMES GmbH","quantity"=>1,"quantity_2"=>0,"original_unit_price"=>95,"original_currency_id"=>12,"original_currency_name"=>"EUR","original_exchange_rate"=>830,"times_1"=>2,"divide_1"=>0,"currency_id"=>12,
+    "currency_name"=>"EUR","exchange_rate"=>830,"unit_price"=>190,"discount"=>0,"discount_to"=>190,"custom_tax"=>0.1,"total"=>190,"is_leaf"=>false,"leaf"=>true,"times_2"=>0,"divide_2"=>0,"system_price"=>0,"system_discount"=>0,"item_total_amount"=>0,"item_total_currency_id"=>0,"parent_id"=>0,"parentId"=>"null","index"=>5,"depth"=>1,"expanded"=>false,"expandable"=>true,"checked"=>"null","cls"=>"","iconCls"=>"","icon"=>"","root"=>false,"isLast"=>true,"isFirst"=>false,"allowDrop"=>true,"allowDrag"=>true,"loaded"=>false,"loading"=>false,"href"=>"","hrefTarget"=>"","qtip"=>"","qtitle"=>""}]
+
+useless = %w(id vendor_unit_name original_currency_name currency_name is_leaf parentId index depth expanded expandable checked cls iconCls icon root isLast isFirst allowDrop allowDrag loaded loading href hrefTarget qtip qtitle)
+
+z.each do |zz|
+    useless.each { |p| zz.delete(p) }
+    p zz["original_unit_price"]
+    zz["description"] = zz["description"].gsub(/\\u([a-z0-9]+)/){|p| [$1.to_i(16)].pack("U")}
+    zz["product_model"] = zz["product_model"].gsub(/\\u([a-z0-9]+)/){|p| [$1.to_i(16)].pack("U")}
+    quote_item = QuoteItem.new(zz)
+    p quote_item.original_unit_price
+    p quote_item.save
+end
+
+7.改对应的quote_id
+
+
+

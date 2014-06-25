@@ -163,88 +163,84 @@ LEFT JOIN users AS u2 ON gu2.user_id = u2.id").map(&:id) if sale.groups.to_s.mat
     #TODO 以下几个可以弄一个namespace，但还未定名称
     desc '发送工厂两周内的需求反馈邮件'
     task :send_p_inquire_updating_mail => :environment do
-        if Time.now.strftime("%U").to_i % 2 == 1
-            start_at = 2.weeks.ago.strftime("%Y-%m-%d")
-            end_at = 0.weeks.ago.strftime("%Y-%m-%d")
+        start_at = 3.weeks.ago.strftime("%Y-%m-%d")
+        end_at = 1.weeks.ago.strftime("%Y-%m-%d")
 
-            p_inquires = PInquire.where("created_at >= ? and created_at < ?", start_at, end_at)
-            p_inquires.group_by(&:vendor_unit_id).each do |inquire|
-                #测试， 发给terry
-                target_ids = [5]
-                #正式，发给对应工厂的采购
-                vendor_unit_id = inquire[0]
-                target_ids = VendorUnit.find(vendor_unit_id).purchasers.map(&:id)
+        p_inquires = PInquire.where("created_at >= ? and created_at < ?", start_at, end_at)
+        p_inquires.group_by(&:vendor_unit_id).each do |inquire|
+            #测试， 发给terry
+            target_ids = [5]
+            #正式，发给对应工厂的采购
+            vendor_unit_id = inquire[0]
+            target_ids = VendorUnit.find(vendor_unit_id).purchasers.map(&:id)
 
-                UserMailer.lead_updating_from_vendor_unit_email(inquire, target_ids).deliver
-                p "发送完毕"
-            end
+            UserMailer.lead_updating_from_vendor_unit_email(inquire, target_ids).deliver
+            p "#{VendorUnit.find(vendor_unit_id).name} 发送完毕"
         end
     end
 
     desc '发送市场两周内的需求反馈邮件'
     task :send_m_inquire_updating_mail => :environment do
-        if Time.now.strftime("%U").to_i % 2 == 1
-            start_at = 2.weeks.ago.strftime("%Y-%m-%d")
-            end_at = 0.weeks.ago.strftime("%Y-%m-%d")
+        start_at = 3.weeks.ago.strftime("%Y-%m-%d")
+        end_at = 1.weeks.ago.strftime("%Y-%m-%d")
 
-            m_inquires = MInquire.where("created_at >= ? and created_at < ?", start_at, end_at)
-            mail_inquires =[]
-            m_inquires.each do |inquire|
-                #binding.pry
-                if inquire.customer.blank?
-                    #如果未处理，则以需求本身的user_id也就是首次被转让给的user_id为准
-                    mail_inquires << Hash[inquire.user_id => inquire]
-                else
-                    #如果被处理成客户了，则以客户的user_id为准
-                    #但注意如果是被设置了组的客户，则给每个组员都要发一份
-                    if inquire.customer.group
-                        inquire.customer.group.users.each do |user|
-                            mail_inquires << Hash[inquire.user_id => inquire]
-                        end
-                    else
-                        mail_inquires << Hash[inquire.customer.user_id => inquire]
+        m_inquires = MInquire.where("created_at >= ? and created_at < ?", start_at, end_at)
+        mail_inquires =[]
+        m_inquires.each do |inquire|
+            #binding.pry
+            if inquire.customer.blank?
+                #如果未处理，则以需求本身的user_id也就是首次被转让给的user_id为准
+                mail_inquires << Hash[inquire.user_id => inquire]
+            else
+                #如果被处理成客户了，则以客户的user_id为准
+                #但注意如果是被设置了组的客户，则给每个组员都要发一份
+                if inquire.customer.group
+                    inquire.customer.group.users.each do |user|
+                        mail_inquires << Hash[user.id => inquire]
                     end
+                else
+                    mail_inquires << Hash[inquire.customer.user_id => inquire]
                 end
             end
-            #binding.pry
+        end
+        #binding.pry
 
-            #再加上PInquire的
-            p_inquires = PInquire.where("created_at >= ? and created_at < ?", start_at, end_at)
-            p_inquires.each do |inquire|
-                #binding.pry
-                if inquire.customer.blank?
-                    #如果未处理，则以需求本身的user_id也就是首次被转让给的user_id为准
-                    mail_inquires << Hash[inquire.user_id => inquire]
-                else
-                    #如果被处理成客户了，则以客户的user_id为准
-                    #但注意如果是被设置了组的客户，则给每个组员都要发一份
-                    if inquire.customer.group
-                        inquire.customer.group.users.each do |user|
-                            mail_inquires << Hash[inquire.user_id => inquire]
-                        end
-                    else
-                        mail_inquires << Hash[inquire.customer.user_id => inquire]
+        #再加上PInquire的
+        p_inquires = PInquire.where("created_at >= ? and created_at < ?", start_at, end_at)
+        p_inquires.each do |inquire|
+            #binding.pry
+            if inquire.customer.blank?
+                #如果未处理，则以需求本身的user_id也就是首次被转让给的user_id为准
+                mail_inquires << Hash[inquire.user_id => inquire]
+            else
+                #如果被处理成客户了，则以客户的user_id为准
+                #但注意如果是被设置了组的客户，则给每个组员都要发一份
+                if inquire.customer.group
+                    inquire.customer.group.users.each do |user|
+                        mail_inquires << Hash[inquire.user_id => inquire]
                     end
+                else
+                    mail_inquires << Hash[inquire.customer.user_id => inquire]
                 end
             end
+        end
+        #binding.pry
+        #mail_inquires.group
+        #grouped_inquires = mail_inquires.group_by(&:keys)
+        #size = mail_inquires.group_by(&:keys).map{|p| [p[0], p[1].size]}
+
+        mail_inquires.group_by(&:keys).each do |inquire|
             #binding.pry
-            #mail_inquires.group
-            #grouped_inquires = mail_inquires.group_by(&:keys)
-            #size = mail_inquires.group_by(&:keys).map{|p| [p[0], p[1].size]}
+            target_ids = inquire[0]
+            target_ids << User.find(inquire[0][0]).get_all_manager_ids
+            target_ids.flatten!
+            target_ids.uniq!
+            target_ids.reject!(&:blank?)
 
-            mail_inquires.group_by(&:keys).each do |inquire|
-                #binding.pry
-                target_ids = inquire[0]
-                target_ids << User.find(inquire[0][0]).get_all_manager_ids
-                target_ids.flatten!
-                target_ids.uniq!
-                target_ids.reject!(&:blank?)
-
-                target_ids -= [1]#先不发给boss以免不必要的麻烦……
-                #binding.pry
-                UserMailer.lead_updating_from_user_email(inquire[1].map { |p| p.values[0] }, target_ids, User.find(inquire[0][0])).deliver
-                p "发送完毕"
-            end
+            target_ids -= [1]#先不发给boss以免不必要的麻烦……
+                             #binding.pry
+            UserMailer.lead_updating_from_user_email(inquire[1].map { |p| p.values[0] }, target_ids, User.find(inquire[0][0])).deliver
+            p "#{User.find(inquire[0][0]).name} 发送完毕"
         end
     end
 
