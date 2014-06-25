@@ -21,3 +21,6 @@
 
 # Ignore IDE files
 /.idea/*
+
+# Ignore PDF files that arn't necessary
+/*.pdf
