@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140403002211) do
+ActiveRecord::Schema.define(:version => 20140625084338) do
 
   create_table "admin_inventories", :force => true do |t|
     t.string   "name"
@@ -986,6 +986,28 @@ ActiveRecord::Schema.define(:version => 20140403002211) do
     t.string   "mail_type"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+  end
+
+  create_table "serial_relationships", :force => true do |t|
+    t.integer  "main_serial_id"
+    t.integer  "related_serial_id"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
+  end
+
+  create_table "serials", :force => true do |t|
+    t.string   "brief"
+    t.string   "name"
+    t.integer  "type_id"
+    t.text     "description"
+    t.text     "application_in_site"
+    t.text     "parameter_in_site"
+    t.text     "feature"
+    t.boolean  "is_recommend"
+    t.boolean  "is_display"
+    t.integer  "user_id"
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
   end
 
   create_table "service_logs", :force => true do |t|

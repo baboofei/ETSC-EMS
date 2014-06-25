@@ -7,7 +7,7 @@ class Product < ActiveRecord::Base
 
     belongs_to :seller, :class_name => 'VendorUnit', :foreign_key => 'seller_vendor_unit_id'#销售厂家
     belongs_to :producer, :class_name => 'VendorUnit', :foreign_key => 'producer_vendor_unit_id'#生产厂家
-    #belongs_to :serial
+    belongs_to :serial
     
     #产品被推荐和销售日志的多对多
     has_many :recommended_products_salelogs, :class_name => 'RecommendedProductsSalelog', :foreign_key => 'product_id'

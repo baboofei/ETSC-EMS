@@ -1,0 +1,25 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  brief: MyString
+  name: MyString
+  type_id: 1
+  description: MyText
+  application_in_site: MyText
+  parameter_in_site: MyText
+  feature: MyText
+  is_recommend: false
+  is_display: false
+  user_id: 1
+
+two:
+  brief: MyString
+  name: MyString
+  type_id: 1
+  description: MyText
+  application_in_site: MyText
+  parameter_in_site: MyText
+  feature: MyText
+  is_recommend: false
+  is_display: false
+  user_id: 1

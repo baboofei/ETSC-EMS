@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  main_serial_id: 1
+  related_serial_id: 1
+
+two:
+  main_serial_id: 1
+  related_serial_id: 1
