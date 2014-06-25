@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+</head>
+<body>
+
+<h3>查询产品：<%= @product_name_array.join("、") %></h3>
+<table style="border:1px solid #038; width: 1000px; position: static; z-index: auto; ">
+  <!--<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">-->
+  <thead>
+  <tr style="background-color: #038; color: #FFF;">
+    <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
+    <th>报价单号</th>
+    <th>报价时间</th>
+    <th>客户单位</th>
+    <th>客户</th>
+    <th>日志最新进展</th>
+    <th>最新进展时间</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @quotes.each do |quote| %>
+      <tr>
+        <td><%= quote.number %></td>
+        <td><%= quote.created_at.strftime("%Y-%m-%d") %></td>
+        <td><%= quote.customer_unit.name %></td>
+        <td><%= quote.customer.name %></td>
+        <td><%= raw strip_links(quote.salelog.salecase.salelogs.last.natural_language) %></td>
+        <td><%= quote.salelog.salecase.salelogs.last.created_at.strftime("%Y-%m-%d") %></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>
+
+</body>
+</html>

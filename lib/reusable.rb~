@@ -1,0 +1,177 @@
+# encoding: utf-8
+module Reusable
+    extend ActiveSupport::Concern
+
+    included do
+        # Add a "search" scope to the models
+        # 别人的例子
+        #def self.search (search)
+        #    if search
+        #        where('comment LIKE ?', "%#{search}%")
+        #    else
+        #        scoped
+        #    end
+        #end
+
+        def self.get_available_data(store_name, user_id)
+            #binding.pry
+            store = Store.find_by_name(store_name)
+            user = User.find(user_id)
+            if store
+                if (store.visible_to_roles & user.roles).size > 0
+                    #全部可见并全部可改的角色，返回所有数据
+                    return where(true)
+                elsif (store.editable_to_roles & user.roles).size > 0
+                    #全部可见并全部不可改的角色，返回所有数据
+                    return where(true)
+                elsif (store.partial_editable_to_roles & user.roles).size > 0
+                    #部分可见部分可改的角色，判断是否继承
+                    if store.is_hierarchy?
+                        #继承的话返回所有“成员”的id数组
+                        member_ids = user.get_all_member_ids
+                    else
+                        #非继承的话返回自己的id构成的数组
+                        member_ids = [user_id]
+                    end
+                    #如果store有group_id的属性，则带上user_id属性，去查自己是否在该工作组
+                    #否则不管
+                    #if eval(store_name).column_names.include? "group_id"
+                        return get_data_from_members(member_ids.flatten.uniq, user_id)
+                    #else
+                    #    return get_data_from_members(member_ids.flatten.uniq)
+                    #end
+                    #
+                    ##再加上自己所属工作组成员的id数组，如果有工作组的话
+                    #member_ids += user.get_group_mate_ids
+                else
+                    #未分配的角色，返回空集
+                    return where(false)
+                end
+            else
+                return where(false)
+            end
+        end
+
+        #按页面传来的过滤条件取数据，含跨表
+        def self.filter_by(filter)
+            #binding.pry
+            if filter
+                filter_array = JSON.parse(filter)
+                result = self
+                filter_array.each { |i_filter|
+                    #binding.pry
+                    case i_filter['comparison']
+                        when 'lt'
+                            comparison = "<"
+                        when 'gt'
+                            comparison = ">"
+                        when 'eq'
+                            comparison = "="
+                    end
+
+                    filter_field_array = i_filter['field'].split("|")
+                    if filter_field_array.size > 1
+                        #要跨表时，includes/joins的是映射名，但where/order语句里是实际表的名称，所以要处理一下
+                        #映射在前，实际表在后，中间用“:”连接
+                        #分成两个表
+                        join_table_array = []
+                        where_table_array = []
+                        filter_field_array[0..-2].each { |p|
+                            if p.split(":").size > 1
+                                #如果有冒号分隔，说明二者不一样
+                                join_table_array << p.split(":")[0]
+                                where_table_array << p.split(":")[1]
+                            else
+                                join_table_array << p
+                                where_table_array << p
+                            end
+                        }
+
+                        join_table = join_table_array.to_link_table_hash
+                        search_table = where_table_array[-1].pluralize
+                        result = result.includes(join_table)
+                    else
+                        search_table = table_name.pluralize
+                    end
+                    #最后一项表示字段
+                    search_field = filter_field_array[-1]
+                    binding.pry
+
+                    case i_filter['type']
+                        when 'string'
+                            result = result.where("#{search_table}.#{search_field} like ?", "%#{i_filter['value']}%")
+                        when 'list'
+                            list_array = i_filter['value'].split(",")
+                            result = result.where("#{search_table}.#{search_field} in (#{list_array.map{|p| "?"}.join(",")})", *list_array)
+                        when 'numeric'
+                            result = result.where("#{search_table}.#{search_field} #{comparison} #{i_filter['value']}")
+                        when 'date'
+                            result = result.where("#{search_table}.#{search_field} #{comparison} ?", i_filter['value'])
+                    end
+                }
+            else
+                result = self.where(true)
+            end
+            #binding.pry
+            return result
+        end
+
+        #按页面传来的排序方式远程排序，含跨表
+        def self.sort_by(sort)
+            if sort
+                sort_array = JSON.parse(sort)
+                result = self
+                sort_array.each { |sort|
+                    sort_field_array = sort['property'].split("|")
+                    if sort_field_array.size > 1
+                        #要跨表时，includes/joins的是映射名，但where/order语句里是实际表的名称，所以要处理一下
+                        #映射在前，实际表在后，中间用“:”连接
+                        #分成两个表
+                        join_table_array = []
+                        where_table_array = []
+                        sort_field_array[0..-2].each { |p|
+                            if p.split(":").size > 1
+                                #如果有冒号分隔，说明二者不一样
+                                join_table_array << p.split(":")[0]
+                                where_table_array << p.split(":")[1]
+                            else
+                                join_table_array << p
+                                where_table_array << p
+                            end
+                        }
+
+                        join_table = join_table_array.to_link_table_hash
+                        sort_table = where_table_array[-1].pluralize
+                        result = result.includes(join_table)
+                    else
+                        sort_table = table_name.pluralize
+                    end
+                    #最后一项表示字段
+                    sort_field = sort_field_array[-1]
+
+                    result = result.order("#{sort_table}.#{sort_field} #{sort['direction']}")
+                }
+            else
+                #没有sort的时候默认排序
+                result = self.where(true).order("#{table_name.pluralize}.id DESC")
+            end
+            return result
+        end
+
+
+        #创建新编号，至少报价、个案、合同可以用，所以公用出来
+        def self.gen_new_number_with_letter(letter)
+            #binding.pry
+            now_year = Time.now.strftime("%y")
+
+            if self.where("number like ?", "%#{now_year}%").size == 0
+                #如果没有今年的数据，则它就是001
+                return letter + now_year + "00001"
+            else
+                #如果有，取最大的加一
+                max_number = self.order("number").last.number
+                return max_number[0..2].to_s + "%05d" % (max_number[3..-1].to_i + 1)
+            end
+        end
+    end
+end

@@ -1,0 +1,39 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  model: MyString
+  name: MyString
+  producer_vendor_unit_id: 1
+  seller_vendor_unit_id: 1
+  en_name: MyString
+  reference: MyString
+  simple_description_cn: MyText
+  simple_description_en: MyText
+  currency_id: 1
+  custom_tax: 9.99
+  tax_number: MyString
+  price_in_list: 9.99
+  price_from_vendor: 9.99
+  price_to_market: 9.99
+  price_in_site: 9.99
+  serial_id: 1
+  user: 
+
+two:
+  model: MyString
+  name: MyString
+  producer_vendor_unit_id: 1
+  seller_vendor_unit_id: 1
+  en_name: MyString
+  reference: MyString
+  simple_description_cn: MyText
+  simple_description_en: MyText
+  currency_id: 1
+  custom_tax: 9.99
+  tax_number: MyString
+  price_in_list: 9.99
+  price_from_vendor: 9.99
+  price_to_market: 9.99
+  price_in_site: 9.99
+  serial_id: 1
+  user: 

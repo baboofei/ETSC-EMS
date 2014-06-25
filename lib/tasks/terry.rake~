@@ -1,0 +1,93 @@
+#encoding: UTF-8
+
+namespace :terry do
+    desc '发邮件测试'
+    task :mail_test => :environment do
+        #DataImporter.import_teachers
+        UserMailer.welcome_email(User.find_by_reg_name('terry')).deliver
+        #puts "XXX"
+    end
+
+    desc '发送工作日志邮件'
+    task :send_salelog_mail => :environment do
+        sales = User.sale
+        sales.each do |sale|
+            #测试，发给Terry
+            #manager_ids = [5]
+            #正式，发给经理和自己。不发给同组成员了，但数据是取同组成员的
+            manager_ids = sale.get_all_manager_ids
+            #manager_ids += sale.get_group_mate_ids
+            manager_ids += [sale.id]
+            manager_ids += [1]#boss的好像有bug，以后再查吧……#TODO
+            manager_ids.uniq!
+            manager_ids.each do |manager_id|
+		        unless manager_id.blank?
+                    exist_mail = ScheduledMail.where("sender = ? and receiver = ? and mailed_at = ? and mail_type = ?", sale.id, manager_id, Date.today.strftime("%Y-%m-%d"), 'salelog')
+		            if exist_mail.blank?
+		                manager = User.find(manager_id)
+            		        p "无对应邮件发送记录，发邮件：从#{sale.name}到#{manager.name} @ #{Time.now}"
+		                #发邮件
+		                UserMailer.salelog_email(sale, manager).deliver
+		                #写数据库
+		                scheduled_mail = ScheduledMail.new
+		                scheduled_mail.sender = sale.id
+		                scheduled_mail.receiver = manager_id
+		                scheduled_mail.mailed_at = Date.today.strftime("%Y-%m-%d")
+		                scheduled_mail.mail_type = 'salelog'
+		                scheduled_mail.save
+		            else
+		                p "已有此记录，发送下一封 @ #{Time.now}"
+		            end
+		        end
+            end
+        end
+    end
+    
+    desc '发送商务工作情况月报'
+    task :send_business_workload_mail => :environment do
+        target_ids = [2, 4, 5]
+	target_ids.each do |target_id|
+	    exist_mail = ScheduledMail.where("receiver = ? and mailed_at = ? and mail_type = ?", target_id, Date.today.strftime("%Y-%m-%d"), 'business_workload_monthly')
+	    if exist_mail.blank?
+		target = User.find(target_id)
+		p "无对应邮件发送记录，发邮件：到#{target.name} @ #{Time.now}"
+		#发邮件
+		UserMailer.business_workload_email(target).deliver
+		#写数据库
+		scheduled_mail = ScheduledMail.new
+		scheduled_mail.receiver = target_id
+		scheduled_mail.mailed_at = Date.today.strftime("%Y-%m-%d")
+		scheduled_mail.mail_type = 'business_workload_monthly'
+		scheduled_mail.save
+	    else
+		p "已有此记录，发送下一封 @ #{Time.now}"
+	    end
+        end
+    end
+
+    desc '同步汇率'
+    task :sync_exchange_rate => :environment do
+        RealExchangeRate.spider
+        p "完成 @ #{Time.now}"
+    end
+    
+    desc '发送销售合同统计月报'
+    task :send_sales_contract_mail => :environment do
+      exist_mail = ScheduledMail.where("receiver = 1 and mailed_at = ? and mail_type = ?", Date.today.strftime("%Y-%m-%d"), 'sales_contract_monthly')
+      if exist_mail.blank?
+	p "无对应邮件发送记录，发销售合同统计邮件 @ #{Time.now}"
+	UserMailer.monthly_contract_report_email.deliver
+	UserMailer.monthly_contract_report_nps_email.deliver
+	UserMailer.monthly_contract_report_rps_email.deliver
+	#写数据库
+	scheduled_mail = ScheduledMail.new
+	scheduled_mail.receiver = 1
+	scheduled_mail.mailed_at = Date.today.strftime("%Y-%m-%d")
+	scheduled_mail.mail_type = 'sales_contract_monthly'
+	scheduled_mail.save
+      else
+	p "已有此记录，发送下一封 @ #{Time.now}"
+      end
+    end
+        
+end

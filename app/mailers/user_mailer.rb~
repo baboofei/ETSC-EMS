@@ -1,0 +1,152 @@
+# encoding: UTF-8
+class UserMailer < ActionMailer::Base
+    include ActionView::Helpers::SanitizeHelper
+    #default :from => "hexawing@gmail.com",         #gmail邮箱，可用
+    #default :from => "etsc@qq.com"         #公司QQ邮箱，可用
+    #default :from => "1163726690@qq.com"         #商务QQ邮箱，可用
+    #default :from => "hexawing@qq.com"         #私人QQ邮箱，可用
+    default :from => %q("ETSC信息管理系统"<admin@etsc-tech.com>)   #263企业邮箱，可用
+    #default :from => "hexawing@163.com"        #163私人邮箱，可用
+
+    def welcome_email(user, sex, department, position)
+        @new_user = user
+        @sex = sex
+        @department = department
+        @position = position
+        mail(:to => "all.list@etsc-tech.com",
+             :subject => "欢迎新同事"
+        )
+    end
+
+    def alert_email(alert_type)
+        mail(:to => "terrych@etsc-tech.com",
+            :subject => "系统异动--#{alert_type}!!!"
+        )
+    end
+
+    def salelog_email(from_user, to_user)
+        @salelogs = Salelog.last_week.by_user_or_group(from_user.id)
+        mail(:to => to_user.etsc_email,
+            :subject => "#{from_user.name}销售工作报告#{(Date.today - 14).strftime("%Y-%m-%d")}至#{Date.today.strftime("%Y-%m-%d")}"
+        )
+    end
+
+    def stock_in_pdf_email(to_user, subject, file_array)
+        file_array.each do |file|
+            file_name = file.split("/")[-1]
+            attachments[file_name] = File.read file
+        end
+        #mail(:to => "terrych@etsc-tech.com",
+        mail(:to => to_user.etsc_email,
+            :subject => subject,
+        )
+        #UserMailer.welcome_email(user, params['sex'], params['department_name'], params['position']).deliver
+    end
+
+    #签署合同时的邮件提醒
+    def contract_sign_email(contract, to_user)
+        @contract = contract
+        vendor_units = VendorUnit.where("contracts.id = ?", contract.id).includes(:products => {:contract_items => :contract})
+        @vendor_unit_names = vendor_units.map(&:name).join("、")
+        @contract_type = Dictionary.where("data_type = ? and value = ?", "contract_type", contract.contract_type).first.display
+        mail(:to => User.find(to_user).etsc_email,
+            :subject => "#{contract.number}-合同签署"
+        )
+    end
+
+    #签署合同时如果需要安装的邮件提醒
+    def contract_install_email(contract, to_user)
+        @contract = contract
+        mail(:to => User.find(to_user).etsc_email,
+            :subject => "#{contract.number}-需要安装"
+        )
+    end
+
+    #合同内容变更时的邮件提醒
+    def contract_change_email(contract, to_user)
+        @contract = contract
+        @natural_language = ContractHistory.where("item = ? and old_id = ?", "contract", contract.id).last.natural_language
+        mail(:to => User.find(to_user).etsc_email,
+            :subject => "#{contract.number}-合同变更"
+        )
+    end
+
+    #商务工作量月度统计
+    def business_workload_email(to_user)
+        from_time = "#{1.month.ago.year}-#{1.month.ago.month}-01"
+        to_time = "#{0.month.ago.year}-#{0.month.ago.month}-01"
+
+        @all_quotes = Quote.where("created_at >= ? and created_at < ?", from_time, to_time)
+        @quotes = Quote.where("created_at >= ? and created_at < ? and state = ?", from_time, to_time, "complete")
+        @contracts = Contract.where("created_at >= ? and created_at < ?", from_time, to_time)
+        @businesses = User.business
+
+        #mail(:to => "terrych@etsc-tech.com",
+        mail(:to => to_user.etsc_email,
+             :subject => "#{1.month.ago.year}年#{1.month.ago.month}月商务工作统计表"
+        )
+    end
+
+    #临时用
+    #TODO
+    def new_customer_report_email()
+        @customers = Customer.last_month
+        @recent_3_exhibitions = Exhibition.order("start_on DESC").limit(3)
+
+        @lead_customers = Customer.last_month.where(["lead_id in (?, ?, ?)", 3, 4, 6])
+
+        question_str = @recent_3_exhibitions.map{"?"}.join(",")
+        recent_3_exhibition_lead_ids = @recent_3_exhibitions.map(&:lead_id)
+        @lead_customers_exhibitions = Customer.last_month.where("lead_id in (#{question_str})", *recent_3_exhibition_lead_ids)
+
+        #mail(:to => "terrych@etsc-tech.com",
+        mail(:to => "mandyr@etsc-tech.com",
+             :subject => "各种月报"
+        )
+    end
+
+    #临时用
+    #TODO
+    def exhibition_follow_up_email()
+        exhibition_id = 104
+        exhibition = Exhibition.where("lead_id = ?", exhibition_id)[0]
+        @lead_customers_exhibitions = Customer.where("lead_id = ?", exhibition_id)
+
+        #mail(:to => "terrych@etsc-tech.com",
+        mail(:to => "mandyr@etsc-tech.com",
+             :subject => "#{exhibition.name}3个月跟进情况"
+        )
+    end
+
+    #临时用
+    #TODO
+    def season_quote_email
+        year = 2013
+        season = 2
+        from_time = "#{year}-#{season*3 - 2}-01"
+        to_time = "#{year}-#{season*3 + 1}-01"
+        @quotes = Quote.where("created_at >= ? and created_at < ? and state = ?", from_time, to_time, "complete")
+        @businesses = User.where("roles.id = 5").includes(:roles)
+
+        #mail(:to => "terrych@etsc-tech.com",
+        mail(:to => "anney@etsc-tech.com",
+             :subject => "#{year}年第#{season}季度报价统计表"
+        )
+    end
+
+    #临时用
+    #TODO
+    def season_contract_email
+        year = 2013
+        season = 2
+        from_time = "#{year}-#{season*3 - 2}-01"
+        to_time = "#{year}-#{season*3 + 1}-01"
+        @contracts = Contract.where("created_at >= ? and created_at < ?", from_time, to_time)
+        @businesses = User.where("roles.id = 6").includes(:roles)
+
+        #mail(:to => "terrych@etsc-tech.com",
+        mail(:to => "anney@etsc-tech.com",
+             :subject => "#{year}年第#{season}季度合同统计表"
+        )
+    end
+end

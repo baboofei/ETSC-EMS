@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  customer_unit_id: 1
+  salecase_id: 1
+
+two:
+  customer_unit_id: 1
+  salecase_id: 1

@@ -1,0 +1,4014 @@
+#!/bin/env ruby
+# encoding: utf-8
+# magic comment……解决汉字UTF8问题
+class Contract < ActiveRecord::Base
+    require "reusable"
+    include Reusable
+
+    belongs_to :dealer, :class_name => 'User', :foreign_key => 'dealer_user_id'
+    belongs_to :signer, :class_name => 'User', :foreign_key => 'signer_user_id'
+
+    belongs_to :customer_unit
+    belongs_to :end_user, :class_name => 'Customer', :foreign_key => 'end_user_customer_id'
+    belongs_to :buyer, :class_name => 'Customer', :foreign_key => 'buyer_customer_id'
+
+    belongs_to :business_unit
+    belongs_to :business_contact
+
+    belongs_to :our_company
+    belongs_to :pay_mode
+    belongs_to :quote
+
+    has_many :contract_items
+    has_many :receivables
+    has_many :collections
+    belongs_to :currency
+
+    state_machine :initial => :a_start do
+        #初步设计了以下状态：
+        #开始      a_start
+        #待审批    b_auditing        [放大镜]
+        #待签署    c_signing         [写字]
+        #已签订    d_progressing     [沙漏]
+        #已完成    e_complete        [对勾]
+        #已取消    f_cancelled       [禁止标志]
+        event :need_audit do
+            #需要审批
+            transition [:a_start] => :b_auditing
+        end
+        event :without_audit do
+            #不需要审批
+            transition [:a_start] => :c_signing
+        end
+        event :refuse do
+            #驳回
+            transition [:b_auditing] => :a_start
+        end
+        event :agree do
+            #通过
+            transition [:b_auditing] => :c_signing
+        end
+        event :sign do
+            #签署
+            transition [:c_signing] => :d_progressing
+        end
+        event :complete do
+            #完成
+            transition [:d_progressing] => :e_complete
+        end
+        event :cancel do
+            #取消
+            transition [:d_progressing] => :f_cancelled
+        end
+    end
+
+    def for_grid_json(store_name, user_id)
+        #检查editable状态。之前貌似都没有判断角色
+        editable = false
+        store = Store.find_by_name(store_name)
+        user = User.find(user_id)
+        #binding.pry
+        if store
+            if (store.visible_to_roles & user.roles).size > 0
+                #全部可见并全部不可改的角色，直接为false
+            elsif (store.editable_to_roles & user.roles).size > 0
+                #全部可见并全部可改的角色，直接为true
+                editable = true
+            elsif (store.partial_editable_to_roles & user.roles).size > 0
+                #部分可见部分可改的角色，判断是否为本人或者属于本人所在项目组
+                #binding.pry
+                #editable = (sale_user_id == user_id || (group && group.users.include?(user)))
+                editable = false
+            else
+                #未分配的角色，返回空集
+            end
+        end
+
+        attr = attributes
+        attr['signer_user_id'] = signer.id
+        attr['signer>name'] = signer.name
+        attr['dealer_user_id'] = dealer.id
+        attr['dealer>name'] = dealer.name
+        attr['customer_unit>(name|customer_unit_aliases>unit_alias)'] = customer_unit.name
+        attr['customer_unit>id'] = customer_unit.id
+        attr['end_user>name'] = end_user.name
+        attr['end_user>phone'] = end_user.phone
+        attr['end_user>mobile'] = end_user.mobile
+        attr['buyer>name'] = buyer.name
+        attr['buyer>phone'] = buyer.phone
+        attr['buyer>mobile'] = buyer.mobile
+        attr['business_unit>name'] = business_unit.blank? ? '无' : business_unit.name
+        attr['business_contact>name'] = business_contact.blank? ? '无' : business_contact.name
+        attr['business_contact>phone'] = business_contact.blank? ? '无' : business_contact.phone
+        attr['business_contact>mobile'] = business_contact.blank? ? '无' : business_contact.mobile
+        attr['quote>number'] = quote.blank? ? '' : quote.number
+        attr['pay_mode>name'] = pay_mode.blank? ? '' : pay_mode.name
+        #attr['purchaser_order>number'] = purchase_order.name
+
+        attr['editable'] = editable
+        attr
+    end
+
+    #自定义提交。因为模型复杂，估计是不可能公用了
+    def self.create_or_update_with(params, user_id)
+        item = "合同"
+        if params[:id].blank?
+            contract = Contract.new
+            message = $etsc_create_ok
+        else
+            contract = Contract.find(params[:id])
+            message = $etsc_update_ok
+        end
+
+        case params['event']
+            when 'create'
+                #首次创建
+                #binding.pry
+                fields_to_be_updated = %w(customer_unit_id customer_number summary buyer_customer_id end_user_customer_id business_unit_id
+                    business_contact_id our_company_id signer_user_id requirement_id contract_type pay_mode_id currency_id sum lc_number
+                    comment quote_id
+                )
+                fields_to_be_updated.each do |field|
+                    contract[field] = params[field]
+                end
+                contract['currency_id'] = params['sum_currency_id'].blank? ? 11 : params['sum_currency_id']
+                contract['sum'] = params['sum_amount']
+                contract['does_need_install'] = params['does_need_install'] == 'on'
+                contract['does_need_lc'] = params['does_need_lc'] == 'on'
+
+                contract['dealer_user_id'] = user_id
+                contract['number'] = gen_new_number_with_letter("C")
+                if !params['sum_currency_id'].blank?
+                    #直接换算成人民币
+                    currency_name = Currency.find(params['sum_currency_id']).name
+                    current_exchange_rate = RealExchangeRate.where("date = ?", "#{Date.today.strftime("%Y-%m-%d")}")[0][currency_name.downcase]
+                    contract.exchange_rate = current_exchange_rate.to_f
+                    contract.rmb = params['sum_amount'].to_f * current_exchange_rate.to_f / 100
+                end
+
+                #判断要不要审批
+                customer_unit_level = CustomerUnit.find(params['customer_unit_id']).credit_level
+                pay_mode_level = PayMode.find(params['pay_mode_id']).credit_level
+                #客户是A级客户，则可以用ABCDE方式的付款；客户是C级客户，则只能用CDE方式
+                if customer_unit_level <= pay_mode_level
+                    #付款方式在信用等级内，不用审批
+                    contract.without_audit
+                else
+                    #不在，要审批
+                    contract.need_audit
+                end
+                #binding.pry
+                contract.save
+                #如果是有报价的，则其下的合同项也从报价项带过来
+                if Quote.find(params['quote_id'])
+                    quote_items = Quote.find(params['quote_id']).quote_items
+                    quote_items.each do |quote_item|
+                        contract_item = ContractItem.new
+                        contract_item.product_id = quote_item.product_id
+                        contract_item.quantity = quote_item.quantity
+                        contract_item.contract_id = contract.id
+                        contract_item.send_status = 1
+                        contract_item.check_and_accept_status = 1
+                        contract_item.warranty_term_id = 3
+                        contract_item.save
+                    end
+                end
+
+                #发消息给销售、销售经理、商务、商务经理、财务、财务经理
+                target_ids = []
+                target_ids << contract.signer.id
+                target_ids << contract.signer.get_direct_manager_ids
+                target_ids << contract.dealer.id
+                target_ids << contract.dealer.get_direct_manager_ids
+                target_ids << User.financial.map(&:id)
+                target_ids.flatten!.uniq!
+
+                target_ids = [5]
+                target_ids.each do |target_id|
+                    #消息通知
+                    sn = (Time.now.to_f*1000).ceil
+                    message_params = {
+                        :content => "新合同已创建：#{contract.number.to_eim_message_link(sn)}",
+                        :receiver_user_id => target_id,
+                        :send_at => Time.now,
+                        :sn => sn
+                    }
+                    PersonalMessage.create_or_update_with(message_params, user_id)
+
+                    #邮件通知
+                    UserMailer.contract_start_email(contract, target_id).deliver
+                end
+
+
+                return {:success => true, :message => "#{item}#{message}", :contract_id => contract.id}
+            when 'update'
+                #判断要不要审批
+                customer_unit_level = contract.customer_unit.credit_level
+                pay_mode_level = contract.pay_mode.credit_level
+                #客户是A级客户，则可以用ABCDE方式的付款；客户是C级客户，则只能用CDE方式
+                if customer_unit_level <= pay_mode_level
+                    #付款方式在信用等级内，不用审批
+                    contract.without_audit
+                else
+                    #不在，要审批
+                    contract.need_audit
+                end
+                contract.save
+                return {:success => true, :message => "#{item}#{message}", :contract_id => contract.id}
+            when 'audit_agree'
+                contract.agree
+                contract.save
+                return {:success => true, :message => "#{item}#{message}", :contract_id => contract.id}
+            when 'audit_refuse'
+                contract.refuse
+                contract.save
+                return {:success => true, :message => "#{item}#{message}", :contract_id => contract.id}
+            when 'sign'
+                contract.sign
+                contract.save
+                return {:success => true, :message => "#{item}#{message}", :contract_id => contract.id}
+            when 'complete'
+                contract.complete
+                contract.save
+                return {:success => true, :message => "#{item}#{message}", :contract_id => contract.id}
+            when 'cancel'
+                contract.cancel
+                contract.save
+                return {:success => true, :message => "#{item}#{message}", :contract_id => contract.id}
+            else
+                p "zzz"
+        end
+
+    end
+
+    def self.update_customer_info_with(params, user_id)
+        contract = Contract.find(params['id'])
+        contract_history = ContractHistory.new
+        modify_detail_array = []
+
+        item = "合同信息"
+        message = $etsc_update_ok
+        fields_to_be_updated = %w(customer_unit_id buyer_customer_id end_user_customer_id)
+        fields_to_be_updated.each do |field|
+            case field
+                when "customer_unit_id"
+                    modify_detail_array << "客户单位从#{contract.customer_unit.name}修改为#{CustomerUnit.find(params['customer_unit_id']).name}" if contract.customer_unit.id.to_s != params['customer_unit_id']
+                when "buyer_customer_id"
+                    modify_detail_array << "客户联系人从#{contract.buyer.name}修改为#{Customer.find(params['buyer_customer_id']).name}" if contract.buyer_customer_id.to_s != params['buyer_customer_id']
+                when "end_user_customer_id"
+                    modify_detail_array << "客户使用人从#{contract.end_user.name}修改为#{Customer.find(params['end_user_customer_id']).name}" if contract.end_user_customer_id.to_s != params['end_user_customer_id']
+                else
+                    # type code here
+            end
+            contract[field] = params[field]
+        end
+        contract.save
+
+        contract_history.item = "contract"
+        contract_history.old_id = contract.id
+        contract_history.new_id = contract.id
+        contract_history.user_id = user_id
+        contract_history.natural_language = "修改了合同信息，改动如下：#{modify_detail_array.join("、")}。"
+        contract_history.save
+
+        return {:success => true, :message => "#{item}#{message}", :contract_id => contract.id}
+    end
+
+    def self.update_business_info_with(params, user_id)
+        contract = Contract.find(params['id'])
+        contract_history = ContractHistory.new
+        modify_detail_array = []
+
+        item = "合同信息"
+        message = $etsc_update_ok
+        fields_to_be_updated = %w(business_unit_id business_contact_id)
+        fields_to_be_updated.each do |field|
+            case field
+                when "business_unit_id"
+                    modify_detail_array << "进出口公司从#{contract.business_unit.blank? ? "无" : contract.business_unit.name}修改为#{params['business_unit_id'].blank? ? "无" : BusinessUnit.find(params['business_unit_id']).name}" if contract.business_unit_id.to_s != params['business_unit_id']
+                    contract['business_unit_id'] = params['business_unit_id']
+                when "business_contact_id"
+                    if params['business_unit_id'].blank?
+                        #如果传来的进出口公司为空，则联系人也为空
+                        modify_detail_array << "进出口公司联系人从#{contract.business_contact.name}修改为无"
+                        contract['business_contact_id'] = nil
+                    else
+                        modify_detail_array << "进出口公司联系人从#{contract.business_contact.name}修改为#{BusinessContact.find(params['business_contact_id']).name}" if contract.business_contact_id.to_s != params['business_contact_id']
+                        contract['business_contact_id'] = params['business_contact_id']
+                    end
+                else
+                    # type code here
+            end
+        end
+        contract.save
+
+        contract_history.item = "contract"
+        contract_history.old_id = contract.id
+        contract_history.new_id = contract.id
+        contract_history.user_id = user_id
+        contract_history.natural_language = "修改了合同信息，改动如下：#{modify_detail_array.join("、")}。"
+        contract_history.save
+
+        return {:success => true, :message => "#{item}#{message}", :contract_id => contract.id}
+    end
+
+    def self.update_user_info_with(params, user_id)
+        contract = Contract.find(params['id'])
+        contract_history = ContractHistory.new
+        modify_detail_array = []
+
+        item = "合同信息"
+        message = $etsc_update_ok
+        fields_to_be_updated = %w(our_company_id signer_user_id)
+        fields_to_be_updated.each do |field|
+            case field
+                when "our_company_id"
+                    modify_detail_array << "卖方公司从#{contract.our_company.name}修改为#{OurCompany.find(params['our_company_id']).name}" if contract.our_company_id.to_s != params['our_company_id']
+                when "signer_user_id"
+                    modify_detail_array << "销售工程师从#{contract.signer.name}修改为#{User.find(params['signer_user_id']).name}" if contract.signer_user_id.to_s != params['signer_user_id']
+                else
+                    # type code here
+            end
+            contract[field] = params[field]
+        end
+        contract.save
+
+        contract_history.item = "contract"
+        contract_history.old_id = contract.id
+        contract_history.new_id = contract.id
+        contract_history.user_id = user_id
+        contract_history.natural_language = "修改了合同信息，改动如下：#{modify_detail_array.join("、")}。"
+        contract_history.save
+
+        return {:success => true, :message => "#{item}#{message}", :contract_id => contract.id}
+    end
+
+    def self.update_contract_info_with(params, user_id)
+        contract = Contract.find(params['id'])
+        contract_history = ContractHistory.new
+        modify_detail_array = []
+
+        item = "合同信息"
+        message = $etsc_update_ok
+        fields_to_be_updated = %w(customer_number summary requirement_id contract_type exchange_rate rmb does_need_install
+            does_need_lc lc_number pay_mode_id comment sum_currency_id sum_amount
+        )
+        #binding.pry
+        fields_to_be_updated.each do |field|
+            case field
+                when "customer_number"
+                    modify_detail_array << "客户合同号从#{contract[field].blank? ? "无" : contract[field]}修改为#{params[field].blank? ? "无" : params[field]}" if contract[field] != params[field]
+                when "summary"
+                    modify_detail_array << "合同摘要从#{contract[field].blank? ? "无" : contract[field]}修改为#{params[field].blank? ? "无" : params[field]}" if contract[field] != params[field]
+                when "requirement_id"
+                    modify_detail_array << "供求类别从#{contract[field].blank? ? "无" : Dictionary.where("data_type = ? and value = ?", "requirement_sort", contract[field]).first.display}修改为#{params[field].blank? ? "无" : Dictionary.where("data_type = ? and value = ?", "requirement_sort", params[field]).first.display}" if contract[field].to_s != params[field]
+                when "contract_type"
+                    modify_detail_array << "合同类别从#{contract[field].blank? ? "无" : Dictionary.where("data_type = ? and value = ?", field, contract[field]).first.display}修改为#{params[field].blank? ? "无" : Dictionary.where("data_type = ? and value = ?", field, params[field]).first.display}" if contract[field].to_s != params[field]
+                when "sum_currency_id"
+                    modify_detail_array << "合同币种从#{contract['currency_id'].blank? ? "无" : Currency.find(contract['currency_id']).name}修改为#{params[field].blank? ? "无" : Currency.find(params[field]).name}" if contract['currency_id'].to_s != params[field]
+                    contract['currency_id'] = params[field]
+                when "sum_amount"
+                    modify_detail_array << "合同金额从#{contract['sum'].blank? ? "无" : contract['sum']}修改为#{params[field].blank? ? "无" : params[field]}" if contract['sum'].to_f != params[field].to_f
+                    contract['sum'] = params[field]
+                when "exchange_rate"
+                    modify_detail_array << "汇率从#{contract[field].blank? ? "无" : contract[field]}修改为#{params[field].blank? ? "无" : params[field]}" if contract[field].to_f != params[field].to_f
+                when "rmb"
+                    modify_detail_array << "折合人民币从#{contract[field].blank? ? "无" : contract[field]}修改为#{params[field].blank? ? "无" : params[field]}" if contract[field].to_f != params[field].to_f
+                when "does_need_install"
+                    #binding.pry
+                    if params[field] != "on"
+                        #说明新值是“不需要安装”
+                        modify_detail_array << "安装需求从需要安装修改为不需要安装" if (contract[field] or contract[field] == 1)
+                    else
+                        modify_detail_array << "安装需求从不需要安装修改为需要安装" if contract[field] != 1
+                    end
+                when "does_need_lc"
+                    if params[field] != "on"
+                        #说明新值是“不需要信用证”
+                        modify_detail_array << "信用证情况从需要信用证修改为不需要信用证" if (contract[field] or contract[field] == 1)
+                    else
+                        modify_detail_array << "信用证情况从不需要信用证修改为需要信用证" if contract[field] != 1
+                    end
+
+                when "lc_number"
+                    modify_detail_array << "信用证编号从从#{contract[field].blank? ? "无" : contract[field]}修改为#{params[field].blank? ? "无" : params[field]}" if contract[field] != params[field]
+                when "pay_mod_id"
+                    modify_detail_array << "付款方式从#{contract[field].blank? ? "无" : PayMode.find(contract[field]).name}修改为#{params[field].blank? ? "无" : PayMode.find(params[field]).name}" if contract[field].to_s != params[field]
+                when "comment"
+                    modify_detail_array << "备注从从#{contract[field].blank? ? "无" : contract[field]}修改为#{params[field].blank? ? "无" : params[field]}" if contract[field] != params[field]
+                else
+                    # type code here
+            end
+            contract[field] = params[field]
+        end
+        contract.save
+
+        contract_history.item = "contract"
+        contract_history.old_id = contract.id
+        contract_history.new_id = contract.id
+        contract_history.user_id = user_id
+        contract_history.natural_language = "修改了合同信息，改动如下：#{modify_detail_array.join("、")}。"
+        contract_history.save
+
+        return {:success => true, :message => "#{item}#{message}", :contract_id => contract.id}
+    end
+
+    def self.huge
+        z = []
+        0.upto(5) do |i|
+            0.upto(5) do |j|
+                0.upto(5) do |k|
+                    z << "#{i * 20},#{j * 20},#{k * 20}"# if i + j + k + l == 10
+                    p ""
+                end
+            end
+        end
+        p z.size
+    end
+end
+
+
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---	---		---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---	---		---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---	---		---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+---		---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---
+	---	---	---	---	---

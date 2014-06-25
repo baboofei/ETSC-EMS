@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  product_id: 1
+  vendor_unit_id: 1
+  salelog_id: 1
+  comment: MyString
+  customer_requirement: MyString
+
+two:
+  product_id: 1
+  vendor_unit_id: 1
+  salelog_id: 1
+  comment: MyString
+  customer_requirement: MyString

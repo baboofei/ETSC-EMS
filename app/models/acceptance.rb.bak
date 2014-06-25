@@ -1,0 +1,18 @@
+# encoding: utf-8
+#TSD服务水单下的收货清单
+class Acceptance < ActiveRecord::Base
+    require "reusable"
+    include Reusable
+
+    attr_accessible :accepted_at, :breakdown, :comment, :product_id, :sn
+
+    belongs_to :flow_sheet
+
+    def for_grid_json
+        attr = attributes
+        #binding.pry if customer_unit.nil?
+        attr
+    end
+
+end
+

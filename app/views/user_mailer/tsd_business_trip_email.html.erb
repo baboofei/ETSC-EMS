@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+</head>
+<body>
+
+<table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
+  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+    <th style="width: 50px;">工程师</th>
+    <th style="width: 200px;">时间段</th>
+    <th style="width: 300px;">事由</th>
+    <th style="width: 70px;">次数</th>
+    <th style="width: 70px;">天数</th>
+  </tr>
+  <% all_index = 0 %>
+  <% all_duration = 0 %>
+  <% @calendars.group_by(&:color_id).each_with_index do |calendars_by_same_user, o_index| %>
+      <% monthly_duration = 0 %>
+      <% calendars_by_same_user[1].each_with_index do |calendar, index| %>
+          <% start_time = ((calendar.start_at.to_date.strftime("%Y-%m-%d") < @from_time) ? @from_time : (calendar.start_at.to_date.strftime("%Y-%m-%d"))) %>
+          <% real_to_time = (@to_time.to_date - 1).strftime("%Y-%m-%d") %>
+          <% end_time = ((calendar.end_at.to_date.strftime("%Y-%m-%d") > real_to_time) ? real_to_time : (calendar.end_at.to_date.strftime("%Y-%m-%d"))) %>
+          <% monthly_duration += ((DateTime.parse(end_time) - DateTime.parse(start_time)).to_i + 1) %>
+      <% end %>
+
+      <% calendars_by_same_user[1].each_with_index do |calendar, index| %>
+          <% start_time = ((calendar.start_at.to_date.strftime("%Y-%m-%d") < @from_time) ? @from_time : (calendar.start_at.to_date.strftime("%Y-%m-%d"))) %>
+          <% real_to_time = (@to_time.to_date - 1).strftime("%Y-%m-%d") %>
+          <% end_time = ((calendar.end_at.to_date.strftime("%Y-%m-%d") > real_to_time) ? real_to_time : (calendar.end_at.to_date.strftime("%Y-%m-%d"))) %>
+          <tr style="text-align: right; background-color: #F4F4F4;">
+            <% if index == 0 %>
+                <% if o_index % 2 == 0 %>
+                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= calendars_by_same_user[1].size %>"><%= calendar.color.used_by[0].name %></td>
+                <% else %>
+                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= calendars_by_same_user[1].size %>"><%= calendar.color.used_by[0].name %></td>
+                <% end %>
+            <% end %>
+            <% if all_index % 2 == 0 %>
+                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= start_time %>~<%= end_time %></td>
+                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= calendar.title %></td>
+            <% else %>
+                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= start_time %>~<%= end_time %></td>
+                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= calendar.title %></td>
+            <% end %>
+            <% if index == 0 %>
+                <% if o_index % 2 == 0 %>
+                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= calendars_by_same_user[1].size %>"><%= calendars_by_same_user[1].size %></td>
+                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= calendars_by_same_user[1].size %>"><%= monthly_duration %></td>
+                <% else %>
+                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= calendars_by_same_user[1].size %>"><%= calendars_by_same_user[1].size %></td>
+                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= calendars_by_same_user[1].size %>"><%= monthly_duration %></td>
+                <% end %>
+            <% end %>
+            <% all_index += 1 %>
+          </tr>
+      <% end %>
+      <% all_duration += monthly_duration %>
+  <% end %>
+  <tr style="text-align: right; background-color: #F4F4F4;">
+    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">合计</td>
+    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">-</td>
+    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">-</td>
+    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @calendars.size %></td>
+    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= all_duration %></td>
+  </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  data_type: MyString
+  display: MyString
+  data_value: MyString
+  available: false
+
+two:
+  data_type: MyString
+  display: MyString
+  data_value: MyString
+  available: false

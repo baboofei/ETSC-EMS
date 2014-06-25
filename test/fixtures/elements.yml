@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  ext_id: MyString
+  function_id: 1
+  description: MyString
+
+two:
+  ext_id: MyString
+  function_id: 1
+  description: MyString

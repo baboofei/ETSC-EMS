@@ -1,0 +1,15 @@
+<p>最近EIM中又新增了几个模块，为方便大家了解及使用EIM，这里简要说明一下。</p>
+<p>你在EIM中有以下模块的权限：</p>
+<table border="1">
+  <tr>
+    <th width="120px">模块名称</th>
+    <th width="350px">描述</th>
+  </tr>
+  <% @functions.each do |function| %>
+    <tr>
+      <td><%= function.name %></td>
+      <td><%= function.description %></td>
+    </tr>
+  <% end %>
+</table>
+<p>如有任何疑问，请<a href="mailto:terrych@etsc-tech.com">与Terry联系</a></p>

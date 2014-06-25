@@ -1,0 +1,65 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  parent_id: 1
+  inner_id: MyString
+  leaf: MyString
+  quote_id: 1
+  vendor_unit_id: 1
+  product_id: 1
+  quantity: 1
+  quantity_2: 1
+  description: MyText
+  price_source: 1
+  original_unit_price: 9.99
+  original_currency_id: 1
+  times_1: 9.99
+  divide_1: 9.99
+  unit_price: 9.99
+  times_2: 9.99
+  divide_2: 9.99
+  discount: 9.99
+  discount_to: 9.99
+  total: 9.99
+  system_price: 9.99
+  system_discount: 9.99
+  original_exchange_rate: 9.99
+  currency_id: 1
+  exchange_rate: 9.99
+  product_name: MyString
+  product_model: MyString
+  item_total_amount: 9.99
+  item_total_currency_id: 1
+  custom_tax: 9.99
+
+two:
+  parent_id: 1
+  inner_id: MyString
+  leaf: MyString
+  quote_id: 1
+  vendor_unit_id: 1
+  product_id: 1
+  quantity: 1
+  quantity_2: 1
+  description: MyText
+  price_source: 1
+  original_unit_price: 9.99
+  original_currency_id: 1
+  times_1: 9.99
+  divide_1: 9.99
+  unit_price: 9.99
+  times_2: 9.99
+  divide_2: 9.99
+  discount: 9.99
+  discount_to: 9.99
+  total: 9.99
+  system_price: 9.99
+  system_discount: 9.99
+  original_exchange_rate: 9.99
+  currency_id: 1
+  exchange_rate: 9.99
+  product_name: MyString
+  product_model: MyString
+  item_total_amount: 9.99
+  item_total_currency_id: 1
+  custom_tax: 9.99

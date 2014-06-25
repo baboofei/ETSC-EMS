@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+</head>
+<body>
+<h3>合同通知</h3>
+
+
+<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">
+  <thead>
+  <tr style="background-color: #038; color: #FFF;">
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">卖方</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">类型</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">负责工程师</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">合同号</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">PO 号</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">外部合同号</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">合同金额</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">人民币金额</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">工厂</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">产品概述</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">最终用户</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">付款方式</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">备注</th>
+  </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.our_company.name %></td>
+        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract_type %></td>
+        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.signer.name %></td>
+        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.number %></td>
+        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"></td>
+        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.customer_number %></td>
+        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.currency.name %><%= @contract.sum %></td>
+        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.rmb %></td>
+        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @vendor_unit_names %></td>
+        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.summary %></td>
+        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.end_user.name %></td>
+        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.pay_mode.name %></td>
+        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.comment %></td>
+      </tr>
+  </tbody>
+</table>
+</body>
+</html>

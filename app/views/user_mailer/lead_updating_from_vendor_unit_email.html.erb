@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+</head>
+<body>
+<h3><%= @vendor_unit.name %> 两周内的需求反馈情况</h3>
+<table style="border:1px solid #038; width: 1500px; position: static; z-index: auto; ">
+  <!--<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">-->
+  <thead>
+  <tr style="background-color: #038; color: #FFF;">
+    <th>客户单位</th>
+    <th>客户</th>
+    <th>销售</th>
+    <th>工厂转入时间</th>
+    <th>初始情况</th>
+    <th>个案描述</th>
+    <th>末次联系进展</th>
+    <th>末次联系时间</th>
+    <th>成案率</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @inquire_array.each do |inquire| %>
+      <% if inquire.customer %>
+          <% salecases = inquire.customer.salecases %>
+          <% salecases.each_with_index do |salecase, index| %>
+              <% last_salelog = salecase.salelogs.sort_by { |p| p.contact_at }[-1] %>
+              <tr>
+                <% if index == 0 %>
+                    <% salecase_size = salecases.size %>
+                    <td rowspan=<%= salecase_size %>><%= inquire.customer.customer_unit.name %></td>
+                    <td rowspan=<%= salecase_size %>><%= inquire.customer.name %></td>
+                    <td rowspan=<%= salecase_size %>><%= inquire.customer.user.name %></td>
+                    <td rowspan=<%= salecase_size %>><%= inquire.created_at.strftime("%Y-%m-%d") %></td>
+                <% end %>
+                <td><%= inquire.detail %></td>
+                <td><%= salecase.comment %></td>
+                <td><%= raw strip_links(last_salelog['natural_language']) %><%= last_salelog['comment'].blank? ? "" : last_salelog['comment'] %></td>
+                <td><%= last_salelog.blank? ? "有问题" : last_salelog['contact_at'].strftime("%Y-%m-%d") %></td>
+                <td><%= salecase['feasible'] %></td>
+              </tr>
+          <% end %>
+      <% else %>
+          <td><%= inquire.customer_unit_name %></td>
+          <td><%= inquire.name %></td>
+          <td><%= inquire.user.name %></td>
+          <td><%= inquire.created_at.strftime("%Y-%m-%d") %></td>
+          <td colspan="5">未处理</td>
+      <% end %>
+  <% end %>
+  </tbody>
+</table>
+</body>
+</html>

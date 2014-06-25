@@ -1,0 +1,175 @@
+{
+    "3": {
+        "cn_name": "顺丰",
+        "printer_name": "EpsonForShunfeng",
+        "page_size": [210, 140],
+        "margin": [0, 13, 26, 13],
+        "monthly_payment_ac": "0271986539",
+        "sender": {
+            "company": {
+                "xy": [14, 84],
+                "w": 40
+            },
+            "name": {
+                "xy": [63, 84]
+            },
+            "addr": {
+                "xy": [9, 78],
+                "w": 70
+            },
+            "phone": {
+                "xy": [31, 64]
+            },
+            "cell": {
+                "xy": [31, 59]
+            },
+            "monthly_payment_ac": {
+                "xy": [139, 82]
+            },
+            "sign": {
+                "xy": [162, 37]
+            },
+            "month": {
+                "xy": [142, 29]
+            },
+            "day": {
+                "xy": [155, 29]
+            }
+        },
+        "receiver":{
+            "company": {
+                "xy": [14, 44],
+                "w": 40
+            },
+            "name": {
+                "xy": [63, 44]
+            },
+            "addr": {
+                "xy": [9, 36],
+                "w": 70
+            },
+            "phone": {
+                "xy": [31, 27]
+            },
+            "cell": {
+                "xy": [31, 22]
+            }            
+        }
+    },
+
+    "4": {
+        "cn_name": "中通",
+        "printer_name": "EpsonForZhongtong",
+        "page_size": [230, 127],
+        "margin": [0, 0, 0, 0],
+        "monthly_payment_ac": "",
+        "sender": {
+            "company": {
+                "xy": [28, 76],
+                "w": 60
+            },
+            "name": {
+                "xy": [33, 100]
+            },
+            "addr": {
+                "xy": [33, 92],
+                "w": 64
+            },
+            "phone": {
+                "xy": [38, 68]
+            },
+            "cell": {
+                "xy": [73, 68]
+            },
+            "monthly_payment_ac": {
+                "xy": [132, 34]
+            },
+            "sign": {
+                "xy": [23, 22]
+            },
+            "month": {
+                "xy": [53, 22]
+            },
+            "day": {
+                "xy": [57, 22]
+            }
+        },
+        "receiver": {
+            "company": {
+                "xy": [118, 76],
+                "w": 60
+            },
+            "name": {
+                "xy": [123, 100]
+            },
+            "addr": {
+                "xy": [123, 92],
+                "w": 64
+            },
+            "phone": {
+                "xy": [128, 68]
+            },
+            "cell": {
+                "xy": [163, 68]
+            }
+        }
+    },
+
+    "5": {
+        "cn_name": "德邦",
+        "printer_name": "EpsonForDeppon",
+        "page_size": [231, 140],
+        "margin": [0, 0, 10, 0],
+        "monthly_payment_ac": "",
+        "sender": {
+            "company": {
+                "xy": [33, 114],
+                "w": 70
+            },
+            "name": {
+                "xy": [28, 106]
+            },
+            "addr": {
+                "xy": [20, 95],
+                "w": 80
+            },
+            "phone": {
+                "xy": [43, 106]
+            },
+            "cell": {
+                "xy": [43, 102]
+            },
+            "monthly_payment_ac": {
+                "xy": [132, 34]
+            },
+            "sign": {
+                "xy": [163, 32]
+            },
+            "month": {
+                "xy": [184, 19]
+            },
+            "day": {
+                "xy": [193, 19]
+            }
+        },
+        "receiver": {
+            "company": {
+                "xy": [33, 81],
+                "w": 70
+            },
+            "name": {
+                "xy": [28, 73]
+            },
+            "addr": {
+                "xy": [20, 62],
+                "w": 80
+            },
+            "phone": {
+                "xy": [43, 73]
+            },
+            "cell": {
+                "xy": [43, 69]
+            }
+        }
+    }
+}

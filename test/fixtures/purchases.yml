@@ -1,0 +1,55 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  contract_project: MyString
+  contract_number: MyString
+  sign_at: 2013-03-25
+  seller: MyString
+  name: MyString
+  model: MyString
+  quantity: 1
+  first_quoted: 9.99
+  unit_price: 9.99
+  price: 9.99
+  discount: 9.99
+  invoice: MyString
+  pay_method: MyString
+  expected_pay_at: 2013-03-25 13:46:46
+  pay_status: MyString
+  invoice_status: MyString
+  warranty: MyString
+  expected_deliver_at: 2013-03-25 13:46:46
+  actually_deliver_at: 2013-03-25 13:46:46
+  deliver_place: MyString
+  vendor_unit: MyString
+  end_user: MyString
+  user: MyString
+  description: MyText
+  comment: MyText
+
+two:
+  contract_project: MyString
+  contract_number: MyString
+  sign_at: 2013-03-25
+  seller: MyString
+  name: MyString
+  model: MyString
+  quantity: 1
+  first_quoted: 9.99
+  unit_price: 9.99
+  price: 9.99
+  discount: 9.99
+  invoice: MyString
+  pay_method: MyString
+  expected_pay_at: 2013-03-25 13:46:46
+  pay_status: MyString
+  invoice_status: MyString
+  warranty: MyString
+  expected_deliver_at: 2013-03-25 13:46:46
+  actually_deliver_at: 2013-03-25 13:46:46
+  deliver_place: MyString
+  vendor_unit: MyString
+  end_user: MyString
+  user: MyString
+  description: MyText
+  comment: MyText

@@ -1,0 +1,35 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  process: 1
+  contact_time: 2013-03-18 14:47:29
+  salecase_id: 1
+  user_id: 1
+  comment: MyText
+  type: 
+  remind_at: 2013-03-18 14:47:29
+  expected_sign_at: 2013-03-18 14:47:29
+  quote_id: 1
+  remind_flag: false
+  wait_reason: 1
+  complete_reason: 1
+  occurred_at: 2013-03-18 14:47:29
+  detail: MyText
+  natural_language: MyText
+
+two:
+  process: 1
+  contact_time: 2013-03-18 14:47:29
+  salecase_id: 1
+  user_id: 1
+  comment: MyText
+  type: 
+  remind_at: 2013-03-18 14:47:29
+  expected_sign_at: 2013-03-18 14:47:29
+  quote_id: 1
+  remind_flag: false
+  wait_reason: 1
+  complete_reason: 1
+  occurred_at: 2013-03-18 14:47:29
+  detail: MyText
+  natural_language: MyText

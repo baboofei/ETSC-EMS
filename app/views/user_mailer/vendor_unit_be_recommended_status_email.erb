@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+</head>
+<body>
+
+<table style="border:1px solid #038; width: 1000px; position: static; z-index: auto; ">
+  <!--<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">-->
+  <thead>
+  <tr style="background-color: #038; color: #FFF;">
+    <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
+    <th>日志时间</th>
+    <th>客户单位</th>
+    <th>客户</th>
+    <th>个案描述</th>
+    <th>成案率</th>
+    <th>推荐产品</th>
+    <th>日志最新进展</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @salelogs.each do |salelog| %>
+      <tr>
+        <td><%= salelog.created_at.strftime("%Y-%m-%d") %></td>
+        <td><%= salelog.salecase.customer_units.map{|p| p.name}.join("、") %></td>
+        <td><%= salelog.salecase.customers.map{|p| p.name}.join("、") %></td>
+        <td><%= salelog.salecase.comment %></td>
+        <td><%= salelog.salecase.feasible %></td>
+        <td><%= salelog.recommends.map{|p| p.display_name}.join("、") %></td>
+        <td><%= Nokogiri::HTML(salelog.salecase.salelogs.last.natural_language).text %></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>
+
+</body>
+</html>

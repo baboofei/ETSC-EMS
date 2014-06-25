@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+</head>
+<body>
+<p><%= @user.name %>，以下是你未转为客户的需求</p>
+
+<table style="border:1px solid #038; width: 1000px; position: static; z-index: auto; ">
+  <!--<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">-->
+  <thead>
+  <tr style="background-color: #038; color: #FFF;">
+    <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
+    <th>姓名/英文名</th>
+    <th>单位</th>
+    <th>创建时间</th>
+    <th>详情</th>
+    <th>对方手机/固话/电邮</th>
+    <th>确认结果</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @inquires.each do |inquire| %>
+  <tr>
+      <td><%= [inquire.name, inquire.en_name].reject{|p| p.blank?}.join("/") %></td>
+      <td><%= inquire.customer_unit_name %></td>
+      <td><%= inquire.created_at.strftime("%Y-%m-%d") %></td>
+      <td><%= inquire.detail.blank? ? inquire.comment.to_s : inquire.detail %></td>
+      <td><%= [inquire.phone, inquire.mobile, inquire.email].reject{|p| p.blank?}.join("/") %></td>
+      <td>&nbsp;</td>
+  </tr>
+  <% end %>
+  </tbody>
+</table>
+<p>请填写此表的“确认结果”一列，并回复邮件给Terry。</p>
+<p>如果已经转为客户，请标明该客户的姓名（有可能在需求里是“李老师”这种）。</p>
+<p>如果未转为客户，请处理一次，以便以后的统计工作能正常进行。</p>
+<p>想找到以前的消息可以在EIM消息模块里筛选“转让”。如果不明白如何操作，请来问Terry，谢谢！</p>
+</body>
+</html>

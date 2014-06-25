@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+</head>
+<body>
+<h3>TSD工作月报</h3>
+<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">
+  <thead>
+  <tr style="background-color: #038; color: #FFF;">
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">水单描述</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:60px;">客户单位</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:50px;">客户</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:180px;">进展开始日期</th>
+    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;">进展描述</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @service_logs.group_by(&:flow_sheet_id).each_with_index do |service_logs_in_same_sheet, o_index| %>
+      <% service_logs_in_same_sheet[1].sort_by{|p| p.inner_id}.each_with_index do |service_log, index| %>
+          <tr style="border:solid #999;border-width:0 1px 1px 0;">
+            <% if index == 0 %>
+                <% flow_sheet = FlowSheet.find(service_logs_in_same_sheet[0]) %>
+                <% if o_index % 2 == 0 %>
+                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= service_logs_in_same_sheet[1].size %>><%= flow_sheet.description %></td>
+                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= service_logs_in_same_sheet[1].size %>><%= flow_sheet.customer_units.map(&:name).join("、") %></td>
+                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= service_logs_in_same_sheet[1].size %>><%= flow_sheet.customers.map(&:name).join("、") %></td>
+                <% else %>
+                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= service_logs_in_same_sheet[1].size %>><%= flow_sheet.description %></td>
+                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= service_logs_in_same_sheet[1].size %>><%= flow_sheet.customer_units.map(&:name).join("、") %></td>
+                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= service_logs_in_same_sheet[1].size %>><%= flow_sheet.customers.map(&:name).join("、") %></td>
+                <% end %>
+            <% end %>
+
+            <% if o_index % 2 == 0 %>
+                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= service_log['start_at'].strftime('%Y-%m-%d') %></td>
+                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= raw strip_links(service_log['natural_language']) %><%= (service_log['comment'].blank? || service_log['comment'] == 'nil') ? "" : service_log['comment'] %></td>
+            <% else %>
+                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= service_log['start_at'].strftime('%Y-%m-%d') %></td>
+                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= raw strip_links(service_log['natural_language']) %><%= (service_log['comment'].blank? || service_log['comment'] == 'nil') ? "" : service_log['comment'] %></td>
+            <% end %>
+          </tr>
+      <% end %>
+  <% end %>
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,2 @@
+module AdminInventoryHistoriesHelper
+end

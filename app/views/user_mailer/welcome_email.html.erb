@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+</head>
+<body>
+<h3>欢迎新同事</h3>
+
+<p>欢迎<%= @new_user.name %>加入东隆！希望大家与其相互配合，帮助<%= @sex.to_i == 1 ? "他" : "她" %>尽快融入到公司，谢谢！如有相关事宜与其联系，请按以下方式：</p>
+
+<p>姓名：<%= @new_user.name %></p>
+<p>部门：<%= @department %></p>
+<p>职务：<%= @position %></p>
+<p>手机：<%= @new_user.mobile %></p>
+<p>分机号：<%= @new_user.extension %></p>
+<p>邮箱：<%= @new_user.etsc_email %></p>
+
+<p>顺祝商祺！</p>
+
+<p>综合运营部</p>
+</body>
+</html>

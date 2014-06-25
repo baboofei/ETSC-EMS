@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+</head>
+<body>
+
+<h3>已报价产品</h3>
+<table style="border:1px solid #038; position: static; z-index: auto; ">
+  <thead>
+  <tr style="background-color: #038; color: #FFF;">
+    <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
+    <th style="width: 200px;">产品</th>
+    <th style="width: 100px;">个案号</th>
+    <th style="width: 150px;">签订合同日期</th>
+    <th style="width: 300px;">客户单位</th>
+    <th style="width: 200px;">客户</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @quoted_products.each do |product| %>
+    <% salecases = product.quote_items.map{|p| p.quote.quotable.salecase} %>
+    <% salecases.each do |salecase| %>
+        <tr>
+          <td><%= product.model %></td>
+          <td><%= salecase.number %></td>
+          <td><%= salecase.end_at.to_s %></td>
+          <td><%= salecase.customer_units.map(&:name).join("、") %></td>
+          <td><%= salecase.customers.map(&:name).join("、") %></td>
+        </tr>
+    <% end %>
+  <% end %>
+  </tbody>
+</table>
+
+<h3>合同中产品</h3>
+<table style="border:1px solid #038; position: static; z-index: auto; ">
+  <thead>
+  <tr style="background-color: #038; color: #FFF;">
+    <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
+    <th style="width: 200px;">产品</th>
+    <th style="width: 100px;">合同号</th>
+    <th style="width: 100px;">发货状态</th>
+    <th style="width: 300px;">客户单位</th>
+    <th style="width: 200px;">客户</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @contracted_products.each do |product| %>
+    <% contract_items = product.contract_items %>
+    <% contract_items.each do |contract_item| %>
+          <tr>
+            <td><%= product.model %></td>
+            <td><%= contract_item.contract.number %></td>
+            <td><%= Dictionary.where("data_type = 'send_status' and value = ?", contract_item.send_status).first.display %></td>
+            <td><%= contract_item.contract.customer_unit.name %></td>
+            <td><%= contract_item.contract.end_user.name %></td>
+          </tr>
+    <% end %>
+  <% end %>
+  </tbody>
+</table>
+
+</body>
+</html>

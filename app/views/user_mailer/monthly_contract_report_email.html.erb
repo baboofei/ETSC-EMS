@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+</head>
+<body>
+
+<h3>按合同类型</h3>
+<table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
+  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+    <th style="width: 150px;">合同类别</th>
+    <th style="width: 150px;">公司部门</th>
+    <th style="width: 120px;">合同数量</th>
+    <th style="width: 225px;">合同金额(RMB)</th>
+    <th style="width: 225px;">合同利润(RMB)</th>
+    <th style="width: 180px;">利润率</th>
+  </tr>
+  <tr style="text-align: right;">
+    <% contracts = @distribute_contracts %>
+    <% rmb = contracts.map{|p| p.rmb.blank? ? 0 :p.rmb}.sum %>
+    <% profit = contracts.map{|p| p.profit.blank? ? 0 :p.profit}.sum %>
+    <td style="text-align: center;" rowspan="4">销售合同</td>
+    <td>渠道</td>
+    <td><%= contracts.size %></td>
+    <td><%= "%.2f" % rmb %></td>
+    <td><%= "%.2f" % profit %></td>
+    <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+  </tr>
+  <tr style="text-align: right;">
+    <% contracts = @nps_contracts %>
+    <% rmb = contracts.map{|p| p.rmb.blank? ? 0 :p.rmb}.sum %>
+    <% profit = contracts.map{|p| p.profit.blank? ? 0 :p.profit}.sum %>
+    <td>新产品战略部</td>
+    <td><%= contracts.size %></td>
+    <td><%= "%.2f" % rmb %></td>
+    <td><%= "%.2f" % profit %></td>
+    <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+  </tr>
+  <tr style="text-align: right;">
+    <% contracts = @rps_contracts %>
+    <% rmb = contracts.map{|p| p.rmb.blank? ? 0 :p.rmb}.sum %>
+    <% profit = contracts.map{|p| p.profit.blank? ? 0 :p.profit}.sum %>
+    <td>销售部</td>
+    <td><%= contracts.size %></td>
+    <td><%= "%.2f" % rmb %></td>
+    <td><%= "%.2f" % profit %></td>
+    <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+  </tr>
+  <tr style="text-align: right;">
+    <% contracts = @taiwan_contracts %>
+    <% rmb = contracts.map{|p| p.rmb.blank? ? 0 :p.rmb}.sum %>
+    <% profit = contracts.map{|p| p.profit.blank? ? 0 :p.profit}.sum %>
+    <td>台湾办事处</td>
+    <td><%= contracts.size %></td>
+    <td><%= "%.2f" % rmb %></td>
+    <td><%= "%.2f" % profit %></td>
+    <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+  </tr>
+  <tr style="text-align: right;">
+    <% contracts = @tsd_contracts %>
+    <% rmb = contracts.map{|p| p.rmb.blank? ? 0 :p.rmb}.sum %>
+    <% profit = contracts.map{|p| p.profit.blank? ? 0 :p.profit}.sum %>
+    <td style="text-align: center;">维修合同</td>
+    <td>技术支持部</td>
+    <td><%= contracts.size %></td>
+    <td><%= "%.2f" % rmb %></td>
+    <td><%= "%.2f" % profit %></td>
+    <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+  </tr>
+  <tr style="text-align: right;">
+    <% contracts = @rent_contracts %>
+    <% rmb = contracts.map{|p| p.rmb.blank? ? 0 :p.rmb}.sum %>
+    <% profit = contracts.map{|p| p.profit.blank? ? 0 :p.profit}.sum %>
+    <td style="text-align: center;">借用/租用合同</td>
+    <td>-</td>
+    <td><%= contracts.size %></td>
+    <td><%= "%.2f" % rmb %></td>
+    <td><%= "%.2f" % profit %></td>
+    <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+  </tr>
+  <tr style="text-align: right;">
+    <% contracts = @project_contracts %>
+    <% rmb = contracts.map{|p| p.rmb.blank? ? 0 :p.rmb}.sum %>
+    <% profit = contracts.map{|p| p.profit.blank? ? 0 :p.profit}.sum %>
+    <td style="text-align: center;">项目合同</td>
+    <td>-</td>
+    <td><%= contracts.size %></td>
+    <td><%= "%.2f" % rmb %></td>
+    <td><%= "%.2f" % profit %></td>
+    <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+  </tr>
+  <tr style="text-align: right;">
+    <% contracts = @all_contracts %>
+    <% rmb = contracts.map{|p| p.rmb.blank? ? 0 :p.rmb}.sum %>
+    <% profit = contracts.map{|p| p.profit.blank? ? 0 :p.profit}.sum %>
+    <td style="text-align: center;">合计</td>
+    <td>-</td>
+    <td><%= contracts.size %></td>
+    <td><%= "%.2f" % rmb %></td>
+    <td><%= "%.2f" % profit %></td>
+    <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+  </tr>
+  <tr style="text-align: right;">
+    <% contracts = @year_contracts %>
+    <% rmb = contracts.map{|p| p.rmb.blank? ? 0 :p.rmb}.sum %>
+    <% profit = contracts.map{|p| p.profit.blank? ? 0 :p.profit}.sum %>
+    <td style="text-align: center;">年度累计</td>
+    <td>-</td>
+    <td><%= contracts.size %></td>
+    <td><%= "%.2f" % rmb %></td>
+    <td><%= "%.2f" % profit %></td>
+    <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+  </tr>
+</table>
+
+<h3>按供求类别</h3>
+<table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
+  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+    <th style="width: 150px;">供求类别</th>
+    <th style="width: 120px;">合同数量</th>
+    <th style="width: 225px;">合同金额(RMB)</th>
+    <th style="width: 225px;">合同利润(RMB)</th>
+    <th style="width: 180px;">利润率</th>
+  </tr>
+  <tr style="text-align: right;">
+    <% contracts = @o_to_i_contracts %>
+    <% rmb = contracts.map{|p| p.rmb.blank? ? 0 :p.rmb}.sum %>
+    <% profit = contracts.map{|p| p.profit.blank? ? 0 :p.profit}.sum %>
+    <td style="text-align: center;">国外→国内</td>
+    <td><%= contracts.size %></td>
+    <td><%= "%.2f" % rmb %></td>
+    <td><%= "%.2f" % profit %></td>
+    <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+  </tr>
+  <tr style="text-align: right;">
+    <% contracts = @o_to_o_contracts %>
+    <% rmb = contracts.map{|p| p.rmb.blank? ? 0 :p.rmb}.sum %>
+    <% profit = contracts.map{|p| p.profit.blank? ? 0 :p.profit}.sum %>
+    <td style="text-align: center;">国外→国外</td>
+    <td><%= contracts.size %></td>
+    <td><%= "%.2f" % rmb %></td>
+    <td><%= "%.2f" % profit %></td>
+    <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+  </tr>
+  <tr style="text-align: right;">
+    <% contracts = @i_to_i_contracts %>
+    <% rmb = contracts.map{|p| p.rmb.blank? ? 0 :p.rmb}.sum %>
+    <% profit = contracts.map{|p| p.profit.blank? ? 0 :p.profit}.sum %>
+    <td style="text-align: center;">国内→国内</td>
+    <td><%= contracts.size %></td>
+    <td><%= "%.2f" % rmb %></td>
+    <td><%= "%.2f" % profit %></td>
+    <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+  </tr>
+  <tr style="text-align: right;">
+    <% contracts = @i_to_o_contracts %>
+    <% rmb = contracts.map{|p| p.rmb.blank? ? 0 :p.rmb}.sum %>
+    <% profit = contracts.map{|p| p.profit.blank? ? 0 :p.profit}.sum %>
+    <td style="text-align: center;">国内→国外</td>
+    <td><%= contracts.size %></td>
+    <td><%= "%.2f" % rmb %></td>
+    <td><%= "%.2f" % profit %></td>
+    <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+  </tr>
+  <tr style="text-align: right;">
+    <% contracts = @all_contracts %>
+    <% rmb = contracts.map{|p| p.rmb.blank? ? 0 :p.rmb}.sum %>
+    <% profit = contracts.map{|p| p.profit.blank? ? 0 :p.profit}.sum %>
+    <td style="text-align: center;">合计</td>
+    <td><%= contracts.size %></td>
+    <td><%= "%.2f" % rmb %></td>
+    <td><%= "%.2f" % profit %></td>
+    <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+  </tr>
+</table>
+
+<h3>按销售</h3>
+<table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
+  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+    <th style="width: 150px;">销售</th>
+    <th style="width: 120px;">合同数量</th>
+    <th style="width: 225px;">合同金额(RMB)</th>
+    <th style="width: 225px;">合同利润(RMB)</th>
+    <th style="width: 180px;">利润率</th>
+  </tr>
+  <% @groups.each do |group| %>
+      <tr style="text-align: right;">
+        <% group_member = group.users.map(&:id) %>
+        <% group_vendor_unit = group.vendor_units.map(&:id) %>
+        <% member_str = "(" + group_member.map { "?" }.join(",") + ")" %>
+        <% vendor_unit_str = "(" + group_vendor_unit.map { "?" }.join(",") + ")" %>
+        <% contracts = @all_contracts.where("users.id in #{member_str}", *group_member).includes(:signer) %>
+        <% if group_vendor_unit == [] %>
+        <% else %>
+            <% contracts = contracts.where("vendor_units.id in #{vendor_unit_str}", *group_vendor_unit).includes(:contract_items => {:product => :producer}) %>
+        <% end %>
+
+        <% rmb = contracts.map { |p| p.rmb.blank? ? 0 : p.rmb }.sum %>
+        <% profit = contracts.map { |p| p.profit.blank? ? 0 : p.profit }.sum %>
+        <td style="text-align: center;"><%= group.name %></td>
+        <td><%= contracts.size %></td>
+        <td><%= "%.2f" % rmb %></td>
+        <td><%= "%.2f" % profit %></td>
+        <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+      </tr>
+  <% end %>
+  <% @sales.each do |sale| %>
+      <tr style="text-align: right; background-color: #F4F4F4;">
+        <% vendor_units_through_group = VendorUnit.where("users.id = ?", sale.id).includes(:groups => :users).map(&:id) %>
+        <% if vendor_units_through_group.size == 0 %>
+            <% contracts = @all_contracts.where("contracts.signer_user_id = ?", sale.id) %>
+        <% else %>
+            <% vendor_units_str = "(" + vendor_units_through_group.map { "?" }.join(",") + ")" %>
+            <% pre_sql = Contract.where("vendor_units.id in #{vendor_units_str}", *vendor_units_through_group).select("contracts.id").joins("LEFT JOIN contract_items ON contract_items.contract_id = contracts.id").joins("LEFT JOIN products ON contract_items.product_id = products.id").joins("LEFT JOIN vendor_units ON products.seller_vendor_unit_id = vendor_units.id") %>
+            <% contracts = @all_contracts.where("contracts.id <> ALL (#{pre_sql.to_sql}) and contracts.signer_user_id = ?", sale.id) %>
+        <% end %>
+        <% rmb = contracts.map { |p| p.rmb.blank? ? 0 : p.rmb }.sum %>
+        <% profit = contracts.map { |p| p.profit.blank? ? 0 : p.profit }.sum %>
+        <td style="text-align: center;"><%= sale.name %></td>
+        <td><%= contracts.size %></td>
+        <td><%= "%.2f" % rmb %></td>
+        <td><%= "%.2f" % profit %></td>
+        <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
+      </tr>
+  <% end %>
+</table>
+</body>
+</html>

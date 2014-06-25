@@ -1,0 +1,61 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  customer_unit_id: 1
+  customer_id: 1
+  sale_log_id: 1
+  sale_case_id: 1
+  quote_number: MyString
+  currency_id: 1
+  total_discount: 9.99
+  fif_currency_id: 1
+  fif: 9.99
+  vat: 9.99
+  other_cost: 9.99
+  total: 9.99
+  sale_user_id: 1
+  business_user_id: 1
+  work_task_id: 1
+  language: 1
+  request: MyText
+  quote_format: 1
+  our_company_id: 1
+  term: MyText
+  comment: MyText
+  status: 1
+  quote_type: 1
+  pdf: MyText
+  summary: MyText
+  rmb: 9.99
+  final_price: 9.99
+  declaration_fee: 9.99
+
+two:
+  customer_unit_id: 1
+  customer_id: 1
+  sale_log_id: 1
+  sale_case_id: 1
+  quote_number: MyString
+  currency_id: 1
+  total_discount: 9.99
+  fif_currency_id: 1
+  fif: 9.99
+  vat: 9.99
+  other_cost: 9.99
+  total: 9.99
+  sale_user_id: 1
+  business_user_id: 1
+  work_task_id: 1
+  language: 1
+  request: MyText
+  quote_format: 1
+  our_company_id: 1
+  term: MyText
+  comment: MyText
+  status: 1
+  quote_type: 1
+  pdf: MyText
+  summary: MyText
+  rmb: 9.99
+  final_price: 9.99
+  declaration_fee: 9.99

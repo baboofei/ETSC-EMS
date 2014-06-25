@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  version: MyString
+  update_type: 1
+  function_id: 1
+  description: MyText
+
+two:
+  version: MyString
+  update_type: 1
+  function_id: 1
+  description: MyText

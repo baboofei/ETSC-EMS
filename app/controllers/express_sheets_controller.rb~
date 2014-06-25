@@ -1,0 +1,88 @@
+# encoding: UTF-8
+class ExpressSheetsController < ApplicationController
+    skip_before_filter :verify_authenticity_token
+
+    @@cfg = File.read("#{Rails.root}/lib/pdf/express_sheet_cfg.json")
+
+    def print_express_sheet
+        page_config = JSON.parse(@@cfg, :symbolize_names => true)
+        normal_font = "#{Rails.root}/app/assets/fonts/yahei_mono.ttf"
+        #image = "shunfeng_96dpi.jpg"
+        require "prawn"
+        require "prawn/measurement_extensions"
+
+        user = User.find(session[:user_id])
+        customer_array = params[:customer_ids].split("|")
+        our_company = OurCompany.find(params[:our_company_id])
+        sym = params[:express_id].to_sym
+
+        #binding.pry
+        #p params
+        sender = {
+            :company => our_company.name,
+            :name => user.name,
+            :addr => our_company.addr,
+            :tel => our_company.phone,
+            #:cell => "",
+            :monthly_payment_ac => page_config[sym][:monthly_payment_ac],
+            :month => "%02d" % Time.now.month,
+            :day => "%02d" % Time.now.day
+        }
+        using = page_config[sym]
+
+        #binding.pry
+        Prawn::Document.generate("ExpressSheet.pdf",
+                                 #"page_size" => [609,397],
+                                 :page_size => using[:page_size].map { |p| p.mm },
+                                 #:page_size => using[:page_size],
+                                 #"background" => image,
+                                 :margin => using[:margin].map { |p| p.mm }) do |pdf|
+
+            customer_array.each_with_index do |c, index|
+                customer = Customer.find(c)
+                addr = customer.customer_unit.city.prvc.name + customer.customer_unit.city.name + customer.addr
+                merged_addr = addr.gsub(/(.*?市)\1+/, '\1') + "#{customer.postcode.blank? ? '' : "(#{customer.postcode})"}"
+                receiver = {
+                    :company => customer.customer_unit.name,
+                    :name => customer.name,
+                    :addr => merged_addr,
+                    :tel => customer.phone,
+                    :cell => customer.mobile
+                }
+
+                pdf.font normal_font, :size => 9
+                pdf.text_box(sender[:company], :at => using[:sender][:company][:xy].map { |p| p.mm }, :width => using[:sender][:company][:w].mm)
+                pdf.text_box(sender[:name], :at => using[:sender][:name][:xy].map { |p| p.mm })
+                pdf.text_box(sender[:addr], :at => using[:sender][:addr][:xy].map { |p| p.mm }, :width => using[:sender][:addr][:w].mm)
+                pdf.text_box(sender[:tel], :at => using[:sender][:tel][:xy].map { |p| p.mm })
+                #pdf.text_box(sender[:cell], :at => using[:sender][:cell][:xy].map{|p| p.mm})
+                pdf.text_box(sender[:monthly_payment_ac].to_s, :at => using[:sender][:monthly_payment_ac][:xy].map { |p| p.mm }, :size => 13)
+                pdf.text_box(sender[:name], :at => using[:sender][:sign][:xy].map { |p| p.mm }, :size => 10)
+                pdf.text_box(sender[:month], :at => using[:sender][:month][:xy].map { |p| p.mm })
+                pdf.text_box(sender[:day], :at => using[:sender][:day][:xy].map { |p| p.mm })
+                pdf.text_box(receiver[:company].to_s, :at => using[:receiver][:company][:xy].map { |p| p.mm }, :width => using[:receiver][:company][:w].mm)
+                pdf.text_box(receiver[:name], :at => using[:receiver][:name][:xy].map { |p| p.mm })
+                pdf.text_box(receiver[:addr], :at => using[:receiver][:addr][:xy].map { |p| p.mm }, :width => using[:receiver][:addr][:w].mm)
+                pdf.text_box(receiver[:tel].multi_split[0], :at => using[:receiver][:tel][:xy].map { |p| p.mm }) unless receiver[:tel].blank?
+                pdf.text_box(receiver[:cell].multi_split[0], :at => using[:receiver][:cell][:xy].map { |p| p.mm }) unless receiver[:cell].blank?
+                #pdf.stroke_bounds
+
+                pdf.start_new_page unless (index + 1 == customer_array.size)
+            end
+
+        end
+        #binding.pry
+        #actually_width = using[:page_size][0]
+        #actually_single_height = (using[:page_size][1] + using[:margin][3])
+        ##actually_height = actually_single_height * customer_array.length
+        ##p "actually_single_height = #{actually_single_height}"
+        #system("lp -o orientation-requested=3 -o media=Custom.#{actually_width}x#{actually_single_height}mm ExpressSheet.pdf")
+
+        actually_width = using[:page_size][0]
+        actually_height = (using[:page_size][1] + using[:margin][3])
+        #system("lp -o media=Custom.#{actually_width}x#{actually_height}mm ExpressSheet.pdf")
+        system("lp ExpressSheet.pdf")
+        #http://www.cups.org/documentation.php/options.html
+        render :json => {:success => true}.to_json
+    end
+end

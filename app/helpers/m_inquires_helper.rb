@@ -1,0 +1,2 @@
+module MInquiresHelper
+end

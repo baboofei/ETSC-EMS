@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+</head>
+<body>
+<h3>按工厂</h3>
+<table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
+  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+    <th rowspan="2">工厂</th>
+    <th colspan="<%= @cancel_reason_array.size %>">结案暂无后续</th>
+    <th rowspan="2">结案后有后续</th>
+  </tr>
+  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+    <% @cancel_reason_array.each do |reason| %>
+        <th width="60px"><%= reason[1] %></th>
+    <% end %>
+  </tr>
+  <% @vendor_units.each do |vendor_unit| %>
+      <tr>
+        <td><%= vendor_unit.name %></td>
+        <% @cancel_reason_array.each do |reason| %>
+            <td><%= Salelog.salecase_success_ratio_tally_via_vendor_unit(@start_at, @end_at, reason[0].to_i, vendor_unit.id) %></td>
+        <% end %>
+        <td><%= Salelog.salecase_success_ratio_tally_via_vendor_unit(@start_at, @end_at, nil, vendor_unit.id) %></td>
+      </tr>
+  <% end %>
+</table>
+</body>
+</html>

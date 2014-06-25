@@ -1,0 +1,67 @@
+# encoding: utf-8
+class RealExchangeRate < ActiveRecord::Base
+    attr_accessible :cad, :date, :eur, :gbp, :jpy, :usd, :hkd, :ntd
+
+    #抓取中国银行网页上的汇率信息存入数据库
+    #http://www.boc.cn/sourcedb/whpj/index.html
+    #
+    def self.spider
+        require 'rubygems'
+        require 'nokogiri'
+        require 'open-uri'
+
+        real_exchange_rate = self.new
+        real_exchange_rate.date = Date.today
+        url = "http://www.boc.cn/sourcedb/whpj/index.html"
+        doc = Nokogiri::HTML(open(url))
+        table = doc.xpath("/html/body/table[2]/tr/td[2]/table[3]/tr/td/table")
+        table.xpath('tr').each { |tr|
+            case tr.xpath('td[1]').inner_text
+                when "新台币"
+                    real_exchange_rate.ntd = tr.xpath('td[6]').inner_text
+                when "英镑"
+                    real_exchange_rate.gbp = tr.xpath('td[6]').inner_text
+                when "港币"
+                    real_exchange_rate.hkd = tr.xpath('td[6]').inner_text
+                when "美元"
+                    real_exchange_rate.usd = tr.xpath('td[6]').inner_text
+                when "日元"
+                    real_exchange_rate.jpy = tr.xpath('td[6]').inner_text
+                when "加拿大元"
+                    real_exchange_rate.cad = tr.xpath('td[6]').inner_text
+                when "欧元"
+                    real_exchange_rate.eur = tr.xpath('td[6]').inner_text
+            end
+        }
+        real_exchange_rate.save
+        #puts table
+        #查找所有合同中状态为“开始”/“待审批”/“待签署”的
+        #并将其汇率同步成当前数据。折合人民币也重新计算
+
+        contracts = Contract.where("(state = ? or state = ? or state = ?) and sum <> 0 and currency_id is not null", "a_start", "b_auditing", "c_signing")
+        exchange_rate_factor = 100
+        contracts.each do |contract|
+            case contract.currency_id
+                when 12
+                    exchange_rate_factor = real_exchange_rate.eur
+                when 13
+                    exchange_rate_factor = real_exchange_rate.gbp
+                when 14
+                    exchange_rate_factor = real_exchange_rate.usd
+                when 15
+                    exchange_rate_factor = real_exchange_rate.cad
+                when 16
+                    exchange_rate_factor = real_exchange_rate.jpy
+                when 17
+                    exchange_rate_factor = real_exchange_rate.hkd
+                when 18
+                    exchange_rate_factor = real_exchange_rate.ntd
+            end
+            contract.exchange_rate = exchange_rate_factor
+            contract.rmb = contract.sum * exchange_rate_factor.to_f / 100
+            contract.save
+        end
+    end
+end
+
+
