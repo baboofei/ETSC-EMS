@@ -1,0 +1,18 @@
+Ext.define('EIM.store.dict.Cities', {
+    extend: 'Ext.data.Store',
+    model: 'EIM.model.dict.City',
+
+    autoLoad: false,
+
+    proxy: {
+        url: 'servlet/GetLogData?type=cities',
+        type: 'ajax',
+//        format: 'json',
+        method: 'GET',
+        reader: {
+            type: 'json',
+            root: 'cities',
+            successProperty: 'success'
+        }
+    }
+});

@@ -1,0 +1,19 @@
+Ext.define('EIM.store.dict.SalecaseCancelReasons', {
+    extend: 'Ext.data.Store',
+    model: 'EIM.model.dict.SalecaseCancelReason',
+
+    autoLoad: false,
+
+    proxy: {
+        url: 'servlet/DictionaryServlet?dictionaries_type=case_cancel_reason',
+        type: 'ajax',
+//        format: 'json',
+        method: 'GET',
+        reader: {
+            type: 'json',
+            root: 'dictionary',
+            successProperty: 'success',
+            totalProperty:'totalRecords'
+        }
+    }
+});
