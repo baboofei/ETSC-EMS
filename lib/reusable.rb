@@ -416,6 +416,7 @@ module Reusable
 
                                     #Customer.where("customer_units.id in (#{question})", *a).includes(:customer_unit)
                                     #模型名.where("表名.字段名 条件").pluck(要取的id)
+                                    #binding.pry
                                     case join_table_queue_array.size
                                         when 1
                                             #比如在CustomerUnit里查name，只有一个["name"]
@@ -464,22 +465,20 @@ module Reusable
                                             #p "table_name 是 #{table_name}"
                                             #binding.pry
 
-                                            if (model_name.constantize.reflections[join_reflection_queue_array[0].pluralize.to_sym].blank?\
-                                             && model_name.constantize.reflections[join_reflection_queue_array[0].singularize.to_sym].blank?)
+                                            all_has_many_reflections = model_name.constantize.reflect_on_all_associations(:has_many)
+                                            if all_has_many_reflections.select{|p| p.name == join_reflection_queue_array[0].to_sym}.size > 0
                                                 collect_id_array << "#{table_name.singularize}_id"
                                             else
                                                 collect_id_array << "id"
                                             end
 
-                                            #if model_name.constantize.column_names.include?("#{join_reflection_queue_array[0]}_id")
-                                            #    collect_id_array << "id"
-                                            #else
+                                            #if (model_name.constantize.reflections[join_reflection_queue_array[0].pluralize.to_sym].blank?\
+                                            # && model_name.constantize.reflections[join_reflection_queue_array[0].singularize.to_sym].blank?)
                                             #    collect_id_array << "#{table_name.singularize}_id"
+                                            #else
+                                            #    collect_id_array << "id"
                                             #end
-                                            #p "运算完后 collect_id_array 是 #{collect_id_array}"
-                                        #collect_id_array << "id"
-                                        #collect_id_array << "#{table_name.singularize}_id"
-                                        #collect_id_array << "#{join_table_queue_array[0].singularize}_id"
+
                                         else
                                             #其它情况，比如在Customer里查customer_unit的别称，长的：["customer_unit", "customer_unit_alias", "unit_alias"]
                                             #事实上不太可能大于3层（先看看吧）
