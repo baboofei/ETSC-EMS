@@ -28,16 +28,16 @@ Credit given mainly to Jerry or Terry, I've no idea.
     
 And Claude, all he did was creating this repo.
 
-Issues
+To Do
 ========
 
-Known issues, priority:
+These requests are future to-dos that need to be done:
 
-    [Warning] Git Repository need serious cleanup.
-
-Other issues:
-
-    [Normal] Need Documentation
+	[1] Add more pages to exhibit
+	[2] Add more features to back-end data sys
+	[3]
+	[4]
+	[5]
 
 Contact
 ========
