@@ -1,0 +1,96 @@
+
+<div class="content_body">
+  <div class="content_side">
+    <div id="solution" class="frame">
+      <h2>解决方案</h2>
+      <ul>
+        <li><span>解决方案首页</span></li>
+        <li><%= link_to "激光器解决方案", :action => "show_laser_solution", :id => nil, :format =>"htm" %></li>
+        <li><%= link_to "光通讯解决方案", :action => "show_communication_solution", :id => nil, :format =>"htm" %></li>
+        <li><%= link_to "工业应用解决方案", :action => "show_industry_solution", :id => nil, :format =>"htm" %></li>
+      </ul>
+    </div>
+  </div>
+  <div class="total_text" id="not_product">
+    <div id="h4_bar">
+      <ul>
+        <li>激光器</li>
+        <li>光通讯</li>
+        <li>工业应用</li>
+      </ul>
+    </div>
+    <div id="border">
+      <div class="other_list" id="block1">
+        <ul>
+          <% for solution in @laser_solution %>
+          <li><%= link_to solution.title, :action => "show_solution", :id => solution, :format => "htm" %></li>
+          <% end %>
+          <li><%= link_to "更多激光器解决方案……", :action => "show_laser_solution", :id => nil, :format =>"htm" %></li>
+        </ul>
+      </div>
+      <div class="other_list" id="block2">
+        <ul>
+          <% for solution in @communication_solution %>
+          <li><%= link_to solution.title, :action => "show_solution", :id => solution, :format => "htm" %></li>
+          <% end %>
+          <li><%= link_to "更多光通讯解决方案……", :action => "show_communication_solution", :id => nil, :format =>"htm" %></li>
+        </ul>
+      </div>
+      <div class="other_list" id="block3">
+        <ul>
+          <% for solution in @industry_solution %>
+          <li><%= link_to solution.title, :action => "show_solution", :id => solution, :format => "htm" %></li>
+          <% end %>
+          <li><%= link_to "更多工业应用解决方案……", :action => "show_industry_solution", :id => nil, :format =>"htm" %></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<script language="javascript" type="text/javascript" defer="defer">
+var _bar = document.getElementById("h4_bar");
+var _bar_children = _bar.childNodes;
+for(i=0;i<_bar_children.length;i++){
+	if(_bar_children[i].nodeType != 3){//3是空，非3则是正常文本
+		var _ul=_bar_children[i];
+		break;//遇到第一个是正常文本的则取出之
+	}
+}
+var _li_array = _ul.childNodes;
+
+var _div = document.getElementById("border");
+var _div_array = _div.childNodes;
+
+show_block(0);
+
+//点击切换显示标签
+function show_block(number){
+//	alert(navigator.appName);
+	for(i=0;i<_div_array.length;i++){//所有的标签全写成链接形式
+		if(navigator.appName.indexOf("Explorer") > -1){
+			var _text = _li_array[i].innerText;
+			_li_array[i].innerHTML = "<a onclick='show_block(" + i + ");' style='cursor:hand;'>" + _text + "</a>";
+		}else{
+			if(_div_array[i].nodeType != 3){
+				var _text = _li_array[i].textContent;
+				_li_array[i].innerHTML = "<a onclick='show_block(" + (i-1)/2 + ");return false;' href='#'>" + _text + "</a>";
+			}
+		}
+	}
+	if(navigator.appName.indexOf("Explorer") > -1){
+		_li_array[number].innerHTML = _li_array[number].innerText;//第number个能找到的改为无链接形式
+	}else{
+		_li_array[number*2+1].innerHTML = _li_array[number*2+1].textContent;//不是IE的话，则是第2*number+1个能找到的改为无链接形式
+	}
+	for(i=0;i<_div_array.length;i++){//所有的内容全部隐藏
+		if(typeof(_div_array[i].id) != "undefined"){//FF里有空白文字，但那些没有id
+			document.getElementById(_div_array[i].id).style.display = "none";
+		}
+	}
+	if(navigator.appName.indexOf("Explorer") > -1){
+		_div_array[number].style.display = "block";//第number个能找到的改为显示
+	}else{
+		_div_array[2*number+1].style.display = "";//不是IE的话，则是第2*number+1个能找到的改为显示
+	}
+}
+</script>

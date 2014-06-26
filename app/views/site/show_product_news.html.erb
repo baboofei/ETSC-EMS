@@ -1,0 +1,22 @@
+<div class="content_body">
+  <div class="content_side">
+    <div id="news" class="frame">
+      <h2>新闻中心</h2>
+      <ul>
+        <li><%= link_to "新闻中心首页", :action => "news", :id => nil, :format =>"htm" %></li>
+        <li><%= link_to "公司新闻", :action => "show_company_news", :id => nil, :format =>"htm" %></li>
+        <li><span>产品新闻</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="total_text" id="not_product">
+    <div class="content_text">
+      <ul>
+        <% for news in @all_product_news %>
+        <li><%= link_to raw(news.title), :action => "show_news", :id => news, :format => "htm" %></li>
+        <% end %>
+      </ul>
+    </div>
+	<%= will_paginate @all_product_news, {:previous_label => '<前页', :next_label => '后页>'} %>
+  </div>
+</div>

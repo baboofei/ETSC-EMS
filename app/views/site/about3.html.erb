@@ -1,0 +1,31 @@
+
+<div class="content_body">
+  <div class="content_side">
+    <div id="about_us" class="frame">
+      <h2>关于我们</h2>
+      <ul>
+        <li><%= link_to "公司简介", :action => "about1", :id => nil, :format =>"htm" %></li>
+        <li><%= link_to "客户信息", :action => "about2", :id => nil, :format =>"htm" %></li>
+        <li><span>合作伙伴</span></li>
+        <li><%= link_to "关于我们", :action => "about4", :id => nil, :format =>"htm" %></li>
+      </ul>
+    </div>
+  </div>
+  <div class="total_text" id="not_product">
+    <div class="content_text">
+      <table cellspacing="5" id="vendor_unit_table">
+        <% i=0 %>
+        <% sorted_vendor_units = sort_by_gbk(@vendor_units) %>
+        <% for vendor_unit in sorted_vendor_units %>
+        <tr class="vendor_unit<%= i%2 == 0?1:2 %>">
+          <td><%= link_to(image_tag("/images/partner/partner_"+((vendor_unit.short_code.blank?)?"":vendor_unit.short_code.to_s)+".gif", :border => 0, :alt => vendor_unit.name, :title => vendor_unit.name),
+            vendor_unit.site.include?("http") ? vendor_unit.site : "http://"+vendor_unit.site,
+            :target => "_blank") %></td>
+          <td><%= vendor_unit.intro %></td>
+        </tr>
+        <% i=i+1 %>
+        <% end %>
+      </table>
+    </div>
+  </div>
+</div>

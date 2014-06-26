@@ -1,0 +1,24 @@
+
+<div class="content_body">
+  <div class="content_side">
+    <div id="support" class="frame">
+      <h2>技术支持</h2>
+      <ul>
+        <li><%= link_to "服务宗旨", :action => "support1", :id => nil, :format =>"htm" %></li>
+        <li><%= link_to "校准维修", :action => "support2", :id => nil, :format =>"htm" %></li>
+        <li><span>常见问题</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="total_text" id="not_product">
+    <div class="content_text">
+      <dl>
+        <% for faq in @faqs %>
+        <dt>问：<%= faq.question %></dt>
+        <dd>答：<%= raw(faq.answer) %></dd>
+        <% end %>
+      </dl>
+    </div>
+	<%= will_paginate @faqs, {:previous_label => '<前页', :next_label => '后页>'} %>
+  </div>
+</div>

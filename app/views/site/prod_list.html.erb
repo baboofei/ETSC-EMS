@@ -1,0 +1,61 @@
+<div class="content_body">
+  <div class="content_side">
+    <div id="product_info" class="frame">
+      <h2>产品信息</h2>
+      <div class="more"><a href="/site/prod_list"><img alt="更多" src="/images/site/more.jpg" /></a></div>
+      <ul>
+        <li><span>产品分类列表</span></li>
+        <% for big_type in @big_types %>
+          <% count_in_big_types = Serial.where('prod_m_types.prod_b_type_id = ? and serials.is_in_site = 1', big_type).includes(:prod_m_type).size %>
+          <% unless count_in_big_types == 0 %>
+            <li><%= link_to big_type.name,:action => "show_b_type",:id => big_type, :format => "htm" %></li>
+          <% end %>
+        <% end %>
+      </ul>
+    </div>
+    <div id="recent_prod" class="frame">
+      <h2>最新产品</h2>
+      <div class="more"><a href="/site/prod_list"><img alt="更多" src="/images/site/more.jpg" /></a></div>
+      <ul>
+        <% for serial in @recent_serials %>
+          <li><%= link_to(raw(serial.name_txt), :action => "show_product", :id => serial, :format => "htm") %></li>
+        <% end %>
+      </ul>
+    </div>
+    <div id="solution" class="frame">
+      <h2>解决方案</h2>
+      <div class="more"><a href="/site/solution"><img alt="更多" src="/images/site/more.jpg" /></a></div>
+      <ul>
+        <% for solution in @recent_solutions %>
+          <li><%= link_to(solution.title, :action => "show_solution", :id => solution, :format => "htm") %></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+  <div class="total_text" id="product">
+    <div class="prod_list" id="content_text">
+      <div id="h2_bar">
+        <h2>产品分类</h2>
+        <div id="h2_plus">当前位置：产品分类列表</div>
+      </div>
+      <% for big_type in @big_types %>
+        <ul class="class1">
+          <% count_in_big_types = Serial.where('prod_m_types.prod_b_type_id = ? and serials.is_in_site = 1', big_type).includes(:prod_m_type).size %>
+          <% unless count_in_big_types == 0 %>
+            <li><%= link_to big_type.name + "(" + count_in_big_types.to_s + ")", :action => "show_b_type", :id => big_type, :format => "htm" %>
+              <ul class = "class2">
+                <% mid_types = ProdMType.where("prod_b_type_id = ?",big_type) %>
+                <% for mid_type in mid_types %>
+                  <% count_in_mid_types = Serial.where('(serials.prod_m_type_id = ? or prod_s_types.prod_m_type_id = ?) and serials.is_in_site = 1', mid_type, mid_type).includes(:prod_s_type).size %>
+                  <% unless count_in_mid_types == 0 %>
+                    <li><%= link_to mid_type.name + "(" + count_in_mid_types.to_s + ")", :action => "show_m_type", :id => mid_type, :format => "htm" %></li>
+                  <% end %>
+                <% end %>
+              </ul>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+  </div>
+</div>
