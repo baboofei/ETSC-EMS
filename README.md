@@ -1,18 +1,7 @@
 ETSC-EMS
 ========
 
-The ETSC Enterprise Management System.
-Written mainly in Ruby, with Rails MVC Framework.
-
-In case you are new to Git or Github or just need some help to begin working... 
-Check out the ...Wait, What? part of this page!
-
-Translation needed, EN-US to ZH-CN.
-
-2014 Jun
-
-Documentation
-========
+The ETSC Enterprise Man
 
 For detailed documentation, see:
 https://github.com/baboofei/ETSC-EMS/wiki
@@ -20,6 +9,8 @@ https://github.com/baboofei/ETSC-EMS/wiki
 Latest change in documentation:
 
     [Add] File & Directory Tree
+    
+Current Code Climate Status: [![Code Climate](https://codeclimate.com/repos/53acc02c6956801ca2005d1e/badges/4fc587b3b5b28de46160/gpa.png)](https://codeclimate.com/repos/53acc02c6956801ca2005d1e/feed)
 
 Contributors
 ========
