@@ -466,8 +466,13 @@ module Reusable
                                             #binding.pry
 
                                             all_has_many_reflections = model_name.constantize.reflect_on_all_associations(:has_many)
-                                            if all_has_many_reflections.select{|p| p.name == join_reflection_queue_array[0].to_sym}.size > 0
-                                                collect_id_array << "#{table_name.singularize}_id"
+                                            matched_reflections = all_has_many_reflections.select { |p| p.name == join_reflection_queue_array[0].to_sym }
+                                            if matched_reflections.size > 0
+                                                if matched_reflections[0].options[:through].blank?
+                                                    collect_id_array << "#{table_name.singularize}_id"
+                                                else
+                                                    collect_id_array << "id"
+                                                end
                                             else
                                                 collect_id_array << "id"
                                             end
