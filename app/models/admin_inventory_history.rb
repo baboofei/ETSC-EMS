@@ -26,10 +26,11 @@ class AdminInventoryHistory < ActiveRecord::Base
 
     def self.export_excel(params, user_id)
 
-        #binding.pry
         #data = where("admin_inventory_histories.user_id = 37").where(["admin_inventory_histories.act_type = ? or admin_inventory_histories.act_type = ?", "buy_in", "reject"])
         data = where("admin_inventory_histories.user_id = #{user_id}").where(["admin_inventory_histories.act_type = ? or admin_inventory_histories.act_type = ?", "buy_in", "reject"])
         unless params["start_at"].blank? && params["end_at"].blank?
+            params["end_at"] = "2999-12-31" if params["end_at"].blank?
+            params["start_at"] = "1900-01-01" if params["start_at"].blank?
             data = data.where(["admin_inventory_histories.created_at >= ? and admin_inventory_histories.created_at <= ?", "#{params["start_at"]}", "#{params["end_at"]}"])
         end
 
@@ -62,7 +63,6 @@ class AdminInventoryHistory < ActiveRecord::Base
         #sheet.update_row 4, 'Hannes Wyss', 'Switzerland', 'Author'
 
         sheet.row(0).concat %w(操作类型 名称 型号 描述 数量 单位 单价 RMB单价 供应商 入库时间 备注)
-        #binding.pry
         1.upto(data.size) { |i|
             history = data[i - 1]
             item = history.after_admin_inventory
