@@ -24,3 +24,6 @@
 
 # Ignore PDF files that arn't necessary
 /*.pdf
+
+# Ignore database config
+/config/database.yml

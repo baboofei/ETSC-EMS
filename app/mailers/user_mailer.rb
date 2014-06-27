@@ -553,6 +553,19 @@ class UserMailer < ActionMailer::Base
         )
     end
 
+    #发送涉及该工厂的已报价未合同、已报价已预签合同的个案列表；以及已合同合同项状态未下单的合同列表
+    def products_updated_hint_through_vendor_unit_email(vendor_unit, unsigned_salecases, pre_signed_salecases, contracts, to_user)
+        @unsigned_salecases = unsigned_salecases
+        @pre_signed_salecases = pre_signed_salecases
+        @contracts = contracts
+
+        mail(:to => to_user.map{|p| User.find(p).etsc_email},
+             :subject => "#{vendor_unit.name}产品改动情况表"
+        )
+        p "#{vendor_unit.name} 产品已发送"
+        sleep 3
+    end
+
     #催款邮件
     def urge_payment_email(sender, receiver_ids)
         receiver_ids = receiver_ids - $obsoleted_user_ids

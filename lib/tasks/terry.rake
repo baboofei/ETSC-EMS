@@ -262,8 +262,8 @@ LEFT JOIN users AS u2 ON gu2.user_id = u2.id").map(&:id) if sale.groups.to_s.mat
             .includes(:recommend_factories))
                 #去掉签过合同的，process == 27
                 #去掉完结的，process == 15
-                salelogs.uniq!.reject! do |p|
-                    salelog_process = p.salecase.salelogs.map(&:process)
+                salelogs.uniq!.reject! do |now_salelog|
+                    salelog_process = now_salelog.salecase.salelogs.map(&:process)
                     (salelog_process.include? 27) || (salelog_process.include? 15)
                 end
                 #测试， 发给terry
@@ -343,13 +343,9 @@ LEFT JOIN users AS u2 ON gu2.user_id = u2.id").map(&:id) if sale.groups.to_s.mat
 
                 #选出有预签合同的，process == 10
                 salecases.uniq!
-                salecases.select! do |salecase|
-                    salecase.salelogs.map(&:process).include? 10
-                end
+                salecases.select! { |salecase| salecase.salelogs.map(&:process).include? 10 }
                 #再剔除掉已经签了合同的，process == 27
-                salecases.reject! do |salecase|
-                    salecase.salelogs.map(&:process).include? 27
-                end
+                salecases.reject! { |salecase| salecase.salelogs.map(&:process).include? 27 }
                 #p salecases.size
                 #binding.pry
 
@@ -395,6 +391,50 @@ LEFT JOIN users AS u2 ON gu2.user_id = u2.id").map(&:id) if sale.groups.to_s.mat
         end
     end
     #疑似namespace处结束
+
+    desc '某工厂产品价格调整时，发送涉及该工厂的已报价未合同、已报价已预签合同的个案列表；以及已合同合同项状态未下单的合同列表'
+    task :send_products_updated_hint_through_vendor_unit_mail => :environment do
+        vendor_unit_short_code_array = %w(PIC MPD)
+
+        vendor_unit_short_code_array.each do |vendor_unit_code|
+            vendor_unit = VendorUnit.where("short_code = ?", vendor_unit_code)[0]
+            #个案
+            #全部报过该工厂产品的个案
+            salecases = Salecase.where("vendor_units.short_code = ?", vendor_unit_code)\
+            .joins("LEFT JOIN salelogs ON salelogs.salecase_id = salecases.id")\
+            .joins("LEFT JOIN quotes ON salelogs.id = quotes.quotable_type = 'Salelog' and quotes.quotable_id = salelogs.id")\
+            .joins("LEFT JOIN quote_items ON quote_items.quote_id = quotes.id")\
+            .joins("LEFT JOIN products ON quote_items.product_id = products.id")\
+            .joins("LEFT JOIN vendor_units ON products.producer_vendor_unit_id = vendor_units.id")
+
+            #去掉完结的，process == 15
+            undone_salecases = salecases.uniq.reject do |salecase|
+                salecase.salelogs.map(&:process).include? 15
+            end
+
+            #去掉签过合同的，process == 27
+            unsigned_salecases = undone_salecases.reject do |salecase|
+                salecase.salelogs.map(&:process).include? 27
+            end
+
+            #选出有预签合同的，process == 10
+            pre_signed_salecases = unsigned_salecases.select do |salecase|
+                salecase.salelogs.map(&:process).include? 10
+            end
+
+            #合同
+            contracts = Contract.where("vendor_units.short_code = ?", vendor_unit_code)\
+            .where("contract_items.send_status = 2 and contract_items.is_history is null")\
+            .includes(:contract_items => {:product => :producer})
+
+            #binding.pry
+            #测试， 发给terry
+            target_ids = [5]
+            ##正式，发给对应工厂的采购
+            #target_ids = vendor_unit.purchasers.map(&:id)
+            UserMailer.products_updated_hint_through_vendor_unit_email(vendor_unit, unsigned_salecases, pre_signed_salecases, contracts, target_ids).deliver
+        end
+    end
 
     desc '发送每月新客户明细邮件'
     task :send_new_customer_detail_mail => :environment do
