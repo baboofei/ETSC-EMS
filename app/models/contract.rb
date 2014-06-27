@@ -674,7 +674,7 @@ class Contract < ActiveRecord::Base
                     PersonalMessage.create_or_update_with(message_params, user_id)
                 end
                 #邮件通知
-                UserMailer.contract_change_email(contract, target_id).deliver if mail_modify_detail_array.size > 0
+                UserMailer.contract_change_email(contract, target_ids).deliver if mail_modify_detail_array.size > 0
             end
         end
 
