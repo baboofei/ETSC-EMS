@@ -82,7 +82,8 @@ EIMV5::Application.routes.draw do
   match 'calendars/rest_calendar' => 'calendars#rest_calendar'
   match ':controller/:action'
   match 'application/download/:file_type/:file_name' => 'application#download'
-  match 'login' => 'index#index'
+  #TODO 想一个比较合适的staff名字
+  match 'staff' => 'index#index'
 
   resources :users
   root :to => 'site#index'

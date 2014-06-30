@@ -1,0 +1,727 @@
+class ContractsController < ApplicationController
+  before_filter :authorize, :time_zone_adjust
+  skip_before_filter :verify_authenticity_token
+  layout "basic"
+  # GET /contracts
+  # GET /contracts.xml
+  def index
+#    @contracts = Contract.all
+#
+#    respond_to do |format|
+#      format.html # index.html.erb
+#      format.xml  { render :xml => @contracts }
+#    end
+#不知道怎么用，用自己的方法先Terry20110221
+    show_or_hide_by_role
+  end
+
+  # GET /contracts/1
+  # GET /contracts/1.xml
+  def show
+    @contract = Contract.find(params[:id])
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml  { render :xml => @contract }
+    end
+  end
+
+  # GET /contracts/new
+  # GET /contracts/new.xml
+  def new
+    @contract = Contract.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml => @contract }
+    end
+  end
+
+  # GET /contracts/1/edit
+  def edit
+    if params[:id] == "foo"
+      #说明其实是新增
+      @contract = Contract.new
+      if @contract.save
+        params[:id] = @contract.id
+        render :text => {'str' => 'OK', "number" => @contract.id}.to_json
+      else
+        render :text => {'str' => 'XX'}.to_json
+      end
+    else
+      #说明是编辑
+      @contract = Contract.find(params[:id])
+    end
+    if customer_unit = @contract.customer_unit
+      @customer_unit_id = customer_unit.id
+      @customer_unit_name = customer_unit.name
+    end
+    if equiper = @contract.equiper
+      @equiper_customer_id = equiper.id
+      @equiper_customer = equiper.name
+    end
+    if buyer = @contract.buyer
+      @buyer_customer_id = buyer.id
+      @buyer_customer = buyer.name
+    end
+    if pop_unit = @contract.pop_unit
+      @pop_unit_id = pop_unit.id
+      @pop_unit = pop_unit.name
+    end
+    if pop = @contract.pop
+      @pop_id = pop.id
+      @pop = pop.name
+    end
+    if signer = @contract.signer
+      @signer_user_id = signer.id
+      @signer_user_name = signer.real_name
+    else
+      @signer_user_id = ""
+      @signer_user_name = ""
+    end
+    if our_company = @contract.our_company
+      @our_company_id = our_company.id
+      @our_company = our_company.name
+    end
+    if @contract.etsc_number.blank?
+      @etsc_number = Contract.next_number
+    else
+      @etsc_number = @contract.etsc_number
+    end
+    @customer_number = @contract.customer_number
+    @summary = @contract.summary
+    @requirement_sort_id = @contract.requirement_sort
+    @status = @contract.status
+    if currency = @contract.currency
+      @currency_id = currency.id
+      @currency = currency.name
+    end
+    @sum = @contract.sum
+    @exchange_rate = @contract.exchange_rate
+    @rmb = @contract.rmb
+    if pay_mode = @contract.pay_mode
+      @pay_mode_id = pay_mode.id
+      @pay_mode = pay_mode.mode_in_txt
+    end
+    @does_need_install = @contract.does_need_install || 0
+    @has_received_lc = @contract.received_lc_on.blank? ? "" : @contract.received_lc_on.to_s
+    @invoice = @contract.invoice
+    @profit = @contract.profit
+    @collection = @contract.collection
+    @remark = @contract.remark
+
+    @flow_status = @contract.flow_status#用于判断是否要弹框写原因
+
+    show_or_hide_by_role
+  end
+
+  # POST /contracts
+  # POST /contracts.xml
+  def create
+    @contract = Contract.new(params[:contract])
+
+    respond_to do |format|
+      if @contract.save
+        format.html { redirect_to(@contract, :notice => 'Sell contract was successfully created.') }
+        format.xml  { render :xml => @contract, :status => :created, :location => @contract }
+      else
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @contract.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  # PUT /contracts/1
+  # PUT /contracts/1.xml
+  def update
+    @contract = Contract.find(params[:id])
+
+    respond_to do |format|
+      if @contract.update_attributes(params[:contract])
+        format.html { redirect_to(@contract, :notice => 'Sell contract was successfully updated.') }
+        format.xml  { head :ok }
+      else
+        format.html { render :action => "edit" }
+        format.xml  { render :xml => @contract.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /contracts/1
+  # DELETE /contracts/1.xml
+  def destroy
+    @contract = Contract.find(params[:id])
+    @contract.destroy
+
+    respond_to do |format|
+      format.html { redirect_to(contracts_url) }
+      format.xml  { head :ok }
+    end
+  end
+
+  #根据session里的user_id判断显示哪些按钮之类
+  def show_or_hide_by_role
+    u = User.find(session[:user_id])
+    if session[:user_id] == 1 or u.role_ids.include?(9)
+      #如果是BOSS或者Admin，则能改全部
+      @edit_bussiness = true
+      @edit_finance = true
+    elsif u.role_ids.include?(3) or u.role_ids.include?(4)
+      #如果是财务，则能改财务相关
+      @edit_bussiness = false
+      @edit_finance = true
+    elsif u.role_ids.include?(6)
+      #如果是商务，则能改商务相关
+      @edit_bussiness = true
+      @edit_finance = false
+    else
+      #如果是其它，则都只能看不能改
+      @edit_bussiness = false
+      @edit_finance = false
+    end
+  end
+
+  def save_as_with_reason_ajax
+#    p params[:notice]
+#    p params[:sale_log]
+    if params[:result_str_hidden] != ""
+      #为空表示没有在JS那边解析过，说明此值已经是表中记录
+      in_str = params[:result_str_hidden]
+      #解析好的串，查找一下是否已经有此值(虽然一般来说是没有)
+      pay_mode = PayMode.find_by_mode_in_str(in_str)
+      unless pay_mode
+        pay_mode = PayMode.new("mode_in_str" => in_str)
+        pay_mode.save
+      end
+      params[:submit][:pay_mode_id]=pay_mode.id
+
+    end
+#    p params
+
+    #带原因的，说明修改了，这时候把之前的参数保存到HistoryContract表中
+    attributes = Contract.find(params[:id]).attributes
+    attributes.delete("sell_quote_id")
+    attributes.delete("created_on")
+    attributes.delete("work_task_id")
+    attributes.delete("sale_log_id")
+    attributes.delete("flow_status")
+    history = HistoryContract.new(attributes)
+    history.reason = params[:submit][:reason]
+    history.edited_on = DateTime.now
+    history.editor_user_id = session[:user_id]
+    if history.save
+#      然后用传过来的params替换掉当前的Contract值
+      contract = Contract.find(params[:id])
+      auto_change_to_blank
+#      p params
+      if contract.update_attributes(params[:submit])
+        #有汇率的话存一下
+#        p params[:submit][:currency_id]
+        if params[:submit][:currency_id]!="" && params[:submit][:exchange_rate] && params[:submit][:exchange_rate] != "0"
+          currency = Currency.find(params[:submit][:currency_id])
+          currency.exchange_rate = params[:submit][:exchange_rate]
+          currency.save
+        end
+        #要发消息的列表
+#        p params[:message]
+        if params[:message]!="false"
+          receivers = []
+          ##负责的销售要发
+          u = contract.signer
+          receivers << u.id
+          ##此销售的部门经理要发
+          department = u.department_id
+          manager = User.find(:all, :conditions => "department_id = #{department} and role_id =1", :include => [:roles]).map{|p| p.id}
+          receivers += manager
+          #财务(会计+出纳)要发
+          financial = User.find(:all, :conditions => "role_id = 3 or role_id = 4", :include => [:roles]).map{|p| p.id}
+          receivers += financial
+          #商务经理要发
+          ba_manager = User.find(:all, :conditions => "department_id = 9 and role_id =1", :include => [:roles]).map{|p| p.id}
+          receivers += ba_manager
+          #BOSS要发
+          receivers << 1
+          receivers.uniq!
+          for receiver in receivers
+            message = Message.new
+            message.sender_user_id = session[:user_id]
+            message.receiver_user_id = receiver
+            message.content = "做了个合同，签订者是#{u.real_name}，"
+            message.content += "客户是#{contract.equiper.customer_unit.name}的#{contract.equiper.name}，"
+            message.content += "合同内容是#{contract.summary}，"
+            message.content += "金额为#{contract.currency.name} #{contract.sum.to_s}，"
+            message.content += "折合人民币#{contract.rmb.to_s}。"
+            message.send_on = DateTime.now
+            message.save
+          end
+#          message.re
+        end
+        #要进销售工作日志的加一条
+        if params[:sale_log]!="false"
+          sale_log = SaleLog.new
+          sale_log.contact_time = DateTime.now
+          sale_log.user_id = contract.signer_user_id#算成销售的，因为商务财务都没有日志=_=
+          sale_log.customer_id = contract.equiper_customer_id#算成使用者的
+          sale_log.process = 9#正式签合同，$PROCESSES_OF_SALE_LOG中定义
+          #这里有点混乱，先写着吧，不行再改
+          unless contract.sell_quote.blank?
+            #如果有sell_quote，那么用它的sale_log.sale_case
+            sale_log.sale_case = contract.sell_quote.sale_log.sale_case
+          else
+            #没有的话，直接用合同自己的log和case
+            sale_log.sale_case = contract.sale_log.sale_case
+          end
+          sale_log.save
+        end
+        redirect_to :action => 'index'
+      else
+        render :action => 'edit'
+      end
+    else
+      render :action => 'edit'
+    end
+  end
+
+  #用于“抵消”默认值
+  def auto_change_to_blank
+    params[:submit][:pop_unit_id] = "" if params[:submit][:pop_unit_id] == "请输入进出口公司，并在提示的下拉框中选一个。记得一定要选一下……"
+    params[:submit][:pop_id] = "" if params[:submit][:pop_id] == "请选择进出口公司联系人姓名……"
+    params[:submit][:etsc_number] = "" if params[:submit][:etsc_number] == "请输入我们公司合同编号……"
+    params[:submit][:customer_number] = "" if params[:submit][:customer_number] == "请输入客户方合同编号……"
+    params[:submit][:summary] = "" if params[:submit][:summary] == "请输入此合同中所含商品简称……"
+    params[:submit][:requirement_sort] = "" if params[:submit][:requirement_sort] == "请选择供求类别……"
+    params[:submit][:status] = "" if params[:submit][:status] == "请选择合同状态……"
+    params[:submit][:currency_id] = "" if params[:submit][:currency_id] == "请选择币种……"
+    params[:submit][:sum] = "" if params[:submit][:sum] == "请输入合同总金额……"
+    params[:submit][:exchange_rate] = "" if params[:submit][:exchange_rate] == "请输入当前汇率……"
+    params[:submit][:does_need_install] = "1" if params[:submit][:does_need_install] == "on"#这个Ext未免太傻了点
+    params[:submit][:pay_mode_id] = "" if params[:submit][:pay_mode_id] == "格式：签合同时付##%(电汇)，发货前付##%(电汇)，发货后付##%(电汇)，验收时付##%(电汇)"
+    params[:submit][:profit] = "" if params[:submit][:profti] == "请输入此合同的利润……"
+    params[:submit][:invoice] = "" if params[:submit][:invoice] == "请选择此合同的开票状态……"
+    params[:submit][:collection] = "" if params[:submit][:collection] == "请输入已经收到的金额……"
+    #顺便记录一下用户id
+    params[:submit][:dealer_user_id] = session[:user_id]
+  end
+
+  #获取合同项信息以生成表格
+  def get_detail
+    respond_to do |format|
+      format.json {
+        detail_list = gen_detail
+        render :text => detail_list.to_json
+      }
+    end
+  end
+
+  def gen_detail(dummy = nil)
+    detail_array = []
+    contract = Contract.find(params[:id])
+    contract_items = contract.contract_items
+    contract_items.each_with_index do |sci, index_i|
+      detail_array << eval("{'id' => '"+sci.id.to_s+
+        "', 'product_model' => '" + sci.product.model + "(" + sci.product.seller.name + ")"+
+        "', 'product_id' => '" + sci.product.id.to_s+
+        "', 'quantity' => '" + sci.product_quantity.to_s+
+        "', 'send_status' => '" + (sci.send_status_txt) +
+        "', 'expected_leave_factory_on' => '" + (sci.expected_leave_factory_on.nil? ? "待定" : sci.expected_leave_factory_on.strftime("%Y-%m-%d"))+
+        "', 'actually_leave_factory_on' => '" + (sci.actually_leave_factory_on.nil? ? "待定" : sci.actually_leave_factory_on.strftime("%Y-%m-%d"))+
+        "', 'reach_customer_on' => '" + (sci.reach_customer_on.nil? ? "待定" : sci.reach_customer_on.strftime("%Y-%m-%d"))+
+        "', 'check_and_accept_on' => '" + (sci.check_and_accept_on.nil? ? "待定" : sci.check_and_accept_on.strftime("%Y-%m-%d"))+
+        "', 'term' => '" + sci.term_txt +
+      "'}")
+    end
+    {"root" => detail_array}
+  end
+
+  def ext_paginate
+    #响应分页事件
+    respond_to do |format|
+      format.json {
+        contract_json = gen_contract_paginate_json(params[:start].to_i,params[:limit],params[:sort],params[:dir],params[:keyword])
+        render :text => contract_json.to_json
+      }
+    end
+  end
+
+  def gen_contract_paginate_json(start,limit,keyword,sort="id",dir="DESC")
+    #生成合同列表的分页JSON
+    contract_json=[]
+#    #有些字段可能在数据库里为空，但显示出来会有问题，所以不能要
+#    not_null_field = %w(etsc_number summary customer_number signer_user_id buyer_customer_id equiper_customer_id pop_id)
+#    origin_conditions = not_null_field.map{|p| "contracts."+p+" is not null"}.join(" or ")#因为会有无效数据，所以先限定一下使之在列表里不显示……
+#    origin_conditions += " and contracts.customer_unit_id is not null and contracts.pop_unit_id is not null"
+#    origin_conditions = "(" + origin_conditions + ")"
+#    if User.find(session[:user_id]).role_ids.include?(1)
+#    else
+#      #如果不是经理角色，则只能处理别人没处理的
+#      origin_conditions += " and (contracts.dealer_user_id = #{session[:user_id]} or contracts.dealer_user_id is null)"
+#    end
+
+    if keyword.blank?
+      #没有关键字
+      total_records = Contract.all
+      contracts = Contract.limit(limit.to_i).offset(start.to_i).order(sort + " " + dir)
+    else
+      #先把关键字按空格切分，全角半角都算，取前五个
+      keywords = keyword.split("　").join(" ").split(" ")[0..4]
+      #如果关键字中有一个“+”，则按and来计算，否则就算or
+      if keywords.index("+")
+        joint = "and"
+        keywords = keywords-["+"]
+      else
+        joint = "or"
+      end
+      #参与查找的字段
+      columns = %w(summary customer_number)
+      fore_conditions_keyword = []#按关键字再循环后的数组
+      back_conditions = []
+      #先对关键字循环
+      for i_keyword in keywords
+        #再对字段循环
+        fore_conditions_column = []#按字段循环后的数组
+        for column in columns
+          fore_conditions_column << "contracts."+column+" like ?"#这里需要注意，带“表名”，为避免多表里有重名字段要特别标记之
+          back_conditions << "%"+i_keyword+"%"
+        end
+        #以下是跨表字段，单独写
+        fore_conditions_column << "customer_units.name like ?"
+        back_conditions << "%"+i_keyword+"%"
+        fore_conditions_column << "customers.name like ?"
+        back_conditions << "%"+i_keyword+"%"
+        fore_conditions_column << "pop_units.name like ?"
+        back_conditions << "%"+i_keyword+"%"
+        fore_conditions_column << "pops.name like ?"
+        back_conditions << "%"+i_keyword+"%"
+
+        fore_condition_column = "(" + fore_conditions_column.join(" or ") + ")"#这一层全是or，因为是针对每个字段
+        fore_conditions_keyword << fore_condition_column
+      end
+      fore_condition = fore_conditions_keyword.join(" "+joint+" ") + " and (" + origin_conditions + ")"
+      conditions = fore_condition.to_a + back_conditions
+      #跨表查询，include后面带的是“模型”里“belongs_to”或者“has_many”的那个东东
+      total_records = Contract.find(:all, :conditions => conditions, :include => [{:equiper => {:customer_unit => :customers}},:pop, :pop_unit])
+      contracts = Contract.find(:all,
+        :order => "contracts."+sort+" "+dir,#这里也有重名字段问题，所以一定要写前面的表名
+        :conditions => conditions,
+        :limit => limit,
+        :offset => start,
+        :include => [{:equiper => {:customer_unit => :customers}},:pop, :pop_unit]
+      )
+    end
+    for contract in contracts
+      contract_json << gen_etsc_contract_json(contract)
+    end
+#    if keyword.blank?
+#      #没有关键字，总记录数取整个产品表
+#      {"totalRecords" => Contract.count.to_s, "root" => contract_json}
+#    else
+      #有关键字，总记录数取查找结果
+      {"totalRecords" => total_records.size.to_s, "data" => contract_json}
+#    end
+  end
+
+  def save_customer_unit_ajax
+    contract = Contract.find(params[:id])
+    contract.customer_unit_id = params[:customer_unit_id]
+    if contract.save
+      render :text => {'str' => 'OK'}.to_json
+    else
+      render :text => {'str' => 'XX'}.to_json
+    end
+  end
+
+  def save_pop_unit_ajax
+    contract = Contract.find(params[:id])
+    contract.pop_unit_id = params[:pop_unit_id]
+    if contract.save
+      render :text => {'str' => 'OK'}.to_json
+    else
+      render :text => {'str' => 'XX'}.to_json
+    end
+  end
+
+  #列出指定id报价下所有报价项的属性，给summary table用
+  def get_contract_items
+    respond_to do |format|
+      format.json {
+        contract_item_list = gen_contract_items
+        render :text => contract_item_list.to_json
+      }
+    end
+  end
+
+  def gen_contract_items(dummy = nil)
+    detail_array = []
+    params["id"] = "1" if params["id"] == "0"#临时用一下
+    contract = Contract.find(params[:id])
+
+    contract_items = contract.contract_items
+    contract_items.each_with_index do |sci, index_b|
+      detail_array << {
+        'id' => sci.id,
+        'product' => sci.product ? (sci.product.name_txt + "(" + sci.product.seller.name + ")") : "",
+        'quantity' => sci.product_quantity.to_s,
+        'send_status' => sci.send_status_txt,
+        'expected_leave_factory_on' => sci.expected_leave_factory_on ? sci.expected_leave_factory_on.strftime("%Y年%m月%d日") : "",
+        'actually_leave_factory_on' => sci.actually_leave_factory_on ? sci.actually_leave_factory_on.strftime("%Y年%m月%d日") : "",
+        'reach_customer_on' => sci.reach_customer_on ? sci.reach_customer_on.strftime("%Y年%m月%d日") : "",
+        'check_and_accept_on' => sci.check_and_accept_on ? sci.check_and_accept_on.strftime("%Y年%m月%d日") : "",
+        'term' => sci.term
+      }
+    end
+    return detail_array
+  end
+
+  def restful
+    if request.get?
+      #查
+      respond_to do |format|
+        format.json {
+          if params[:sort].nil?
+            #如果没有在表格里排序，则没有参数传回来，不管，就相当于用默认的ID降序排
+            contract_json = gen_contract_paginate_json(params[:start],params[:limit],params[:keyword])#,params[:sort],params[:dir])
+          else
+            #如果表格里有排序，会传过来类似"[{\"property\":\"mobile\",\"direction\":\"ASC\"}]"的参数
+            sort_param_hash = JSON.parse(params[:sort])
+            sort = sort_param_hash[0]["property"]
+            dir = sort_param_hash[0]["direction"]
+            contract_json = gen_contract_paginate_json(params[:start],params[:limit],params[:keyword],sort,dir)
+          end
+          render :text => contract_json.to_json
+        }
+      end
+    elsif request.put?
+      #改
+      data = params["data"]
+      #处理完毕，新增json、砍多余字段
+      contract_json = []
+      contract_id = data["id"]
+      contract = Contract.find(contract_id)
+      data.delete("id")
+      data.delete("contract_item_ids")#这个在合同项修改时已经存过了对应关系，这里删掉，不然会只认第一项
+      data.delete("receivable_ids")#这个在应收款修改时已经存过了对应关系，这里删掉，不然会只认第一项
+      data.delete("collection_ids")#这个在已收款修改时已经存过了对应关系，这里删掉，不然会只认第一项
+      data["dealer_user_id"] = session[:user_id]
+      #当前时间为收到信用证时间
+      data["received_lc_on"] = DateTime.now if data["does_receive_lc"] != ""
+      data.delete("does_receive_lc")
+      #保存
+      #先把当前合同的一系列参数传给HistoryContract表
+      attributes = contract.attributes
+      attributes.delete("sell_quote_id")
+      attributes.delete("created_on")
+      attributes.delete("work_task_id")
+      attributes.delete("sale_log_id")
+      attributes.delete("flow_status")
+      history = HistoryContract.new(attributes)
+      history.reason = params["data"]["reason"]
+      history.edited_on = DateTime.now
+      history.editor_user_id = session[:user_id]
+      if history.save
+        contract.update_attributes(data)
+        data["id"] = contract_id
+        contract_json << gen_etsc_contract_json(contract)
+        render :text => {"success" => true, "message" => "已修改", "data" => contract_json}.to_json
+      else
+        render :text => {"success" => false, "message" => "修改出错", "data" => contract_json}.to_json
+      end
+    elsif request.post?
+      #增
+      data = params["data"]
+      #传来的字符串留着备用
+      temp_receivable_ids = data["receivable_ids"]
+      temp_collection_ids = data["collection_ids"]
+      temp_contract_item_ids = data["contract_item_ids"]
+      #处理完毕，新增json、砍多余字段
+      contract_json = []
+      data.delete("contract_item_ids")#这个在合同项修改时已经存过了对应关系，这里删掉，不然会只认第一项
+      data.delete("receivable_ids")#这个在应收款修改时已经存过了对应关系，这里删掉，不然会只认第一项
+      data.delete("collection_ids")#这个在已收款修改时已经存过了对应关系，这里删掉，不然会只认第一项
+      data["dealer_user_id"] = session[:user_id]
+      data.delete("dealer")
+      data.delete("signer")
+      data.delete("our_company")
+      data.delete("pay_mode")
+      unless data["pay_mode_id"].is_a?(Integer)
+        #如果传来的pay_mode_id是不整数，则解析之
+        pay_mode_str = parse_pay_mode(data["pay_mode_id"])
+        #如果没有重复的，则以此新增一项pay_mode
+        if PayMode.where("mode_in_str = ?", pay_mode_str).size == 0
+          pay_mode = PayMode.new
+          pay_mode.mode_in_str = pay_mode_str
+          pay_mode.save
+        else
+          pay_mode = PayMode.where("mode_in_str = ?", pay_mode_str)[0]
+        end
+
+        data["pay_mode_id"] = pay_mode.id
+      end
+      data["does_need_install"] = (data["does_need_install"] == "")
+      #当前时间为收到信用证时间
+      data["received_lc_on"] = DateTime.now if data["does_receive_lc"] != ""
+      data.delete("does_receive_lc")
+      data.delete("received_lc_on")
+      data.delete("pop")
+      data.delete("pop_unit")
+      data.delete("customer_unit")
+      data.delete("equiper_customer")
+      data.delete("buyer_customer")
+      data.delete("currency")
+      data.delete("receivable_ids")
+      data.delete("collection_ids")
+      data.delete("contract_item_ids")
+      data["etsc_number"] = Contract.next_number
+
+      contract = Contract.new(data)
+      contract.save
+
+      #从已有的收款点等参数中新增一些新的，并归属于新增的这个contract
+      if temp_receivable_ids.size > 0
+        for receivable in temp_receivable_ids
+          attributes = receivable.attributes
+          new_receivable = Receivable.new(attributes)
+          new_receivable.contract_id = contract.id
+          new_receivable.save
+        end
+      end
+      if temp_collection_ids.size > 0
+        for collection in temp_collection_ids
+          attributes = collection.attributes
+          new_collection = Collection.new(attributes)
+          new_collection.contract_id = contract.id
+          new_collection.save
+        end
+      end
+      if temp_contract_item_ids.size > 0
+        for contract_item in temp_contract_item_ids
+          attributes = contract_item.attributes
+          new_contract_item = ContractItem.new(attributes)
+          new_contract_item.contract_id = contract.id
+          new_contract_item.save
+        end
+      end
+
+      data["id"] = contract.id
+      contract_json << gen_etsc_contract_json(contract)
+      render :text => {"success" => true, "message" => "已新建", "data" => contract_json}.to_json
+    end
+  end
+
+  #自定义生成所需字段的json，给“增”“改”“查”用
+  def gen_etsc_contract_json(contract)
+    contract.pop_unit ? (pop_unit, pop_unit_id = contract.pop_unit.name, contract.pop_unit.id) : (pop_unit, pop_unit_id = nil, nil)
+    contract.pop ? (pop, pop_id = contract.pop.name, contract.pop.id) : (pop, pop_id = nil, nil)
+    contract.currency ? (currency, currency_id = contract.currency.name, contract.currency.id) : (currency, currency_id = nil, nil)
+    contract.pay_mode ? (pay_mode, pay_mode_id = contract.pay_mode.mode_in_txt, contract.pay_mode.id) : (pay_mode, pay_mode_id = nil, nil)
+    {
+      "etsc_number" => contract.etsc_number,
+      "summary" => contract.summary,
+      "sell_quote_number" => contract.sell_quote ? contract.sell_quote.quote_number : "",
+      "customer_number" => contract.customer_number,
+      "signer" => contract.signer.real_name,
+      "signer_user_id" => contract.signer.id,
+      "dealer" => contract.dealer.real_name,
+      "dealer_user_id" => contract.dealer.id,
+      "our_company" => contract.our_company.shown_name,
+      "our_company_id" => contract.our_company.id,
+      "pop_unit" => pop_unit,
+      "pop_unit_id" => pop_unit_id,
+      "pop" => pop,
+      "pop_id" => pop_id,
+      "customer_unit" => contract.customer_unit.name,
+      "customer_unit_id" => contract.customer_unit.id,
+      "equiper_customer" => contract.equiper.name,
+      "equiper_customer_id" => contract.equiper.id,
+      "buyer_customer" => contract.buyer.name,
+      "buyer_customer_id" => contract.buyer.id,
+      "requirement_sort" => contract.requirement_sort,
+      "status" => contract.status,
+      "does_need_install" => contract.does_need_install,
+      "does_receive_lc" => contract.received_lc_on ? true : false,
+      "received_lc_on" => contract.received_lc_on,
+      "sum" => contract.sum.to_s,
+      "currency" => currency,
+      "currency_id" => currency_id,
+      "exchange_rate" => contract.exchange_rate,
+      "rmb" => contract.rmb,
+      "pay_mode" => pay_mode,
+      "pay_mode_id" => pay_mode_id,
+      "profit" => contract.profit,
+      "invoice" => contract.invoice,
+      "receivable_ids" => contract.receivables.map{|p| p.id}.join("|"),
+      "collection_ids" => contract.collections.map{|p| p.id}.join("|"),
+      "contract_item_ids" => contract.contract_items.map{|p| p.id}.join("|"),
+      "remark" => contract.remark,
+      "reason" => "",
+      "id" => contract.id
+    }
+  end
+
+  #解析自定义的付款方式串
+  def parse_pay_mode(pay_mode_txt)
+    pay_mode_str = ""
+    pay_mode_part1 = pay_mode_txt.split("，")[0]
+    if pay_mode_part1 =~ /%/
+      #包含“%”，说明是以百分比形式保存的
+      pay_mode_str += "PER"
+    else
+      #不包含“%”，是以币种形式保存的
+      pay_mode_str += pay_mode_part1.gsub(/[^A-Z]/, "")
+    end
+
+    temp_hash_for_order = {}
+    if pay_mode_txt =~ /签合同时/
+      #包含“签合同时”这一时间段
+      detail = pay_mode_txt.split("签合同时")[1].split("，")[0]
+      #取出L或者T
+      l_or_t_or_c = detail.match(/信用证/).blank? ? (detail.match(/电汇/).blank? ? "C" : "T") : "L"
+      #取出金额或者百分比
+      sum_or_per = detail.gsub(/\D/, "")
+      temp_hash_for_order[1] = sum_or_per + l_or_t_or_c
+    else
+      #不包含“签合同时”，这一项写0，再查别的
+      temp_hash_for_order[1] = "0T"
+    end
+
+    if pay_mode_txt =~ /发货前/
+      #包含“发货前”这一时间段
+      detail = pay_mode_txt.split("发货前")[1].split("，")[0]
+      #取出L或者T
+      l_or_t_or_c = detail.match(/信用证/).blank? ? (detail.match(/电汇/).blank? ? "C" : "T") : "L"
+      #取出金额或者百分比
+      sum_or_per = detail.gsub(/\D/, "")
+      temp_hash_for_order[2] = sum_or_per + l_or_t_or_c
+    else
+      #不包含“发货前”，这一项写0，再查别的
+      temp_hash_for_order[2] = "0T"
+    end
+
+    if pay_mode_txt =~ /发货后/
+      #包含“发货后”这一时间段
+      detail = pay_mode_txt.split("发货后")[1].split("，")[0]
+      #取出L或者T
+      l_or_t_or_c = detail.match(/信用证/).blank? ? (detail.match(/电汇/).blank? ? "C" : "T") : "L"
+      #取出金额或者百分比
+      sum_or_per = detail.gsub(/\D/, "")
+      temp_hash_for_order[3] = sum_or_per + l_or_t_or_c
+    else
+      #不包含“发货后”，这一项写0，再查别的
+      temp_hash_for_order[3] = "0T"
+    end
+
+    if pay_mode_txt =~ /验收时/
+      #包含“验收时”这一时间段
+      detail = pay_mode_txt.split("验收时")[1].split("，")[0]
+      #取出L或者T
+      l_or_t_or_c = detail.match(/信用证/).blank? ? (detail.match(/电汇/).blank? ? "C" : "T") : "L"
+      #取出金额或者百分比
+      sum_or_per = detail.gsub(/\D/, "")
+      temp_hash_for_order[4] = sum_or_per + l_or_t_or_c
+    else
+      #不包含“验收时”，这一项写0，再查别的
+      temp_hash_for_order[4] = "0T"
+    end
+    pay_mode_str += temp_hash_for_order[1].to_s + temp_hash_for_order[2].to_s + temp_hash_for_order[3].to_s + temp_hash_for_order[4].to_s
+    return pay_mode_str
+  end
+end

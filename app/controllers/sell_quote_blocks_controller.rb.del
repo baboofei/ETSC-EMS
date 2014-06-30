@@ -1,0 +1,86 @@
+class SellQuoteBlocksController < ApplicationController
+  before_filter :authorize, :time_zone_adjust
+  skip_before_filter :verify_authenticity_token
+  layout "basic"
+  # GET /sell_quote_blocks
+  # GET /sell_quote_blocks.xml
+  def index
+    @sell_quote_blocks = SellQuoteBlock.all
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml => @sell_quote_blocks }
+    end
+  end
+
+  # GET /sell_quote_blocks/1
+  # GET /sell_quote_blocks/1.xml
+  def show
+    @sell_quote_block = SellQuoteBlock.find(params[:id])
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml  { render :xml => @sell_quote_block }
+    end
+  end
+
+  # GET /sell_quote_blocks/new
+  # GET /sell_quote_blocks/new.xml
+  def new
+    @sell_quote_block = SellQuoteBlock.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml => @sell_quote_block }
+    end
+  end
+
+  # GET /sell_quote_blocks/1/edit
+  def edit
+    @sell_quote_block = SellQuoteBlock.find(params[:id])
+  end
+
+  # POST /sell_quote_blocks
+  # POST /sell_quote_blocks.xml
+  def create
+    @sell_quote_block = SellQuoteBlock.new(params[:sell_quote_block])
+
+    respond_to do |format|
+      if @sell_quote_block.save
+        format.html { redirect_to(@sell_quote_block, :notice => 'Sell quote block was successfully created.') }
+        format.xml  { render :xml => @sell_quote_block, :status => :created, :location => @sell_quote_block }
+      else
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @sell_quote_block.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  # PUT /sell_quote_blocks/1
+  # PUT /sell_quote_blocks/1.xml
+  def update
+    @sell_quote_block = SellQuoteBlock.find(params[:id])
+
+    respond_to do |format|
+      if @sell_quote_block.update_attributes(params[:sell_quote_block])
+        format.html { redirect_to(@sell_quote_block, :notice => 'Sell quote block was successfully updated.') }
+        format.xml  { head :ok }
+      else
+        format.html { render :action => "edit" }
+        format.xml  { render :xml => @sell_quote_block.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /sell_quote_blocks/1
+  # DELETE /sell_quote_blocks/1.xml
+  def destroy
+    @sell_quote_block = SellQuoteBlock.find(params[:id])
+    @sell_quote_block.destroy
+
+    respond_to do |format|
+      format.html { redirect_to(sell_quote_blocks_url) }
+      format.xml  { head :ok }
+    end
+  end
+end
