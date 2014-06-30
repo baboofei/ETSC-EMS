@@ -30,6 +30,18 @@ class SiteController < ApplicationController
         |x|
       @vendor_units << VendorUnit.where("short_code = ?", x)[0]
     }
+                                                             #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+                                                             #    @vendor_units << VendorUnit.where("short_code = ?", 'PIC')[0]
+                                                             #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+                                                             #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+                                                             #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+                                                             #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+                                                             #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+                                                             #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+                                                             #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+                                                             #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+                                                             #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+                                                             #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
     @vendor_units += VendorUnit.where("is_partner = ? and is_producer = ?", 1, 1).order("name")
     render :layout => "site"
   end
@@ -227,7 +239,7 @@ class SiteController < ApplicationController
   end
 
   #判断新闻要不要显示图片的函数，返回一个Image对象或者nil
-  def get_news_image(news)
+  def if_news_image_exist(news)
     if news
       if !(news.event_images.blank?)
         #如果有新闻图片，则返回第一张图
