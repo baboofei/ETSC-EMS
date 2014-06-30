@@ -82,6 +82,8 @@ EIMV5::Application.routes.draw do
   match 'calendars/rest_calendar' => 'calendars#rest_calendar'
   match ':controller/:action'
   match 'application/download/:file_type/:file_name' => 'application#download'
+  match 'login' => 'index#index'
+
   resources :users
-  root :to => 'index#index'
+  root :to => 'site#index'
 end

@@ -1,1 +1,75 @@
-<h3>ABC</h3>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <% if params[:controller] == "site" && params[:action] == "show_product" %>
+      <meta name="keywords" content="<%= (s = Serial.find(params[:id])) ? s.keywords.map{|p| p.keyword}.join(",") : "武汉东隆科技" %>" />
+    <% else %>
+      <meta name="keywords" content="武汉东隆科技" />
+    <% end %>
+    <meta name="description" content="东隆科技是一家从事光电产品研发、生产及销售的高科技企业，致力于为客户提供专业的全套解决方案。公司创立于1997年，总部位于武汉·中国光谷的东湖高新技术开发区。“服务创造未来”是我们的一贯宗旨，我们坚持以一流的品质、专业的解决方案、完善快捷的服务，立足于国内光电事业，与广大客户携手合作，共创辉煌。" />
+    <meta name="ETSC" content="sales@etsc-tech.com" />
+    <% if params[:controller] == "site" && params[:action] == "show_product" %>
+      <title>东隆科技——国际知名光电产品供应商☆<%= Serial.find(params[:id]).name_txt %>☆</title>
+    <% else %>
+      <title>东隆科技——国际知名光电产品供应商</title>
+    <% end %>
+    <%= stylesheet_link_tag 'site_main' %>
+    <%= javascript_include_tag "MSClass" %>
+  </head>
+  <body>
+    <div id="top_main">
+      <h1>东隆科技有限公司</h1>
+      <div id="top_navibar">
+        <div id="login"><a href="/login">&nbsp;</a></div>
+        <div id="bar2">
+          <div id="qqstat"><a href="http://sighttp.qq.com/cgi-bin/check?sigkey=9291d958668e7f7f74ab2187f7c0333c1d2298dd5b012a55098a51356ed12ed8"; target=_blank; onclick="var tempSrc='http://sighttp.qq.com/wpa.js?rantime='+Math.random()+'&sigkey=9291d958668e7f7f74ab2187f7c0333c1d2298dd5b012a55098a51356ed12ed8';var oldscript=document.getElementById('testJs');var newscript=document.createElement('script');newscript.setAttribute('type','text/javascript'); newscript.setAttribute('id', 'testJs');newscript.setAttribute('src',tempSrc);if(oldscript == null){document.body.appendChild(newscript);}else{oldscript.parentNode.replaceChild(newscript, oldscript);}return false;"><img border="0" SRC='http://wpa.qq.com/pa?p=1:499269653:5' alt="点击这里给东隆客服留言" /><span>点击这里给东隆客服留言</span></a></div>
+          <%= form_tag("/site/search_result", {:method => "get", :id => "searchbar"}) do -%>
+            <%= link_to "English", :controller => "en_site", :action => "index", :id => nil, :format =>"htm" %>
+            <%= text_field_tag("keyword",{},{:value => "请输入搜索关键字", :onfocus => "this.value='';"}) %>
+            <%= submit_tag("搜索", {:class => "search_button", :id => "search"}) %>
+            <input type="button" id="adv_search" value="高级" class="search_button" />
+          <% end %>
+        </div>
+        <div id="navilink">
+          <ul>
+            <li><%= link_to "首页",:action => "index", :id => nil, :format =>"htm" %></li>
+            <li><%= link_to "关于我们",:action => "about1", :id => nil, :format =>"htm" %></li>
+            <li><%= link_to "产品信息",:action => "prod_list", :id => nil, :format =>"htm" %></li>
+            <li><%= link_to "技术支持",:action => "support1", :id => nil, :format =>"htm" %></li>
+            <li><%= link_to "解决方案",:action => "solution", :id => nil, :format =>"htm" %></li>
+            <li><%= link_to "新闻资讯",:action => "news", :id => nil, :format =>"htm" %></li>
+            <li><%= link_to "招贤纳士",:action => "job", :id => nil, :format =>"htm" %></li>
+            <li><a href="mailto:sales@etsc-tech.com">联系我们</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <%= yield %>
+    <div id="bottom_main">
+      <div id="contact_link">
+        <ul>
+          <li><%= link_to "关于我们",:action => "about1" %></li>
+          <li><%= link_to "产品信息",:action => "prod_list" %></li>
+          <li><%= link_to "技术支持",:action => "support1" %></li>
+          <li><%= link_to "新闻资讯",:action => "news" %></li>
+          <li><a href="mailto:sales@etsc-tech.com">联系我们</a></li>
+        </ul>
+      </div>
+      <div id="compaddr">
+        <div id="reg"><img alt="logo" src="/images/site/logo.jpg" width="61" height="23" />
+				东隆科技版权所有&copy;2008<a href="http://www.miibeian.gov.cn/"> 鄂ICP备05008104号</a>			 </div>
+        <div id="tel">电话：86 27 87807177&nbsp;&nbsp;&nbsp;&nbsp;86 10 88231478&nbsp;&nbsp;&nbsp;&nbsp; 86 755 83015356
+        </div>
+        <div id="mail">邮箱： sales@etsc-tech.com
+        </div>
+      </div>
+    </div>
+<!--script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fb363246fd7cddf170b59f4d3f15e7d20' type='text/javascript'%3E%3C/script%3E"));
+</script-->
+  </body>
+</html>

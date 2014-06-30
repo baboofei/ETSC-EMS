@@ -19,7 +19,6 @@
 //以上是User Grid的模型代码
 
 //以下是登录用的User模型代码
-
 var islogin;
 var userName, userId, unreadReminds;
 var globeFilter;
