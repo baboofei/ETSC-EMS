@@ -20,6 +20,10 @@ class Product < ActiveRecord::Base
 
     has_many :received_equipments
 
+    #产品和附件多对多
+    has_many :accessories_products
+    has_many :accessories, :through => :accessories_products
+
     #虚拟属性
     def display_name
         if name.include? model

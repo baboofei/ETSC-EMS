@@ -11,7 +11,15 @@ class Serial < ActiveRecord::Base
   has_many :reverse_serial_relationships, :class_name => 'SerialRelationship', :foreign_key => :related_serial_id
   has_many :main_serials, :through => :reverse_serial_relationships
 
-  def self.recent_20
-    where("true").limit(20).order("id DESC")
+  scope :with_recommend_images, includes(:products => :accessories).where("serials.is_recommend").where("accessories.url REGEXP '\/[A-Z]{3}_PIC_'")
+  scope :recent_20, where("true").limit(20).order("id DESC")
+  def name_txt
+    if brief && name.blank?
+      brief
+    elsif name && brief.blank?
+      name
+    else
+      name + ' - ' + brief
+    end
   end
 end

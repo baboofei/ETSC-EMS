@@ -19,8 +19,8 @@ class SiteController < ApplicationController
 
   def index
     @recent_serials = Serial.recent_20
-    all_recommend_serials = Serial.with_recommend_images.uniq#有图的才出……
-    @recommend_serials = all_recommend_serials.shuffle![0..5]#打乱后取前6个
+    all_recommend_serials = Serial.with_recommend_images.uniq #有图的才出……
+    @recommend_serials = all_recommend_serials.shuffle![0..5] #打乱后取前6个
     @solutions = Solution.find(:all).shuffle![0..5]
 
     @recent_news = Event.order("created_at DESC").limit(6)

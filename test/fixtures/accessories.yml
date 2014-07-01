@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  url: MyText
+  thumbnail_url: MyText
+  description: MyText
+
+two:
+  url: MyText
+  thumbnail_url: MyText
+  description: MyText
