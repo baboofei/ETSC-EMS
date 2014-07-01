@@ -1,0 +1,190 @@
+Ext.define('EIM.view.salecase.Grid', {
+    extend: 'Ext.grid.Panel',
+    alias: 'widget.salecase_grid',
+
+    requires: 'Ext.ux.grid.FiltersFeature',
+
+    title: '销售个案列表',
+    store: 'GridSalecases',
+    iconCls: 'ttl_grid',
+    viewConfig: {
+        getRowClass: function(record, index, rowParams) {
+            if(!record.get('editable')) {
+                return 'shared'
+            }
+        }
+    },
+
+    initComponent: function() {
+        var me = this;
+        //“所属用户”的伪字典项，供表格中表头筛选用
+        var userArray = filter_all_member_sale();
+        //“优先级”的字典项，供表格中显示和表头筛选用
+        var priorityArray = filter_all_dict('sales_priority', true);
+
+        this.columns = [
+            {
+                header: '个案编号',
+                dataIndex: 'number',
+                width: 75,
+                sortable: true,
+                filter: {
+                    type: 'string'
+                }
+            },
+            {
+                header: '个案描述',
+                dataIndex: 'comment',
+                flex: 1,
+                sortable: true,
+                filter: {
+                    type: 'string'
+                }
+            },
+            {
+                header: '起始日期',
+                dataIndex: 'start_at',
+                width: 100,
+                sortable: true,
+                filter: {
+                    type: 'date',
+                    dateFormat: 'Y-m-d'
+                },
+                renderer: Ext.util.Format.dateRenderer("Y-m-d")
+            },
+            {
+                header: '最近联系日期',
+                dataIndex: 'updated_at',
+                width: 100,
+                sortable: true,
+                filter: {
+                    type: 'date',
+                    dateFormat: 'Y-m-d'
+                },
+                renderer: Ext.util.Format.dateRenderer("Y-m-d")
+            },
+            {
+                header: '已签合同？',
+                dataIndex: 'has_signed_contract',
+                width: 80
+            },
+            {
+                header: '负责人',
+                dataIndex: 'user_id',
+                width: 50,
+                sortable: true,
+                filter: {
+                    type: 'list',
+                    phpMode: true,
+                    options: Ext.Array.map(userArray, function(record) {
+                        return [record["id"], record["name"]];
+                    })
+                },
+                renderer: function(value, metaData, record) {
+                    return record.get('user_name');
+                }
+            },
+            {
+                header: '项目组',
+                dataIndex: 'group_id',
+                width: 80,
+                sortable: true,
+                renderer: function(value, metaData, record) {
+                    return record.get('group_name');
+                }
+            },
+            {
+                header: '客户单位',
+                dataIndex: 'customer_units>(name|en_name|unit_aliases>unit_alias)',
+                width: 200,
+                sortable: false,
+                filter: {
+                    type: 'string'
+                }
+            },
+            {
+                header: '客户联系人',
+                dataIndex: 'customers>(name|en_name)',
+                width: 200,
+                sortable: false,
+                filter: {
+                    type: 'string'
+                }
+            },
+            {
+                header: '优先级',
+                dataIndex: 'priority',
+                width: 50,
+                sortable: true,
+                filter: {
+                    type: 'list',
+                    phpMode: true,
+                    options: Ext.Array.map(priorityArray, function(record) {
+                        return [record["value"], record["display"]];
+                    })
+                },
+                renderer: function(value) {
+                    var name;
+                    Ext.Array.each(priorityArray, function(item, index, allItems) {
+                        if(item['value'] === value) {
+                            name = item['display'];
+                        }
+                    });
+                    return name;
+                }
+            },
+            {
+                header: '成案率(%)',
+                dataIndex: 'feasible',
+                width: 60,
+                sortable: true,
+                filter: {
+                    type: 'numeric'
+                }
+//            },
+//            {
+//                header: '提醒时间',
+//                dataIndex: 'remind_at',
+//                width: 100,
+//                sortable: true,
+//                filter: {
+//                    type: 'date',
+//                    dateFormat: 'Y-m-d'
+//                },
+//                renderer: Ext.util.Format.dateRenderer("Y-m-d")
+            }
+        ];
+
+        this.addSalecaseButton = Ext.create('Ext.Button', {
+            text: '新增个案',
+            iconCls: 'btn_add',
+            action: 'addSalecase'
+        });
+        this.transferSalecaseButton = Ext.create('Ext.Button', {
+            text: '转让个案',
+            action: 'transferSalecase',
+            disabled: true
+        });
+        this.pagingToolbar = Ext.create('Ext.PagingToolbar', {
+            store: this.store,
+            displayInfo: true,
+            border: 0,
+            minWidth: 380
+        });
+
+        this.features = [
+            {
+                ftype: 'filters',
+                encode: true
+            }
+        ];
+
+        this.bbar = [this.addSalecaseButton, this.transferSalecaseButton, '-', this.pagingToolbar];
+
+        this.callParent(arguments);
+    },
+
+    getSelectedItem: function() {
+        return this.getSelectionModel().getSelection()[0];
+    }
+});

@@ -1,0 +1,207 @@
+/**
+ * 整体布局上的controller
+ */
+
+Ext.define('EIM.controller.Layout', {
+    extend: 'Ext.app.Controller',
+
+    stores: [
+        'AllDicts',
+        'AllElements',
+        'dict.Currencies',
+        'dict.Applications',
+        'dict.Areas',
+        'dict.OurCompanies',
+        'dict.Roles',
+        'dict.Users',
+        'dict.Members'
+    ],
+    models: [
+        'AllDict',
+        'AllElement',
+        'dict.Currency',
+        'dict.Application',
+        'dict.Area',
+        'dict.OurCompany',
+        'dict.Role',
+        'dict.User',
+        'dict.Member'
+    ],
+
+    views: [
+        'layout.Layout'
+    ],
+
+    init: function() {
+        var me = this;
+        me.control({
+            'tabpanel#center': {
+                /**
+                 * 解决标签切换时左边树节点的对应选中与否
+                 * @param tabPanel
+                 * @param newCard
+                 * @param oldCard
+                 * @param eOpts
+                 */
+                tabchange: function(tabPanel, newCard, oldCard, eOpts) {
+                    var tree = Ext.ComponentQuery.query("functree")[0];
+                    var record = tree.getRootNode().findChild('id', newCard.innerId, true);
+                    if(record) {
+                        tree.selectPath(record.getPath());
+                    } else {
+                        tree.getSelectionModel().deselectAll();
+                    }
+                },
+                render: function() {
+                    var me = this;
+                    /**
+                     * 给class为innerNavi的元素(也就是在remind里点击能打开其它标签的那个链接)加载一个事件代理
+                     */
+                    Ext.getBody().on('click', function(event, target) {
+                        /*target大概是这样：
+                         *<a href="#" class="innerNavi" x="r_sn:1364519247618|id:customer_unit_tab|innerId:2|title:客户单位管理|controller:CustomerUnits|widget:customer_unit_grid|filterStr:张">link</a>
+                         */
+                        var trunked_str = target["attributes"]["x"].nodeValue;
+                        /**
+                         * 不出意外应该拆成这样：
+                         * "r_sn:1364519247618|id:customer_unit_tab|innerId:2|title:客户单位管理|controller:CustomerUnits|widget:customer_unit_grid|filterStr:张"
+                         * 去引号
+                         * r_sn:1364519247618|id:customer_unit_tab|innerId:2|title:客户单位管理|controller:CustomerUnits|widget:customer_unit_grid|filterStr:张
+                         */
+                        var array = trunked_str.split("|");
+                        /**
+                         * 就成了这样：
+                         * [
+                         * "r_sn:1364519247618"
+                         * "id:​customer_unit_tab",
+                         * "innerId:​2",
+                         * "title:​客户单位管理",
+                         * "controller:​CustomerUnits",
+                         * "widget:​customer_unit_grid"
+                         * "filterStr:张"
+                         * ]
+                         */
+                        var hash = {};
+                        for(var i = 0; i < array.length; i++) {
+                            hash[array[i].split(":")[0]] = array[i].split(":")[1];
+                        }
+                        /**
+                         * 终于变成了hash
+                         */
+                        //                        console.log(hash);
+                        var r_sn = hash["r_sn"];
+                        var m_sn = hash["m_sn"];
+                        var id = hash["id"];
+                        var innerId = hash["innerId"];
+                        var controller = hash["controller"];
+                        var title = hash["title"];
+                        var tabParent = Ext.getCmp('center');
+                        var widget = hash["widget"];
+                        globeFilter = hash["filterStr"];
+
+                        if(tabParent) {
+                            if(tabParent.getChildByElement(id)) {
+                                tabParent.setActiveTab(id);
+                                var grid_name = widget.replace(/_\S+\b/, "_grid");//约定最后都是“xxx_grid”的形式
+                                var grid = Ext.ComponentQuery.query(grid_name)[0];
+                                me.getController(controller).applyFilter(grid);
+                            } else {
+                                //TODO 可以重构
+                                Ext.getBody().mask("加载中，请稍候……");
+                                me.getController('Functions').onTabLoad(controller);
+                                var newTab = tabParent.add({
+                                    id: id,
+                                    innerId: innerId,
+                                    title: title,
+                                    closable: true,
+                                    xtype: widget
+                                });
+                                tabParent.setActiveTab(newTab);
+                                Ext.getBody().unmask();
+                            }
+                            //同时判断是哪一类链接，并Ajax把本条设为已读
+                            if(r_sn) {
+                                Ext.Ajax.request({
+                                    url: 'reminds/mark_single_as_read',
+                                    params: {
+                                        sn: r_sn
+                                    },
+                                    success: function() {
+                                        if(Ext.getStore('GridReminds')) Ext.getStore('GridReminds').load();
+                                    }
+                                });
+                            }
+                            if(m_sn) {
+                                Ext.Ajax.request({
+                                    url: 'personal_messages/mark_single_as_read',
+                                    params: {
+                                        sn: m_sn
+                                    },
+                                    success: function() {
+                                        if(Ext.getStore('GridPersonalMessages')) Ext.getStore('GridPersonalMessages').load();
+                                    }
+                                });
+                            }
+                        }
+                    }, null, {
+                        delegate: '.innerNavi'
+                    });
+
+                    /**
+                     * 定时任务
+                     * @type {Object}
+                     */
+                    var task = {
+                        run:function(){
+                            Ext.Ajax.request({
+                                url:'personal_messages/check_new_messages',
+//                                params: {
+//                                    id: abc
+//                                },
+                                success: function(response) {
+//                                    console.log(response.responseText);
+//                                    console.log(Ext.decode(response.responseText));
+//                                    console.log(Ext.decode(response.responseText)['first_content']);
+                                    var text = Ext.decode(response.responseText);
+                                    if(text['totalRecords'] === 1) {
+                                        if(text['first_content'] != "") {
+                                            Ext.example.msg('消息', text['first_content'], 't', 't', 5000);
+                                        }
+                                    }else{
+                                        if(text['totalRecords'] > 1) {
+                                            Ext.example.msg('消息', '你有' + text['totalRecords'] + '条新消息', 't', 't', 5000);
+                                        }
+                                    }
+                                },
+                                failure: function() {
+
+                                }
+                            });
+                        },
+                        interval: 30000
+                    }
+                    Ext.TaskManager.start(task);
+                }
+            },
+            'field': {
+                /**
+                 * 解决必填项前加标记
+                 * 这里加的是“*”
+                 * @param thisField
+                 * @param eOpts
+                 */
+                beforerender: function(thisField, eOpts) {
+                    if(thisField && !thisField.rendered && thisField.isFieldLabelable && thisField.fieldLabel && thisField.allowBlank == false) {
+                        thisField.fieldLabel += '<span class="req" style="color:#ff0000">*</span>';
+                    }
+                }
+            },
+            'button[action=changePassword]': {
+                click: function() {
+                    load_uniq_controller(me, 'Users');
+                    Ext.widget('password_form').show();
+                }
+            }
+        });
+    }
+});

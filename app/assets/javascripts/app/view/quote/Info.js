@@ -1,0 +1,206 @@
+Ext.define('EIM.view.quote.Info', {
+    extend: 'Ext.form.Panel',
+    alias: 'widget.quote_info',
+
+    title: '报价信息',
+    //    iconCls: 'ttl_config',
+    initComponent: function() {
+        Ext.tip.QuickTipManager.init();
+        this.callParent(arguments);
+    },
+
+    bodyPadding: 4,
+    autoScroll: true,
+    layout: 'anchor',
+    fieldDefaults: EIM_field_defaults,
+
+    items: [
+        {
+            xtype: 'container',
+            layout: 'hbox',
+            defaults: {
+                flex: 1
+            },
+            items: [
+                {
+                    xtype: 'expandable_customer_unit_combo',
+                    allowBlank: false
+                },
+                {
+                    xtype: 'expandable_customer_combo',
+                    allowBlank: false
+                },
+                {
+                    xtype: 'textfield',
+                    fieldLabel: '报价编号',
+                    name: 'number',
+                    disabled: true
+                },
+                {
+                    xtype: 'hidden',
+                    name: 'id',
+                    hidden: true
+                }
+            ]
+        },
+        {
+            xtype: 'container',
+            layout: 'hbox',
+            defaults: {
+                flex: 1
+            },
+            padding: '4 0 0 0',
+            items: [
+                {
+                    xtype: 'combo',
+                    fieldLabel: '卖方公司',
+                    name: 'our_company_id',
+                    allowBlank: false,
+                    editable: false,
+                    store: Ext.create('Ext.data.Store', {
+                        data: filter_all_our_company(),
+                        model: 'EIM.model.dict.OurCompany',
+                        proxy:  'memory'
+                    }),
+                    valueField: 'id',
+                    displayField: 'name'
+                },
+                {
+                    xtype: 'combo',
+                    fieldLabel: '工程师',
+                    name: 'sale>id',
+                    allowBlank: false,
+                    editable: false,
+                    store: 'ComboQuoteSales',
+                    triggerAction: 'all',
+//                    queryCaching: false,
+                    valueField: 'id',
+                    displayField: 'name'
+                },
+                {
+                    xtype: 'textfield',
+                    fieldLabel: '个案编号',
+                    name: '^quotable>(salecase|flow_sheet)>(number)',
+//                    name: 'salelog>salecase>number',
+                    disabled: true
+                },
+                {
+                    xtype: 'hidden',
+                    name: 'salelog_id',
+                    hidden: true
+                },
+                {
+                    xtype: 'hidden',
+                    name: 'quotable_type',
+                    hidden: true
+                },
+                {
+                    xtype: 'hidden',
+                    name: 'quotable_id',
+                    hidden: true
+                }
+            ]
+        },
+        {
+            xtype: 'container',
+            layout: 'hbox',
+            defaults: {
+                flex: 1
+            },
+            padding: '4 0 0 0',
+            items: [
+                {
+                    xtype: 'combo',
+                    fieldLabel: '报价类型',
+                    name: 'quote_type',
+                    allowBlank: false,
+                    editable: false,
+                    store: Ext.create('Ext.data.Store', {
+                        data: filter_all_dict('quote_type'),
+                        model: 'EIM.model.AllDict',
+                        proxy:  'memory'
+                    }),
+                    valueField: 'value',
+                    displayField: 'display'
+                },
+                {
+                    xtype: 'combo',
+                    fieldLabel: '报价语言',
+                    name: 'language',
+                    allowBlank: false,
+                    editable: false,
+                    store: Ext.create('Ext.data.Store', {
+                        data: filter_all_dict('quote_language'),
+                        model: 'EIM.model.AllDict',
+                        proxy:  'memory'
+                    }),
+                    valueField: 'value',
+                    displayField: 'display'
+                },
+                {
+                    xtype: 'combo',
+                    fieldLabel: '报价格式',
+                    name: 'quote_format',
+                    allowBlank: false,
+                    editable: false,
+                    store: Ext.create('Ext.data.Store', {
+                        data: filter_all_dict('quote_format'),
+                        model: 'EIM.model.AllDict',
+                        proxy:  'memory'
+                    }),
+                    valueField: 'value',
+                    displayField: 'display'
+                }
+            ]
+        },
+        {
+            xtype: 'container',
+            layout: 'hbox',
+            defaults: {
+                flex: 1
+            },
+            padding: '4 0',
+            items: [
+                {
+                    xtype: 'textfield',
+                    fieldLabel: '报价摘要',
+                    name: 'summary',
+                    flex: 2
+                },
+                {
+                    xtype: 'datefield',
+                    fieldLabel: '报价日期',
+                    name: 'created_at',
+                    allowBlank: false,
+                    format: 'Y-m-d',
+                    value: new Date()
+                }
+            ]
+        },
+        {
+            xtype: 'container',
+            layout: 'hbox',
+            defaults: {
+                flex: 1
+            },
+            items: [
+                {
+                    xtype: 'textfield',
+                    fieldLabel: '报价要求',
+                    emptyText: '销售对报价条款上的一些要求',
+                    name: 'request',
+                    flex: 2
+                },
+                {
+                    xtype: 'combo',
+                    name: 'group_id',
+                    store: 'ComboGroups',
+                    fieldLabel: '项目组',
+                    displayField: 'name',
+                    valueField: 'id',
+                    editable: false
+                }
+            ]
+        }
+    ]
+});
