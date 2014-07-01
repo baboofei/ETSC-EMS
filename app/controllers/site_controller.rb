@@ -1,3 +1,4 @@
+# encoding: UTF-8
 class SiteController < ApplicationController
   layout "site", :except => "show_original_image"
   before_filter :append_allow_edit, :only => [:show_product]
