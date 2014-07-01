@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140701021021) do
+ActiveRecord::Schema.define(:version => 20140701025801) do
 
   create_table "accessories", :force => true do |t|
     t.text     "url"
@@ -465,6 +465,14 @@ ActiveRecord::Schema.define(:version => 20140701021021) do
     t.integer  "invisible_role_id"
     t.datetime "created_at",        :null => false
     t.datetime "updated_at",        :null => false
+  end
+
+  create_table "events", :force => true do |t|
+    t.string   "title"
+    t.text     "content"
+    t.integer  "category"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "exhibitions", :force => true do |t|
@@ -1026,6 +1034,13 @@ ActiveRecord::Schema.define(:version => 20140701021021) do
     t.datetime "updated_at"
   end
 
+  create_table "serials_solutions", :force => true do |t|
+    t.integer  "solution_id"
+    t.integer  "serial_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
   create_table "service_logs", :force => true do |t|
     t.integer  "flow_sheet_id"
     t.date     "start_at"
@@ -1038,6 +1053,15 @@ ActiveRecord::Schema.define(:version => 20140701021021) do
     t.string   "comment"
     t.datetime "created_at",       :null => false
     t.datetime "updated_at",       :null => false
+  end
+
+  create_table "solutions", :force => true do |t|
+    t.string   "title"
+    t.text     "content"
+    t.text     "url"
+    t.integer  "category"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "stores", :force => true do |t|
