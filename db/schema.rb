@@ -11,7 +11,22 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140625084338) do
+ActiveRecord::Schema.define(:version => 20140701021021) do
+
+  create_table "accessories", :force => true do |t|
+    t.text     "url"
+    t.text     "thumbnail_url"
+    t.text     "description"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
+  create_table "accessories_products", :force => true do |t|
+    t.integer  "product_id"
+    t.integer  "accessory_id"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
 
   create_table "admin_inventories", :force => true do |t|
     t.string   "name"
@@ -998,16 +1013,17 @@ ActiveRecord::Schema.define(:version => 20140625084338) do
   create_table "serials", :force => true do |t|
     t.string   "brief"
     t.string   "name"
-    t.integer  "type_id"
+    t.integer  "prod_m_type_id"
+    t.integer  "prod_s_type_id"
     t.text     "description"
     t.text     "application_in_site"
     t.text     "parameter_in_site"
     t.text     "feature"
     t.boolean  "is_recommend"
-    t.boolean  "is_display"
+    t.boolean  "is_in_site"
     t.integer  "user_id"
-    t.datetime "created_at",          :null => false
-    t.datetime "updated_at",          :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "service_logs", :force => true do |t|
