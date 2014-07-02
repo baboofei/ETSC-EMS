@@ -218,18 +218,18 @@ class SiteController < ApplicationController
   end
 
   def news
-    @newest_event = Event.find(:first, :order => "created_at DESC")
+    @newest_event = Event.last
     @newest_image = if_news_image_exist(@newest_event)
-    @company_news = Event.find(:all, :limit => 15, :order => "created_at DESC", :conditions => "event_sort = 1")
-    @product_news = Event.find(:all, :limit => 15, :order => "created_at DESC", :conditions => "event_sort = 2")
+    @company_news = Event.where("category = 1").limit(15).order("created_at DESC")
+    @product_news = Event.where("category = 2").limit(15).order("created_at DESC")
   end
 
   def show_company_news
-    @all_company_news = Event.where("event_sort = 1").order("created_at DESC").paginate :page => params[:page], :per_page => 15
+    @all_company_news = Event.where("category = 1").order("created_at DESC").paginate :page => params[:page], :per_page => 15
   end
 
   def show_product_news
-    @all_product_news = Event.where("event_sort = 2").order("created_at DESC").paginate :page => params[:page], :per_page => 15
+    @all_product_news = Event.where("category = 2").order("created_at DESC").paginate :page => params[:page], :per_page => 15
   end
 
   def show_news

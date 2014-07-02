@@ -33,12 +33,12 @@
           <li>
             <% unless recommend_serial.product_images.nil? %>
               <% if recommend_serial.product_images.size>0 %>
-                <%= link_to(image_tag(recommend_serial.product_images[0].url,:alt => recommend_serial.name_txt, :title => recommend_serial.name_txt), :action => "show_product", :id => recommend_serial.id, :format => "htm") %>
+                 
               <% else %>
-                <%= link_to(image_tag("/images/site/no_image.jpg",:alt => recommend_serial.name_txt, :title => recommend_serial.name_txt), :action => "show_product", :id => recommend_serial.id, :format => "htm") %>
+                 
               <% end %>
             <% end %>
-            <div><%= link_to(raw(recommend_serial.name_txt), :action => "show_product", :id => recommend_serial.id, :format => "htm")  %></div> </li>
+            <div> </div> </li>
         <% end %>
       </ul>
     <% end %>
@@ -49,7 +49,7 @@
     <div id="prod_marquee">
       <ul id="body_prod_marq">
         <% for serial in @recent_serials %>
-          <li><%= link_to(raw(serial.name_txt), :action => "show_product", :id => serial.id, :format => "htm") %></li>
+          <li> </li>
         <% end %>
       </ul>
     </div>
@@ -59,7 +59,7 @@
     <div class="more"><a href="/site/news.htm"><img alt="more" src="/images/site/more.jpg" /></a></div>
     <ul>
       <% for news in @recent_news %>
-        <li><%= link_to(truncate(news.title, :length => 25), :action => "show_news", :id => news.id, :format => "htm") %></li>
+        <li> </li>
       <% end %>
     </ul>
   </div>
@@ -69,7 +69,7 @@
     <div id="partner_marquee" style="overflow:auto;-moz-user-select:none">
         <% for vendor_unit in @vendor_units %>
           <% if vendor_unit.short_code %>
-            <%= link_to(image_tag("/images/partner/partner_"+vendor_unit.short_code+".gif", :border => 0, :alt => vendor_unit.name, :title => vendor_unit.name), {:action => "about3", :id => nil, :format => "htm"}) %>
+             
           <% end %>
         <% end %>
     </div>
@@ -95,15 +95,14 @@
     })
     /*********产品滚动***************/
     new Marquee(["prod_marquee","body_prod_marq"],0,1,331,147,40,0,2000);
-    /*********合作伙伴滚动*************/
     new Marquee("partner_marquee",2,1,909,52,20,500,1000,0);
   </script>
   <div id="resources_download" class="frame">
     <h2>资源下载</h2>
     <div class="more"><img alt="more" src="/images/site/more.jpg" /></div>
     <ul>
-      <li><a href="/site/download_file/fiberoptics_2012.pdf"><img src="/images/site/Fiber_2012.jpg" alt="东隆科技光纤光学产品手册，大小<%= get_resource_size("fiberoptics_2012.pdf") %>" title="东隆科技光纤光学产品手册，大小<%= get_resource_size("fiberoptics_2012.pdf") %>" /></a></li>
-      <li><a href="/site/download_file/photonics_2012.pdf"><img src="/images/site/phonics_2012.jpg" alt="东隆科技激光及测试产品手册，大小<%= get_resource_size("photonics_2012.pdf") %>" title="东隆科技激光及测试产品手册，大小<%= get_resource_size("photonics_2012.pdf") %>" /></a></li>
+      <li><a href="/site/download_file/fiberoptics_2012.pdf"><img src="/images/site/Fiber_2012.jpg" alt="东隆科技光纤光学产品手册，大小" title="东隆科技光纤光学产品手册，大小 " /></a></li>
+      <li><a href="/site/download_file/photonics_2012.pdf"><img src="/images/site/phonics_2012.jpg" alt="东隆科技激光及测试产品手册，大小" title="东隆科技激光及测试产品手册，大小 " /></a></li>
     </ul>
   </div>
   <div id="solutions" class="frame">
@@ -111,7 +110,7 @@
     <div class="more"><a href="/site/solution.htm"><img alt="more" src="/images/site/more.jpg" /></a></div>
     <ul>
       <% for solution in @solutions %>
-        <li><%= link_to(truncate(solution.title, :length => 23), :action => "show_solution", :id => solution.id, :format => "htm") %></li>
+        <li> </li>
       <% end %>
     </ul>
   </div>
