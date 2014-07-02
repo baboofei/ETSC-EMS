@@ -20,8 +20,7 @@
         <% member_str = "(" + group_member.map { "?" }.join(",") + ")" %>
         <% vendor_unit_str = "(" + group_vendor_unit.map { "?" }.join(",") + ")" %>
         <% contracts = @all_contracts.where("users.id in #{member_str}", *group_member).includes(:signer) %>
-        <% if group_vendor_unit == [] %>
-        <% else %>
+        <% if group_vendor_unit != [] %>
             <% contracts = contracts.where("vendor_units.id in #{vendor_unit_str}", *group_vendor_unit).includes(:contract_items => {:product => :producer}) %>
         <% end %>
 

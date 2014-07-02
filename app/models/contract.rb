@@ -198,7 +198,7 @@ class Contract < ActiveRecord::Base
                 #binding.pry
                 fields_to_be_updated = %w(customer_unit_id customer_number summary buyer_customer_id end_user_customer_id business_unit_id
                     business_contact_id our_company_id signer_user_id requirement_id contract_type pay_mode_id currency_id sum lc_number
-                    comment quote_id
+                    comment quote_id group_id
                 )
                 fields_to_be_updated.each do |field|
                     contract[field] = params[field]

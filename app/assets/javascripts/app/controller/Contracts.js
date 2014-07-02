@@ -12,7 +12,8 @@ Ext.define('EIM.controller.Contracts', {
         'ContractHistories',
         'Collections',
         'Receivables',
-        'ComboQuoteSales'
+        'ComboQuoteSales',
+        'ComboGroups'
     ],
     models: [
         'Contract',
@@ -22,7 +23,8 @@ Ext.define('EIM.controller.Contracts', {
         'Collection',
         'Receivable',
         'ComboQuoteSale',
-        'ComboUser'
+        'ComboUser',
+        'ComboGroup'
     ],
 
     views: [

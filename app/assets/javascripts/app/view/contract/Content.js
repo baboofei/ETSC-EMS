@@ -100,7 +100,17 @@ Ext.define('EIM.view.contract.Content', {
                 },
                 {
                     name: 'rmb',
+                    hidden: true,
                     fieldLabel: '折合人民币'
+                },
+                {
+                    xtype: 'combo',
+                    name: 'group_id',
+                    store: 'ComboGroups',
+                    fieldLabel: '项目组',
+                    displayField: 'name',
+                    valueField: 'id',
+                    editable: false
                 }
             ]
         },

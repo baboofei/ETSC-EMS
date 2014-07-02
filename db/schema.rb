@@ -466,7 +466,7 @@ ActiveRecord::Schema.define(:version => 20140701025801) do
     t.datetime "updated_at",        :null => false
   end
 
-  create_table "event_images_bak", :force => true do |t|
+  create_table "event_images", :force => true do |t|
     t.integer  "event_id"
     t.string   "url"
     t.string   "thumbnail_url"
@@ -479,26 +479,18 @@ ActiveRecord::Schema.define(:version => 20140701025801) do
     t.string   "title"
     t.text     "content"
     t.integer  "category"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
-  create_table "events_bak", :force => true do |t|
-    t.string   "title"
-    t.text     "content"
-    t.integer  "category"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "events_products_bak", :id => false, :force => true do |t|
+  create_table "events_products", :id => false, :force => true do |t|
     t.integer  "event_id"
     t.integer  "serial_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "events_serials_bak", :id => false, :force => true do |t|
+  create_table "events_serials", :id => false, :force => true do |t|
     t.integer  "event_id"
     t.integer  "serial_id"
     t.datetime "created_at"
@@ -993,21 +985,6 @@ ActiveRecord::Schema.define(:version => 20140701025801) do
     t.datetime "remind_at"
     t.boolean  "remind_flag"
     t.integer  "group_id"
-    t.datetime "created_at",                                 :null => false
-    t.datetime "updated_at",                                 :null => false
-  end
-
-  create_table "salecases_bak", :force => true do |t|
-    t.string   "number"
-    t.datetime "start_time"
-    t.datetime "end_time"
-    t.integer  "user_id"
-    t.text     "comment"
-    t.integer  "status"
-    t.integer  "priority"
-    t.decimal  "feasible",    :precision => 10, :scale => 0
-    t.datetime "remind_at"
-    t.boolean  "remind_flag"
     t.datetime "created_at",                                 :null => false
     t.datetime "updated_at",                                 :null => false
   end

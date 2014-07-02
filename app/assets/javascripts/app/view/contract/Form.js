@@ -104,7 +104,6 @@ Ext.define('EIM.view.contract.Form', {
                                     proxy:  'memory'
                                 }),
                                 valueField: 'id',
-                                flex: 2,
                                 displayField: 'name'
                             },
                             {
@@ -116,8 +115,16 @@ Ext.define('EIM.view.contract.Form', {
                                 store: 'ComboQuoteSales',
                                 triggerAction: 'all',
                                 valueField: 'id',
-                                flex: 1,
                                 displayField: 'name'
+                            },
+                            {
+                                xtype: 'combo',
+                                name: 'group_id',
+                                store: 'ComboGroups',
+                                fieldLabel: '项目组',
+                                displayField: 'name',
+                                valueField: 'id',
+                                editable: false
                             }
                         ]
                     },

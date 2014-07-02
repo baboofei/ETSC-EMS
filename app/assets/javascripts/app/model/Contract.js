@@ -190,6 +190,10 @@ Ext.define('EIM.model.Contract', {
             type: 'int'
         },
         {
+            name: 'group_id',
+            type: 'int'
+        },
+        {
             name: 'contract_type',
             type: 'string'
         },
