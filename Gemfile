@@ -4,6 +4,7 @@ source 'http://ruby.taobao.org/'
 gem 'rails', '3.2.8'
 gem 'rb-readline', '0.4.2'
 
+gem 'rake', '10.3.2'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
@@ -48,5 +49,3 @@ gem 'pry', '0.9.10', :group => :development
 #gem "prawn", :path => 'vendor/prawn'
 #gem 'prawn', '0.12.0'
 gem 'prawn', :git => "https://github.com/prawnpdf/prawn.git", :ref => '8028ca0cd2'
-# Add rake of correct version
-gem 'rake', '10.3.2'

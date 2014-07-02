@@ -1,14 +1,24 @@
-<%#*<!DOCTYPE html>%>
-<%#*<html>%>
-<%#*<head>%>
-  <%#*<title>EIMV3</title>%>
-  <%#= stylesheet_link_tag :all %>
-  <%#= javascript_include_tag :defaults %>
-  <%#= csrf_meta_tag %>
-<%#*</head>%>
-<%#*<body>%>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EIM MVC版(5.0)</title>
+  <%= stylesheet_link_tag 'application' %>
+  <%= stylesheet_link_tag 'EIM' %>
+  <%= stylesheet_link_tag 'ux/BoxSelect' %>
+  <%= javascript_include_tag 'application' %>
+  <%= javascript_include_tag 'patch' %>
+  <%= javascript_include_tag 'extensible-1.5.2/src/locale/extensible-lang-zh_CN' %>
+  <style type="text/css">
+    .x-grid-table a{
+        text-decoration: none;
+    }
+  </style>
+
+  <%= csrf_meta_tag %>
+</head>
+<body>
 
 <%= yield %>
 
-<%#*</body>%>
-<%#*</html>%>
+</body>
+</html>

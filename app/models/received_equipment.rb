@@ -4,7 +4,8 @@ class ReceivedEquipment < ActiveRecord::Base
     require "reusable"
     include Reusable
 
-    attr_accessible :accepted_at, :collect_account_number, :comment, :flow_sheet_id, :is_in_warranty, :is_packaged, :is_sent_back, :product_id, :sn, :symptom
+    attr_accessible :accepted_at, :collect_account_number, :comment, :flow_sheet_id, :is_in_warranty, :product_id, :sn,
+                    :symptom, :state
 
     belongs_to :flow_sheet
     belongs_to :product
