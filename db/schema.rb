@@ -14,18 +14,18 @@
 ActiveRecord::Schema.define(:version => 20140701025801) do
 
   create_table "accessories", :force => true do |t|
-    t.text     "url"
-    t.text     "thumbnail_url"
-    t.text     "description"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
+    t.string   "url"
+    t.string   "thumbnail_url"
+    t.string   "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
-  create_table "accessories_products", :force => true do |t|
-    t.integer  "product_id"
+  create_table "accessories_products", :id => false, :force => true do |t|
     t.integer  "accessory_id"
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
+    t.integer  "product_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "admin_inventories", :force => true do |t|
@@ -38,12 +38,12 @@ ActiveRecord::Schema.define(:version => 20140701025801) do
     t.integer  "inventory_type"
     t.integer  "inventory_level"
     t.integer  "keep_at"
-    t.decimal  "current_quantity",   :precision => 10, :scale => 2
+    t.decimal  "current_quantity", :precision => 10, :scale => 2
     t.string   "count_unit"
-    t.decimal  "buy_price",          :precision => 12, :scale => 2
-    t.decimal  "financial_price",    :precision => 12, :scale => 2
+    t.decimal  "buy_price",        :precision => 12, :scale => 2
+    t.decimal  "financial_price",  :precision => 12, :scale => 2
     t.integer  "currency_id"
-    t.decimal  "rmb",                :precision => 12, :scale => 2
+    t.decimal  "rmb",              :precision => 12, :scale => 2
     t.string   "state"
     t.string   "project"
     t.integer  "keeper_user_id"
@@ -56,10 +56,9 @@ ActiveRecord::Schema.define(:version => 20140701025801) do
     t.integer  "in_stock_source"
     t.integer  "out_stock_source"
     t.datetime "expire_at"
-    t.datetime "expire_warranty_at"
     t.integer  "user_id"
-    t.datetime "created_at",                                        :null => false
-    t.datetime "updated_at",                                        :null => false
+    t.datetime "created_at",                                      :null => false
+    t.datetime "updated_at",                                      :null => false
   end
 
   create_table "admin_inventory_histories", :force => true do |t|
@@ -467,12 +466,43 @@ ActiveRecord::Schema.define(:version => 20140701025801) do
     t.datetime "updated_at",        :null => false
   end
 
+  create_table "event_images_bak", :force => true do |t|
+    t.integer  "event_id"
+    t.string   "url"
+    t.string   "thumbnail_url"
+    t.string   "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "events", :force => true do |t|
     t.string   "title"
     t.text     "content"
     t.integer  "category"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+  end
+
+  create_table "events_bak", :force => true do |t|
+    t.string   "title"
+    t.text     "content"
+    t.integer  "category"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "events_products_bak", :id => false, :force => true do |t|
+    t.integer  "event_id"
+    t.integer  "serial_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "events_serials_bak", :id => false, :force => true do |t|
+    t.integer  "event_id"
+    t.integer  "serial_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "exhibitions", :force => true do |t|
@@ -904,9 +934,7 @@ ActiveRecord::Schema.define(:version => 20140701025801) do
     t.date     "accepted_at"
     t.boolean  "is_in_warranty"
     t.string   "collect_account_number"
-    t.boolean  "is_packaged"
-    t.boolean  "is_sent_back"
-    t.boolean  "is_return_factory"
+    t.string   "state"
     t.string   "comment"
     t.datetime "created_at",             :null => false
     t.datetime "updated_at",             :null => false
@@ -1021,17 +1049,16 @@ ActiveRecord::Schema.define(:version => 20140701025801) do
   create_table "serials", :force => true do |t|
     t.string   "brief"
     t.string   "name"
-    t.integer  "prod_m_type_id"
-    t.integer  "prod_s_type_id"
+    t.integer  "type_id"
     t.text     "description"
     t.text     "application_in_site"
     t.text     "parameter_in_site"
     t.text     "feature"
     t.boolean  "is_recommend"
-    t.boolean  "is_in_site"
+    t.boolean  "is_display"
     t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
   end
 
   create_table "serials_solutions", :force => true do |t|
@@ -1058,10 +1085,10 @@ ActiveRecord::Schema.define(:version => 20140701025801) do
   create_table "solutions", :force => true do |t|
     t.string   "title"
     t.text     "content"
-    t.text     "url"
+    t.string   "url"
     t.integer  "category"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "stores", :force => true do |t|
