@@ -22,7 +22,7 @@
 # Ignore IDE files
 /.idea/*
 
-# Ignore PDF files that arn't necessary
+# Ignore PDF files that aren't necessary
 /*.pdf
 
 # Ignore database config

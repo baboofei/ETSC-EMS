@@ -25,6 +25,8 @@ class Contract < ActiveRecord::Base
     belongs_to :pay_mode
     belongs_to :quote
 
+    belongs_to :group
+
     has_many :contract_items
     has_many :receivables
     has_many :collections
@@ -178,7 +180,7 @@ class Contract < ActiveRecord::Base
     def self.get_data_from_members(member_ids, user_id)
         str = "(" + member_ids.map{"?"}.join(",") + ")"
         #所有权是自己，或者组id包含了自己所在的组
-        where("contracts.signer_user_id in #{str}", *member_ids)
+        where("contracts.signer_user_id in #{str} or users.id = ?", *member_ids, user_id).includes(:group => :users)
     end
 
     #自定义提交。因为模型复杂，估计是不可能公用了

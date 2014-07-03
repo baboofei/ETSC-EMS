@@ -13,6 +13,7 @@ class Group < ActiveRecord::Base
 
     has_many :salecases
     has_many :quotes
+    has_many :contracts
     has_many :customers
 
     def self.with_user(user_id)
