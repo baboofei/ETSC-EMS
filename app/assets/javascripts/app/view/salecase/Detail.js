@@ -94,8 +94,17 @@ Ext.define('EIM.view.salecase.Detail', {
                     ]
                 },
                 {
-                    xtype: 'customer_mini_grid',
-                    title: '联系人列表',
+                    xtype: 'tabpanel',
+                    items: [
+                        {
+                            xtype: 'customer_mini_grid',
+                            title: '客户列表'
+                        },
+                        {
+                            xtype: 'business_contact_mini_grid',
+                            title: '商务相关联系人列表'
+                        }
+                    ],
                     //            id: 'customer_grid',
                     region: 'center'/*,
                  store: 'Users'*/

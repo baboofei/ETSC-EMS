@@ -247,7 +247,7 @@ class Customer < ActiveRecord::Base
         Salelog.create_or_update_with(salelog_params)
     end
 
-    def self.delete_customers_salecases(params, user_id)
+    def self.delete_customers_in_salecases(params, user_id)
         need_sign = !Salecase.find(params[:salecase_id]).group.nil?
         CustomersSalecase.delete_all(["customer_id = ? and salecase_id = ?", params[:customer_id], params[:salecase_id]])
         #新建一条“删除联系人”的日志

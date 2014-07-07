@@ -170,7 +170,7 @@ class CustomersController < ApplicationController
 
     #在销售个案里减客户
     def delete_customers_salecases
-        Customer.delete_customers_salecases(params, session[:user_id])
+        Customer.delete_customers_in_salecases(params, session[:user_id])
         render :json => {:success => true}
     end
 

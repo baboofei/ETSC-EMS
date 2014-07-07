@@ -1,16 +1,15 @@
 /**
- * 用于添加客户联系人到“联系人列表”里的小型表单
- * 有“选择客户单位”、“+”和“选择客户”、“+”的组件
+ * 用于添加商务相关联系人到“联系人列表”里的小型表单
+ * 有“选择商务相关单位”、“+”和“选择商务相关联系人”、“+”的组件
  * 还有“移动电话”、“固定电话”和“传真”的显示，可以修改
  */
-Ext.define('EIM.view.customer.AddToMiniForm', {
+Ext.define('EIM.view.business_contact.AddToMiniForm', {
     extend: 'Ext.window.Window',
-    alias: 'widget.customer_add_to_mini_form',
+    alias: 'widget.business_contact_add_to_mini_form',
 
-    title: '添加客户联系人',
+    title: '添加商务相关联系人',
     layout: 'fit',
     width: 300,
-    height: 230,
     border: 0,
     modal: true,
 
@@ -28,10 +27,10 @@ Ext.define('EIM.view.customer.AddToMiniForm', {
                         hidden: true
                     },
                     {
-                        xtype: 'expandable_customer_unit_combo'
+                        xtype: 'expandable_business_unit_combo'
                     },
                     {
-                        xtype: 'expandable_customer_combo',
+                        xtype: 'expandable_business_contact_combo',
                         padding: '5 0'
                     },
                     {

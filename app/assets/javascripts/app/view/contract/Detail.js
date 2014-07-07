@@ -91,6 +91,10 @@ Ext.define('EIM.view.contract.Detail', {
                                 },
                                 {
                                     xtype: 'button',
+                                    text: '打印快递单'
+                                },
+                                {
+                                    xtype: 'button',
                                     text: '确认修改'
                                 }
                             ]
@@ -132,6 +136,10 @@ Ext.define('EIM.view.contract.Detail', {
                                 {
                                     xtype: 'displayfield',
                                     flex: 1
+                                },
+                                {
+                                    xtype: 'button',
+                                    text: '打印快递单'
                                 },
                                 {
                                     xtype: 'button',
