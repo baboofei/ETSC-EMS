@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140704012855) do
+ActiveRecord::Schema.define(:version => 20140708012328) do
 
   create_table "accessories", :force => true do |t|
     t.string   "url"
@@ -1140,6 +1140,13 @@ ActiveRecord::Schema.define(:version => 20140704012855) do
     t.datetime "updated_at",                     :null => false
   end
 
+  create_table "users_vips", :id => false, :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "vip_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "vendor_unit_aliases", :force => true do |t|
     t.string   "unit_alias"
     t.integer  "vendor_unit_id"
@@ -1243,6 +1250,39 @@ ActiveRecord::Schema.define(:version => 20140704012855) do
     t.string   "user_id"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
+  end
+
+  create_table "vip_units", :force => true do |t|
+    t.string   "name"
+    t.string   "en_name"
+    t.integer  "city_id"
+    t.string   "addr"
+    t.string   "en_addr"
+    t.string   "postcode"
+    t.string   "site"
+    t.string   "comment"
+    t.integer  "user_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "vips", :force => true do |t|
+    t.string   "name"
+    t.string   "en_name"
+    t.integer  "vip_unit_id"
+    t.string   "mobile"
+    t.string   "phone"
+    t.string   "fax"
+    t.string   "email"
+    t.string   "im"
+    t.string   "department"
+    t.string   "position"
+    t.string   "comment"
+    t.integer  "user_id"
+    t.string   "postcode"
+    t.string   "addr"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
 
   create_table "warranty_terms", :force => true do |t|
