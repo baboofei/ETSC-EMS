@@ -9,6 +9,7 @@ Ext.define('EIM.controller.Salecases', {
         'Salelogs',
         'Customers',
         'MiniCustomers',
+        'MiniBusinessContacts',
         'ComboGroups'/*,
         'dict.SalelogProcesses',
         'dict.SalelogPriorities',
@@ -19,6 +20,7 @@ Ext.define('EIM.controller.Salecases', {
         'Salelog',
         'Customer',
         'MiniCustomer',
+        'MiniBusinessContact',
         'ComboGroup',
 //        'dict.SalelogProcess',
 //        'dict.SalelogPriority',
@@ -34,6 +36,7 @@ Ext.define('EIM.controller.Salecases', {
 //        'etscux.ExpandableCustomerUnitCombo',
 //        'etscux.ExpandableCustomerCombo',
         'customer.MiniGrid',
+        'business_contact.MiniGrid',
         'salecase.Form',
         'salecase.TransferForm'
     ],
@@ -66,14 +69,26 @@ Ext.define('EIM.controller.Salecases', {
             'customer_mini_grid': {
                 selectionchange: this.customerMiniSelectionChange
             },
+            'business_contact_mini_grid': {
+                selectionchange: this.business_contactMiniSelectionChange
+            },
             'customer_add_to_mini_form': {
                 show: this.resetCustomerStore
             },
-            'button[action=addCustomerFrom]': {
+            'business_contact_add_to_mini_form': {
+                show: this.resetBusinessContactStore
+            },
+            'customer_mini_grid button[action=addCustomerFrom]': {
                 click: this.addCustomerFrom
             },
-            'button[action=deleteCustomerFrom]': {
+            'business_contact_mini_grid button[action=addBusinessContactFrom]': {
+                click: this.addBusinessContactFrom
+            },
+            'customer_mini_grid button[action=deleteCustomerFrom]': {
                 click: this.deleteCustomerFrom
+            },
+            'business_contact_mini_grid button[action=deleteBusinessContactFrom]': {
+                click: this.deleteBusinessContactFrom
             },
             //个案信息修改的“确定”按钮
             'button[action=salecaseSubmit]': {
@@ -167,12 +182,21 @@ Ext.define('EIM.controller.Salecases', {
     },
     
     /*
-     * 打开“添加联系人”窗口时，把客户combo里带的customer_unit的过滤条件清除掉
+     * 打开“添加客户联系人”窗口时，把客户combo里带的customer_unit的过滤条件清除掉
      */
     resetCustomerStore: function(window) {
-        var expandable_combo = window.down('expandable_customer_combo', false);
+        var expandable_combo = window.down('expandable_customer_combo');
         var customer_combo = expandable_combo.down('combo', false);
         customer_combo.getStore().getProxy().setExtraParam('customer_unit_id', null);
+    },
+
+    /*
+     * 打开“添加商务相关联系人”窗口时，把客户combo里带的business_contact_unit的过滤条件清除掉
+     */
+    resetBusinessContactStore: function(window) {
+        var expandable_combo = window.down('expandable_business_contact_combo');
+        var business_contact_combo = expandable_combo.down('combo', false);
+        business_contact_combo.getStore().getProxy().setExtraParam('business_contact_unit_id', null);
     },
 
     addCustomerFrom: function() {
@@ -181,6 +205,12 @@ Ext.define('EIM.controller.Salecases', {
         Ext.widget('customer_add_to_mini_form').show();
     },
     
+    addBusinessContactFrom: function() {
+        var me = this;
+        load_uniq_controller(me, 'BusinessContacts');
+        Ext.widget('business_contact_add_to_mini_form').show();
+    },
+
     deleteCustomerFrom: function(button) {
         var grid = button.up('grid');
         var store = grid.getStore();
@@ -192,9 +222,34 @@ Ext.define('EIM.controller.Salecases', {
                 store.remove(selection);
                 Ext.Ajax.request({//AJAX方式提交
                     url: 'customers/delete_customers_salecases',
-//                    url: 'servlet/SalselogPostServlet?type=deleteCaseCustomers',
                     params: {
                         customer_id: selection.get("id"),
+                        salecase_id : salecase_id
+                    },
+                    success:function(request){
+                        Ext.getStore("Salelogs").load()
+                    },
+                    failure:function(){
+                        Ext.Msg.alert('错误','你的网貌似有问题，请刷新再说……');
+                    }
+                });
+            }
+        });
+    },
+    
+    deleteBusinessContactFrom: function(button) {
+        var grid = button.up('grid');
+        var store = grid.getStore();
+        var selection = grid.getSelectedItem();
+        var salecase_id = Ext.ComponentQuery.query("salecase_grid")[0].getSelectionModel().getSelection()[0].get("id");
+
+        Ext.Msg.confirm('请确认', '你真的要删除选中项吗？', function(button) {
+            if(button === 'yes') {
+                store.remove(selection);
+                Ext.Ajax.request({//AJAX方式提交
+                    url: 'business_contacts/delete_business_contacts_salecases',
+                    params: {
+                        business_contact_id: selection.get("id"),
                         salecase_id : salecase_id
                     },
                     success:function(request){
@@ -277,28 +332,31 @@ Ext.define('EIM.controller.Salecases', {
         var add_salelog_btn = Ext.ComponentQuery.query("salelog_grid button[action=addSalelog]", root)[0];
         var add_remind_btn = Ext.ComponentQuery.query("salelog_grid button[action=addRemind]", root)[0];
         var add_customer_btn = Ext.ComponentQuery.query("customer_mini_grid button[action=addCustomerFrom]", root)[0];
+        var add_business_contact_btn = Ext.ComponentQuery.query("business_contact_mini_grid button[action=addBusinessContactFrom]", root)[0];
         var edit_salecase_btn = Ext.ComponentQuery.query("button[action=salecaseSubmit]")[0];
         var transfer_salecase_btn = Ext.ComponentQuery.query("button[action=transferSalecase]")[0];
         add_salelog_btn.setDisabled(true);
         add_remind_btn.setDisabled(true);
         add_customer_btn.setDisabled(true);
+        add_business_contact_btn.setDisabled(true);
         edit_salecase_btn.setDisabled(true);
         if(selected.length > 0){
             form.loadRecord(selected[0]);
+            var salecase_params = {salecase_id: selected[0].get("id")};
             Ext.getStore('Salelogs').load({
-                params: {
-                    salecase_id: selected[0].get("id")
-                }
+                params: salecase_params
             });
             Ext.getStore('MiniCustomers').load({
-                params: {
-                    salecase_id: selected[0].get("id")
-                }
+                params: salecase_params
+            });
+            Ext.getStore('MiniBusinessContacts').load({
+                params: salecase_params
             });
             if(selected[0].get("editable")) {
                 add_salelog_btn.setDisabled(false);
                 add_remind_btn.setDisabled(false);
                 add_customer_btn.setDisabled(false);
+                add_business_contact_btn.setDisabled(false);
                 edit_salecase_btn.setDisabled(false);
                 transfer_salecase_btn.setDisabled(false);
             }
@@ -307,12 +365,13 @@ Ext.define('EIM.controller.Salecases', {
             Ext.getStore('Salelogs').removeAll();
             Ext.getStore('Customers').removeAll();
             Ext.getStore('MiniCustomers').removeAll();
+            Ext.getStore('MiniBusinessContacts').removeAll();
             transfer_salecase_btn.setDisabled(true);
         }
     },
 
     /**
-     * “联系人列表”里选中时，允许/禁止“删除联系人”按钮
+     * “客户联系人列表”里选中时，允许/禁止“删除联系人”按钮
      * @param grid
      * @param selected
      * @param eOpts
@@ -326,12 +385,23 @@ Ext.define('EIM.controller.Salecases', {
             delete_customer_btn.setDisabled(true);
         }
     },
-//    loadProcessStore: function() {
-////        Ext.getStore("dict.SalelogProcesses").load();
-//    },
 
-//    editSalelog: function(grid, record, item, index, e, eOpts ){
-//    },
+    /**
+     * “商务相关联系人列表”里选中时，允许/禁止“删除联系人”按钮
+     * @param grid
+     * @param selected
+     * @param eOpts
+     */
+    business_contactMiniSelectionChange: function(grid, selected, eOpts) {
+        var root = Ext.ComponentQuery.query("salecase_tab")[0];
+        var delete_business_contact_btn = Ext.ComponentQuery.query("business_contact_mini_grid button[action=deleteBusinessContactFrom]", root)[0];
+        if(selected.length > 0){
+            delete_business_contact_btn.setDisabled(false);
+        }else{
+            delete_business_contact_btn.setDisabled(true);
+        }
+    },
+
     loadRemindController: function() {
         var me = this;
         load_uniq_controller(me, 'Reminds');

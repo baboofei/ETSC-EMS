@@ -12,6 +12,10 @@ class BusinessUnit < ActiveRecord::Base
 
     has_many :contracts
 
+    #个案和商务相关单位多对多
+    has_many :business_units_salecases
+    has_many :salecases, :through => :business_units_salecases
+
     belongs_to :user
 
     #快递单多态

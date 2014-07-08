@@ -15,6 +15,14 @@ class Salecase < ActiveRecord::Base
     has_many :customers_salecases
     has_many :customers, :through => :customers_salecases
 
+    #个案和商务相关单位多对多
+    has_many :business_units_salecases
+    has_many :business_units, :through => :business_units_salecases
+
+    #个案和商务相关联系人多对多
+    has_many :business_contacts_salecases
+    has_many :business_contacts, :through => :business_contacts_salecases
+
     has_many :salelogs
 
     belongs_to :group

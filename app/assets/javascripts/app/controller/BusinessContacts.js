@@ -12,6 +12,7 @@ Ext.define('EIM.controller.BusinessContacts', {
     ],
 
     views: [
+        'business_contact.AddToMiniForm',
         'business_contact.Panel',
         'business_contact.Grid',
         'business_contact.Form'
@@ -50,6 +51,12 @@ Ext.define('EIM.controller.BusinessContacts', {
             },
             'business_contact_form button[action=save]': {
                 click: this.saveBusinessContact
+            },
+            'business_contact_add_to_mini_form button[action=add_to]': {
+                click: this.addToMiniBusinessContact
+            },
+            'business_contact_add_to_mini_form combo[name=business_contact_id]': {
+                select: this.showContact
             }
         });
     },
@@ -182,5 +189,45 @@ Ext.define('EIM.controller.BusinessContacts', {
                 }
             });
         }
+    },
+
+    /**
+     * 销售日志模块中“添加商务相关联系人”操作时的提交
+     */
+    addToMiniBusinessContact: function(button) {
+        var win = button.up("window");
+        var form = win.down("form", false);
+        //        var values = Ext.encode(form.form.getValues());
+        var salecase_id = Ext.ComponentQuery.query("salecase_grid")[0].getSelectionModel().getSelection()[0].get("id");
+        if(form.form.isValid()) {
+            //防双击
+            button.disable();
+            form.submit({
+                url: 'business_contacts/save_business_contacts_salecases',
+                params: {
+                    //                    value: values,
+                    salecase_id : salecase_id
+                },
+                success: function(response){
+                    //                    var text = Ext.decode(response.responseText);
+                    win.close();
+                    Ext.getStore('MiniBusinessContacts').load();
+                    Ext.getStore("Salelogs").load()
+                }
+            });
+        }
+    },
+    /**
+     * 选联系人后把联系信息显示在下面灰框里供查看
+     */
+    showContact: function(combo, record, eOpts) {
+        var form = combo.up('form');
+        var mobile = form.down('[name=mobile]', false);
+        var phone = form.down('[name=phone]', false);
+        var fax = form.down('[name=fax]',false);
+        console.log("A");
+        mobile.setValue(record[0].get("mobile"));
+        phone.setValue(record[0].get("phone"));
+        fax.setValue(record[0].get("fax"));
     }
 });

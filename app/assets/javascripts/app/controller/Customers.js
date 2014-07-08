@@ -449,7 +449,7 @@ Ext.define('EIM.controller.Customers', {
     },
 
     /**
-     * 销售日志模块中“添加联系人”操作时的提交
+     * 销售日志模块中“添加客户联系人”操作时的提交
      */
     addToMiniCustomer: function(button) {
         var win = button.up("window");

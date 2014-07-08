@@ -51,7 +51,7 @@ ActionMailer::Base.smtp_settings = {
 #,
 #    :enable_starttls_auto => false
 }
-#ActionMailer::Base.raise_delivery_errors = true
+ActionMailer::Base.raise_delivery_errors = true
 #以上为263企业邮箱，可用
 
 #ActionMailer::Base.smtp_settings = {

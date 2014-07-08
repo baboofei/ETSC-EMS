@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140701025801) do
+ActiveRecord::Schema.define(:version => 20140704012855) do
 
   create_table "accessories", :force => true do |t|
     t.string   "url"
@@ -109,6 +109,13 @@ ActiveRecord::Schema.define(:version => 20140701025801) do
     t.datetime "updated_at",       :null => false
   end
 
+  create_table "business_contacts_salecases", :id => false, :force => true do |t|
+    t.integer  "business_contact_id"
+    t.integer  "salecase_id"
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
+  end
+
   create_table "business_unit_aliases", :force => true do |t|
     t.string   "unit_alias"
     t.integer  "business_unit_id"
@@ -129,6 +136,13 @@ ActiveRecord::Schema.define(:version => 20140701025801) do
     t.integer  "user_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+  end
+
+  create_table "business_units_salecases", :id => false, :force => true do |t|
+    t.integer  "business_unit_id"
+    t.integer  "salecase_id"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
   end
 
   create_table "businesses_vendor_units", :id => false, :force => true do |t|
@@ -466,7 +480,7 @@ ActiveRecord::Schema.define(:version => 20140701025801) do
     t.datetime "updated_at",        :null => false
   end
 
-  create_table "event_images", :force => true do |t|
+  create_table "event_images_bak", :force => true do |t|
     t.integer  "event_id"
     t.string   "url"
     t.string   "thumbnail_url"
@@ -483,14 +497,14 @@ ActiveRecord::Schema.define(:version => 20140701025801) do
     t.datetime "updated_at"
   end
 
-  create_table "events_products", :id => false, :force => true do |t|
+  create_table "events_products_bak", :id => false, :force => true do |t|
     t.integer  "event_id"
     t.integer  "serial_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "events_serials", :id => false, :force => true do |t|
+  create_table "events_serials_bak", :id => false, :force => true do |t|
     t.integer  "event_id"
     t.integer  "serial_id"
     t.datetime "created_at"
