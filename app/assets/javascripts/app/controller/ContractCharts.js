@@ -1,19 +1,19 @@
 Ext.define('EIM.controller.ContractCharts', {
-    extend: 'Ext.app.Controller',
+	extend: 'Ext.app.Controller',
 
-    stores: ['ContractCharts'],
-    models: ['ContractChart'],
+	stores: ['ContractCharts'],
+	models: ['ContractChart'],
 
-    views: ['contract.Chart'],
+	views: ['contract.Chart'],
 
-//    refs: [{
-//
-//    }],
+	//    refs: [{
+	//
+	//    }],
 
-    init: function() {
-        var me = this;
-        me.control({
+	init: function() {
+		var me = this;
+		me.control({
 
-        });
-    }
+		});
+	}
 });

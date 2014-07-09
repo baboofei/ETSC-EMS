@@ -10,9 +10,10 @@ Ext.define('EIM.controller.FlowSheets', {
         'Customers',
         'ServiceMiniCustomers',
         'FlowSheetReceivedEquipments',
-//        'ComboQuoteSales',
+        //        'ComboQuoteSales',
         'ComboSupporters',
-        'ComboGroups'/*,
+        'ComboGroups'
+        /*,
         'dict.SalelogProcesses',
         'dict.SalelogPriorities',
         'dict.Expresses'*/
@@ -23,12 +24,12 @@ Ext.define('EIM.controller.FlowSheets', {
         'Customer',
         'ServiceMiniCustomer',
         'FlowSheetReceivedEquipment',
-//        'ComboQuoteSale',
+        //        'ComboQuoteSale',
         'ComboSupporter',
         'ComboGroup',
-//        'dict.SalelogProcess',
-//        'dict.SalelogPriority',
-//        'dict.Express',
+        //        'dict.SalelogProcess',
+        //        'dict.SalelogPriority',
+        //        'dict.Express',
         'ComboUser'
     ],
 
@@ -37,28 +38,27 @@ Ext.define('EIM.controller.FlowSheets', {
         'flow_sheet.Grid',
         'salelog.Grid',
         'flow_sheet.Detail',
-//        'etscux.ExpandableCustomerUnitCombo',
-//        'etscux.ExpandableCustomerCombo',
+        //        'etscux.ExpandableCustomerUnitCombo',
+        //        'etscux.ExpandableCustomerCombo',
         'customer.ServiceMiniGrid',
         'flow_sheet.ReceivedEquipmentGrid',
         'flow_sheet.ServiceLogGrid',
         'flow_sheet.Info',
-        'flow_sheet.Form'/*,
+        'flow_sheet.Form'
+        /*,
         'flow_sheet.TransferForm'*/
     ],
 
-    refs: [
-        {
-            ref: 'grid',
-            selector: 'flow_sheet_grid'
-        }
-    ],
+    refs: [{
+        ref: 'grid',
+        selector: 'flow_sheet_grid'
+    }],
 
     init: function() {
         var me = this;
         var salelog_tip = Ext.create('Ext.tip.ToolTip', {
-            autoHide : false,
-            closable : true,
+            autoHide: false,
+            closable: true,
             draggable: true,
             resizable: true,
             maxWidth: 500
@@ -73,11 +73,11 @@ Ext.define('EIM.controller.FlowSheets', {
             'button[action=addFlowSheet]': {
                 click: this.addFlowSheet
             },
-//            'flow_sheet_service_log_grid menuitem[action=quote]': {
-//                click: function() {
-//                    console.log("AA");
-//                }
-//            },
+            //            'flow_sheet_service_log_grid menuitem[action=quote]': {
+            //                click: function() {
+            //                    console.log("AA");
+            //                }
+            //            },
             'flow_sheet_service_log_grid menuitem[action=confirmQuit]': {
                 click: this.popConfirmQuitForm
             },
@@ -168,19 +168,19 @@ Ext.define('EIM.controller.FlowSheets', {
             },
             //个案信息修改的“确定”按钮
             'flow_sheet_info [action=submitFlowSheetInfo]': {
-            	click: this.flowSheetSubmit
+                click: this.flowSheetSubmit
             },
             //“新增个案”表单的“保存”按钮
             'flow_sheet_form button[action=save]': {
                 click: this.flow_sheetFormSubmit
             },
-//            //“推荐产品”表单的“保存”按钮
-//            'recommend_item_form button[action=save]': {
-//                click: this.recommendItemSubmit
-//            },
+            //            //“推荐产品”表单的“保存”按钮
+            //            'recommend_item_form button[action=save]': {
+            //                click: this.recommendItemSubmit
+            //            },
             'salelog_grid': {
                 cellclick: function(grid, td, cellIndex, record, tr, rowIndex, e) {
-                    if(td.innerHTML.indexOf("</a>") === -1) {
+                    if (td.innerHTML.indexOf("</a>") === -1) {
                         salelog_tip.update(td.innerHTML);
                         salelog_tip.show();
                         salelog_tip.setPosition(e.getXY());
@@ -192,15 +192,15 @@ Ext.define('EIM.controller.FlowSheets', {
             },
             'salelog_form': {
                 close: function() {
-//                    if(Ext.ComponentQuery.query("recommended_item_grid")) Ext.ComponentQuery.query("recommended_item_grid")[0].destroy();
-//                    if(Ext.ComponentQuery.query("recommend_tab")) Ext.ComponentQuery.query("recommend_tab")[0].destroy();
-//                    if(Ext.ComponentQuery.query("salelog_form")) Ext.ComponentQuery.query("salelog_form")[0].destroy();
-//                    console.log("recommended_item_grid 被销毁了");
+                    //                    if(Ext.ComponentQuery.query("recommended_item_grid")) Ext.ComponentQuery.query("recommended_item_grid")[0].destroy();
+                    //                    if(Ext.ComponentQuery.query("recommend_tab")) Ext.ComponentQuery.query("recommend_tab")[0].destroy();
+                    //                    if(Ext.ComponentQuery.query("salelog_form")) Ext.ComponentQuery.query("salelog_form")[0].destroy();
+                    //                    console.log("recommended_item_grid 被销毁了");
                 }
             },
-//            'flow_sheet_transfer_form button[action=save]': {
-//                click: this.transferFlowSheetSubmit
-//            },
+            //            'flow_sheet_transfer_form button[action=save]': {
+            //                click: this.transferFlowSheetSubmit
+            //            },
             'mail_tab': {
                 render: this.loadMailController
             },
@@ -214,8 +214,8 @@ Ext.define('EIM.controller.FlowSheets', {
                 render: this.loadWaitController
             }
         });
-//      Ext.create("EIM.view.flow_sheet.Layout", {
-//      });
+        //      Ext.create("EIM.view.flow_sheet.Layout", {
+        //      });
     },
 
     /**
@@ -269,7 +269,7 @@ Ext.define('EIM.controller.FlowSheets', {
         view.down('[name=flow_sheet_id]', false).setValue(selection.get('id'));
         view.down('admin_inventory_mini_grid[name=source_grid]', false).getStore().load();
         view.down('admin_inventory_mini_grid[name=target_grid]', false).getStore().clearData();
-//        console.log();
+        //        console.log();
     },
 
     popChangeDetachedPartsForm: function() {
@@ -380,11 +380,15 @@ Ext.define('EIM.controller.FlowSheets', {
         var grid = me.getGrid();
         var selection = grid.getSelectedItem();
         var customer_unit_field = view.down('expandable_customer_unit_combo combo', false);
-        customer_unit_field.getStore().loadData([[selection.get('customer_units>id').split('|')[0], selection.get('customer_units>(name|en_name|unit_aliases>unit_alias)').split("、")[0]]]);
+        customer_unit_field.getStore().loadData([
+            [selection.get('customer_units>id').split('|')[0], selection.get('customer_units>(name|en_name|unit_aliases>unit_alias)').split("、")[0]]
+        ]);
         customer_unit_field.setValue(parseInt(selection.get('customer_units>id').split('|')[0]));
 
         var customer_field = view.down('expandable_customer_combo combo', false);
-        customer_field.getStore().loadData([[selection.get('customers>id').split('|')[0], selection.get('customers>(name|en_name)').split("、")[0]]]);
+        customer_field.getStore().loadData([
+            [selection.get('customers>id').split('|')[0], selection.get('customers>(name|en_name)').split("、")[0]]
+        ]);
         customer_field.getStore().getProxy().setExtraParam('customer_unit_id', parseInt(selection.get('customer_units>id').split('|')[0]));
         customer_field.setValue(parseInt(selection.get('customers>id').split('|')[0]));
     },
@@ -410,16 +414,16 @@ Ext.define('EIM.controller.FlowSheets', {
         return_equipment_button.disable();
         receive_equipment_button.disable();
         deliver_equipment_button.disable();
-        if(selected.length > 0) {
+        if (selected.length > 0) {
             delete_equipment_button.enable();
             var equipment_array = Ext.Array.pluck(selected, "data");
             var packaged_count = 0;
             var returned_count = 0;
             var delivered_count = 0;
             Ext.Array.each(equipment_array, function(item, index) {
-                if(item["is_packaged"]) packaged_count += 1;
-                if(item["is_return_factory"]) returned_count += 1;
-                if(item["is_sent_back"]) delivered_count += 1;
+                if (item["is_packaged"]) packaged_count += 1;
+                if (item["is_return_factory"]) returned_count += 1;
+                if (item["is_sent_back"]) delivered_count += 1;
             });
             var all_packaged = (packaged_count == equipment_array.length);
             var none_packaged = (packaged_count == 0);
@@ -455,7 +459,7 @@ Ext.define('EIM.controller.FlowSheets', {
         view.down('[name=flow_sheet_id]', false).setValue(selection.get('id'));
         view.down('[name=equipment_ids]', false).setValue(Ext.Array.pluck(Ext.Array.pluck(equipment_grid.getSelectedItems(), "data"), "id").join("|"));
     },
-    
+
     returnEquipment: function() {
         var me = this;
         load_uniq_controller(me, 'service_log.ReturnEquipment');
@@ -505,7 +509,7 @@ Ext.define('EIM.controller.FlowSheets', {
         load_uniq_controller(me, 'Customers');
         Ext.widget('customer_add_to_mini_form').show();
     },
-    
+
     deleteCustomerFrom: function(button) {
         var grid = button.up('grid');
         var store = grid.getStore();
@@ -513,37 +517,37 @@ Ext.define('EIM.controller.FlowSheets', {
         var flow_sheet_id = Ext.ComponentQuery.query("flow_sheet_grid")[0].getSelectionModel().getSelection()[0].get("id");
 
         Ext.Msg.confirm('请确认', '你真的要删除选中项吗？', function(button) {
-            if(button === 'yes') {
+            if (button === 'yes') {
                 store.remove(selection);
-                Ext.Ajax.request({//AJAX方式提交
+                Ext.Ajax.request({ //AJAX方式提交
                     url: 'customers/delete_customers_flow_sheets',
-//                    url: 'servlet/SalselogPostServlet?type=deleteCaseCustomers',
+                    //                    url: 'servlet/SalselogPostServlet?type=deleteCaseCustomers',
                     params: {
                         customer_id: selection.get("id"),
-                        flow_sheet_id : flow_sheet_id
+                        flow_sheet_id: flow_sheet_id
                     },
-                    success:function(request){
+                    success: function(request) {
                         Ext.getStore("Salelogs").load()
                     },
-                    failure:function(){
-                        Ext.Msg.alert('错误','你的网貌似有问题，请刷新再说……');
+                    failure: function() {
+                        Ext.Msg.alert('错误', '你的网貌似有问题，请刷新再说……');
                     }
                 });
             }
         });
     },
-    
+
     flowSheetSubmit: function(button, e, eOpts) {
-//    	var me = button;
-    	var form = button.up('form');
-    	var sale_case_id = Ext.ComponentQuery.query("flow_sheet_grid")[0].getSelectionModel().getSelection()[0].get("id");
-    	form.submit({
-    		url: 'flow_sheets/save_flow_sheet',
-    		params: {
-    			id : sale_case_id
-	    	},
-    		submitEmptyText: false,
-            success: function(the_form, action){
+        //    	var me = button;
+        var form = button.up('form');
+        var sale_case_id = Ext.ComponentQuery.query("flow_sheet_grid")[0].getSelectionModel().getSelection()[0].get("id");
+        form.submit({
+            url: 'flow_sheets/save_flow_sheet',
+            params: {
+                id: sale_case_id
+            },
+            submitEmptyText: false,
+            success: function(the_form, action) {
                 var response = action.response;
                 var msg = Ext.decode(response.responseText);
                 Ext.example.msg('成功', msg.message);
@@ -557,20 +561,20 @@ Ext.define('EIM.controller.FlowSheets', {
                     }
                 });
             }
-    	});
+        });
     },
 
     flow_sheetFormSubmit: function(button, e, eOpts) {
         var me = button;
         var win = me.up('window');
         var form = win.down('form', false);
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.form.submit({
-                url:'flow_sheets/save_flow_sheet',
+                url: 'flow_sheets/save_flow_sheet',
                 submitEmptyText: false,
-                success: function(the_form, action){
+                success: function(the_form, action) {
                     win.close();
                     var response = action.response;
                     var msg = Ext.decode(response.responseText);
@@ -586,7 +590,7 @@ Ext.define('EIM.controller.FlowSheets', {
      * @param grid
      */
     applyFilter: function(grid) {
-        if(!Ext.isEmpty(globeFilter)) {
+        if (!Ext.isEmpty(globeFilter)) {
             grid.filters.clearFilters();
             var gridFilter = grid.filters.addFilter({
                 active: true,
@@ -611,7 +615,7 @@ Ext.define('EIM.controller.FlowSheets', {
         var delete_customer_btn = Ext.ComponentQuery.query("flow_sheet_detail customer_service_mini_grid button[action=deleteCustomerFrom]", root)[0];
         var update_flow_sheet_info_btn = Ext.ComponentQuery.query("flow_sheet_info [action=submitFlowSheetInfo]", root)[0];
         var add_received_equipment_btn = Ext.ComponentQuery.query("flow_sheet_detail flow_sheet_received_equipment_grid button[action=addEquipment]", root)[0];
-//        var delete_received_equipment_btn = Ext.ComponentQuery.query("flow_sheet_detail flow_sheet_received_equipment_grid button[action=deleteEquipment]", root)[0];
+        //        var delete_received_equipment_btn = Ext.ComponentQuery.query("flow_sheet_detail flow_sheet_received_equipment_grid button[action=deleteEquipment]", root)[0];
         var add_service_log_btn = Ext.ComponentQuery.query("flow_sheet_detail flow_sheet_service_log_grid button[action=addServiceLog]", root)[0];
         var add_quote_btn = Ext.ComponentQuery.query("flow_sheet_detail flow_sheet_service_log_grid button[action=addQuote]", root)[0];
         //        console.log(form);
@@ -619,10 +623,10 @@ Ext.define('EIM.controller.FlowSheets', {
         delete_customer_btn.setDisabled(true);
         update_flow_sheet_info_btn.setDisabled(true);
         add_received_equipment_btn.setDisabled(true);
-//        delete_received_equipment_btn.setDisabled(true);
+        //        delete_received_equipment_btn.setDisabled(true);
         add_service_log_btn.setDisabled(true);
         add_quote_btn.setDisabled(true);
-        if(selected.length > 0){
+        if (selected.length > 0) {
             form.loadRecord(selected[0]);
             Ext.getStore('ServiceLogs').load({
                 params: {
@@ -639,16 +643,16 @@ Ext.define('EIM.controller.FlowSheets', {
                     flow_sheet_id: selected[0].get("id")
                 }
             });
-//            if(selected[0].get("editable")) {
+            //            if(selected[0].get("editable")) {
             add_customer_btn.setDisabled(false);
             delete_customer_btn.setDisabled(false);
             update_flow_sheet_info_btn.setDisabled(false);
             add_received_equipment_btn.setDisabled(false);
-//            delete_received_equipment_btn.setDisabled(false);
+            //            delete_received_equipment_btn.setDisabled(false);
             add_service_log_btn.setDisabled(false);
             add_quote_btn.setDisabled(false);
-//            }
-        }else{
+            //            }
+        } else {
             form.form.reset();
             Ext.getStore('ServiceLogs').removeAll();
             Ext.getStore('ServiceMiniCustomers').removeAll();
@@ -661,7 +665,7 @@ Ext.define('EIM.controller.FlowSheets', {
         Ext.Array.each(menu_items, function(item, index, items) {
             item.hide();
         });
-        if(selected.length > 0) {
+        if (selected.length > 0) {
             switch (selected[0].get('state')) {
                 case "a_start":
                     menu.down('[action=checkEquipment]').show();
@@ -728,18 +732,18 @@ Ext.define('EIM.controller.FlowSheets', {
     customerMiniSelectionChange: function(selection_model, selected, eOpts) {
         var root = Ext.ComponentQuery.query("flow_sheet_tab")[0];
         var delete_customer_btn = Ext.ComponentQuery.query("service_customer_mini_grid button[action=deleteCustomerFrom]", root)[0];
-        if(selected.length > 0){
+        if (selected.length > 0) {
             delete_customer_btn.setDisabled(false);
-        }else{
+        } else {
             delete_customer_btn.setDisabled(true);
         }
     },
-//    loadProcessStore: function() {
-////        Ext.getStore("dict.SalelogProcesses").load();
-//    },
+    //    loadProcessStore: function() {
+    ////        Ext.getStore("dict.SalelogProcesses").load();
+    //    },
 
-//    editSalelog: function(grid, record, item, index, e, eOpts ){
-//    },
+    //    editSalelog: function(grid, record, item, index, e, eOpts ){
+    //    },
     loadRemindController: function() {
         var me = this;
         load_uniq_controller(me, 'Reminds');

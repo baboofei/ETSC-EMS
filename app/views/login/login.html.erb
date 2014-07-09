@@ -168,35 +168,39 @@
 <% end %>
 <script lang="javascript">
 var add_crown = function() {
-var table = document.getElementById('saleTable');
-var row_count = table.tBodies[0].rows.length;
-var contract_count_array = [];
-var contract_rmb_array = [];
-var contract_profit_array = [];
-var contract_profit_rate_array = [];
-for(var i = 1; i < row_count; i++) {
-var row = table.tBodies[0].rows[i];
-contract_count_array.push(row.cells[1].innerHTML * 1);
-contract_rmb_array.push(row.cells[2].innerHTML * 1);
-contract_profit_array.push(row.cells[3].innerHTML * 1);
-var pure_rate_text = row.cells[4].innerHTML;
-var pure_rate = pure_rate_text.substring(0, pure_rate_text.length - 1);
-contract_profit_rate_array.push(pure_rate * 1);
-}
-for(var i = 1; i < row_count; i++) {
-if(table.tBodies[0].rows[i].cells[1].innerHTML * 1 === Math.max.apply(null, contract_count_array)) {
-table.tBodies[0].rows[i].cells[1].innerHTML = "<img src='<%= asset_path("silk_icon/crown.png") %>'>" + table.tBodies[0].rows[i].cells[1].innerHTML;
-}
-if(table.tBodies[0].rows[i].cells[2].innerHTML * 1 === Math.max.apply(null, contract_rmb_array)) {
-table.tBodies[0].rows[i].cells[2].innerHTML = "<img src='<%= asset_path("silk_icon/crown.png") %>'>" + table.tBodies[0].rows[i].cells[2].innerHTML;
-}
-if(table.tBodies[0].rows[i].cells[3].innerHTML * 1 === Math.max.apply(null, contract_profit_array)) {
-table.tBodies[0].rows[i].cells[3].innerHTML = "<img src='<%= asset_path("silk_icon/crown.png") %>'>" + table.tBodies[0].rows[i].cells[3].innerHTML;
-}
-if(table.tBodies[0].rows[i].cells[4].innerHTML === (Math.max.apply(null, contract_profit_rate_array) + "%")) {
-table.tBodies[0].rows[i].cells[4].innerHTML = "<img src='<%= asset_path("silk_icon/crown.png") %>'>" + table.tBodies[0].rows[i].cells[4].innerHTML;
-}
-}
+    var table = document.getElementById('saleTable');
+    var row_count = table.tBodies[0].rows.length;
+    var contract_count_array = [];
+    var contract_rmb_array = [];
+    var contract_profit_array = [];
+    var contract_profit_rate_array = [];
+    for (var i = 1; i < row_count; i++) {
+        var row = table.tBodies[0].rows[i];
+        contract_count_array.push(row.cells[1].innerHTML * 1);
+        contract_rmb_array.push(row.cells[2].innerHTML * 1);
+        contract_profit_array.push(row.cells[3].innerHTML * 1);
+        var pure_rate_text = row.cells[4].innerHTML;
+        var pure_rate = pure_rate_text.substring(0, pure_rate_text.length - 1);
+        contract_profit_rate_array.push(pure_rate * 1);
+    }
+    for (var i = 1; i < row_count; i++) {
+        if (table.tBodies[0].rows[i].cells[1].innerHTML * 1 === Math.max.apply(null, contract_count_array)) {
+            table.tBodies[0].rows[i].cells[1].innerHTML = "<img src='<%= asset_path("
+            silk_icon / crown.png ") %>'>" + table.tBodies[0].rows[i].cells[1].innerHTML;
+        }
+        if (table.tBodies[0].rows[i].cells[2].innerHTML * 1 === Math.max.apply(null, contract_rmb_array)) {
+            table.tBodies[0].rows[i].cells[2].innerHTML = "<img src='<%= asset_path("
+            silk_icon / crown.png ") %>'>" + table.tBodies[0].rows[i].cells[2].innerHTML;
+        }
+        if (table.tBodies[0].rows[i].cells[3].innerHTML * 1 === Math.max.apply(null, contract_profit_array)) {
+            table.tBodies[0].rows[i].cells[3].innerHTML = "<img src='<%= asset_path("
+            silk_icon / crown.png ") %>'>" + table.tBodies[0].rows[i].cells[3].innerHTML;
+        }
+        if (table.tBodies[0].rows[i].cells[4].innerHTML === (Math.max.apply(null, contract_profit_rate_array) + "%")) {
+            table.tBodies[0].rows[i].cells[4].innerHTML = "<img src='<%= asset_path("
+            silk_icon / crown.png ") %>'>" + table.tBodies[0].rows[i].cells[4].innerHTML;
+        }
+    }
 }
 add_crown();
 </script>

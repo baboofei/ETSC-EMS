@@ -64,14 +64,14 @@ Ext.define('EIM.controller.Etscuxes', {
         'business_contact.Form',
         'pop_unit.Form'
     ],
-//    refs: [{
-//        ref: 'zzform',
-//        selector: 'form'
-//    }],
+    //    refs: [{
+    //        ref: 'zzform',
+    //        selector: 'form'
+    //    }],
 
     init: function() {
         var me = this;
-//        Ext.ComponentQuery.query('expandable_customer_combo combo')[0].getStore()
+        //        Ext.ComponentQuery.query('expandable_customer_combo combo')[0].getStore()
         me.control({
             /**
              * 客户和客户单位的组
@@ -155,15 +155,15 @@ Ext.define('EIM.controller.Etscuxes', {
             'expandable_business_unit_combo combo': {
                 select: this.passParamsToBusinessContactCombo
             },
-            'expandable_business_unit_combo button[text=+]':{
+            'expandable_business_unit_combo button[text=+]': {
                 click: this.popUpBusinessUnitFormAndSetValue
             },
-            'expandable_business_contact_combo combo':{
+            'expandable_business_contact_combo combo': {
                 beforequery: function(queryEvent, records, eOpts) {
                     delete queryEvent.combo.lastQuery;
                 }
             },
-            'expandable_business_contact_combo button[text=+]':{
+            'expandable_business_contact_combo button[text=+]': {
                 click: function() {
                     var me = this;
                     load_uniq_controller(me, 'BusinessContacts');
@@ -177,15 +177,15 @@ Ext.define('EIM.controller.Etscuxes', {
             'expandable_pop_unit_combo combo': {
                 select: this.passParamsToPopCombo
             },
-            'expandable_pop_unit_combo button[text=+]':{
+            'expandable_pop_unit_combo button[text=+]': {
                 click: this.popUpPopUnitFormAndSetValue
             },
-            'expandable_pop_combo combo':{
+            'expandable_pop_combo combo': {
                 beforequery: function(queryEvent, records, eOpts) {
                     delete queryEvent.combo.lastQuery;
                 }
             },
-            'expandable_pop_combo button[text=+]':{
+            'expandable_pop_combo button[text=+]': {
                 click: function() {
                     var me = this;
                     load_uniq_controller(me, 'Pops');
@@ -196,13 +196,13 @@ Ext.define('EIM.controller.Etscuxes', {
             /**
              * 币种的下拉框，当它有值时，后面的数字框也必须有值
              */
-            'amount_with_currency combo':{
+            'amount_with_currency combo': {
                 blur: this.validateCurrencyComponentCombo
             },
             /**
              * 金额的输入框，当它有值时，前面的下拉框也必须有值
              */
-            'amount_with_currency numberfield':{
+            'amount_with_currency numberfield': {
                 blur: this.validateCurrencyComponentNumber
             },
 
@@ -236,30 +236,33 @@ Ext.define('EIM.controller.Etscuxes', {
      */
     addParamsToCustomerStore: function(combo, records, eOpts) {
         var expand = combo.up('form').down('expandable_customer_combo', false)
-        if(expand){
+        if (expand) {
             var customer_combo = expand.down('combo', false);
             customer_combo.getStore().getProxy().setExtraParam('customer_unit_id', records[0]["data"]["id"])
             customer_combo.reset();
         }
         var addr_field = combo.up('form').down('[name=addr]', false);
         var addr_combo = combo.up('form').down('[name=addr_combo]', false);
-//        console.log(addr_field);
-        if(addr_field) {
+        //        console.log(addr_field);
+        if (addr_field) {
             //如果地址是“紫金港校区：西湖区余杭塘路866号；玉泉校区：西湖区浙大路38号”这样的形式，
             //也即包含分号，则把多地址解析一下放到addr_combo里供选
             var addr = records[0].get('addr');
             var addr_array = addr.split("；");
 
-            if(addr_array.length === 1) {
+            if (addr_array.length === 1) {
                 addr_combo.getStore().removeAll();
                 addr_combo.setValue();
                 addr_field.setValue(addr);
             } else {
-//                addr_combo.getStore().load();
+                //                addr_combo.getStore().load();
 
                 var addr_store = [];
                 Ext.Array.each(addr_array, function(item) {
-                    addr_store.push({name: item.split("：")[0], address: item.split("：")[1]});
+                    addr_store.push({
+                        name: item.split("：")[0],
+                        address: item.split("：")[1]
+                    });
                 });
                 addr_combo.getStore().loadData(addr_store);
                 addr_combo.expand();
@@ -272,14 +275,14 @@ Ext.define('EIM.controller.Etscuxes', {
     /**
      * 弹出“新增客户单位”的表单，并把已经填的值放进表单里
      */
-    popUpCustomerUnitFormAndSetValue: function(button){
+    popUpCustomerUnitFormAndSetValue: function(button) {
         var me = this;
         var value = button.up('expandable_customer_unit_combo').down('combo', false).getRawValue();
-//        console.log("AAA");
+        //        console.log("AAA");
         load_uniq_controller(me, 'CustomerUnits');
         //把已经填的值带给弹出的窗口
         var form = Ext.widget('customer_unit_form');
-        form.show('', function(){
+        form.show('', function() {
             form.down('[name=name|en_name|unit_aliases>unit_alias]').setValue(value);
             form.down('[name=source_element_id]').setValue(button.id);
         });
@@ -288,17 +291,17 @@ Ext.define('EIM.controller.Etscuxes', {
     /**
      * 弹出“新增客户”的表单，并视情况把已经填的客户单位的值放进表单里
      */
-    popUpCustomerFormAndSetCustomerUnitValue: function(button){
+    popUpCustomerFormAndSetCustomerUnitValue: function(button) {
         var me = this;
         load_uniq_controller(me, 'Customers');
         var form = Ext.widget('customer_form');
         form.show('', function() {
             var expand_customer_unit = button.up('form').down('expandable_customer_unit_combo', false);
-            if(expand_customer_unit) {
+            if (expand_customer_unit) {
                 var combo = expand_customer_unit.down('combo')
-                if(combo.getValue() === combo.getRawValue()) {
+                if (combo.getValue() === combo.getRawValue()) {
                     //如果两个值相等，说明是个假值(还没有这个单位)，则弹出的表单里不预填写
-                }else{
+                } else {
                     //否则把单位的值传过去
                     var target_combo = form.down('expandable_customer_unit_combo').down('combo');
                     target_combo.setValue(combo.getValue());
@@ -316,20 +319,20 @@ Ext.define('EIM.controller.Etscuxes', {
     passParamsToProductComboOrBox: function(combo, records, eOpts) {
         var product_field = combo.up('form').down('expandable_product_combo', false);
         var product_box_field = combo.up('form').down('expandable_product_box_select', false);
-        if(product_field){
+        if (product_field) {
             var product_combo = product_field.down('combo', false);
             product_combo.getStore().getProxy().setExtraParam('vendor_unit_id', records[0]["data"]["id"])
             product_combo.reset();
         }
-        if(product_box_field) {
+        if (product_box_field) {
             var product_box = product_box_field.down('boxselect', false);
             product_box.getStore().getProxy().setExtraParam('vendor_unit_id', records[0]["data"]["id"])
             product_box.reset();
         }
-        if(combo.fieldLabel.indexOf('供应商') != -1) {
+        if (combo.fieldLabel.indexOf('供应商') != -1) {
             //因为还有“所有权”的combo，这个不触发
             var vendor_field = combo.up('form').down('expandable_vendor_combo', false);
-            if(vendor_field) {
+            if (vendor_field) {
                 var vendor_combo = vendor_field.down('combo', false);
                 vendor_combo.getStore().getProxy().setExtraParam('vendor_unit_id', records[0]["data"]["id"])
                 vendor_combo.reset();
@@ -340,13 +343,13 @@ Ext.define('EIM.controller.Etscuxes', {
     /**
      * 弹出“新增工厂”的表单，并把已经填的工厂的值放进表单里
      */
-    popUpVendorUnitFormAndSetValue: function(button){
+    popUpVendorUnitFormAndSetValue: function(button) {
         var me = this;
         var value = button.up('expandable_vendor_unit_combo').down('combo', false).getRawValue();
         load_uniq_controller(me, 'VendorUnits');
         //把已经填的值带给弹出的窗口
         var form = Ext.widget('vendor_unit_mini_add_form');
-        form.show('', function(){
+        form.show('', function() {
             form.down('[name=name]').setValue(value);
             form.down('[name=source_element_id]').setValue(button.id);
         });
@@ -358,13 +361,13 @@ Ext.define('EIM.controller.Etscuxes', {
     prepareBoxSelectData: function(box, newValue, oldValue) {
         var newArray = newValue.split(', ');
         var oldArray;
-        if(oldValue != undefined) oldArray = oldValue.split(', ');
-        if(oldValue === undefined || oldArray.join("") === "") oldArray = [];
-        if(newArray.length > oldArray.length) {
+        if (oldValue != undefined) oldArray = oldValue.split(', ');
+        if (oldValue === undefined || oldArray.join("") === "") oldArray = [];
+        if (newArray.length > oldArray.length) {
             //新的值多，也就是加了选择。把加的这一条的数据加到变量里
             //对新的值循环，如果旧的值里有它就不管，没有它则加一条
             Ext.Array.each(newArray, function(item) {
-                if(oldArray.indexOf(item) === -1 && !Ext.isEmpty(item)) {
+                if (oldArray.indexOf(item) === -1 && !Ext.isEmpty(item)) {
                     Ext.ComponentQuery.query('functree')[0].tempBatchProduct[item] = box.getStore().getById(Number(item));
                 }
             });
@@ -372,7 +375,7 @@ Ext.define('EIM.controller.Etscuxes', {
             //旧的多，也就是删了选择。在变量里找到少的这一条对应的数据，去掉
             //对旧的值循环，如果新的值里有它就不管，没有就把此条去掉
             Ext.Array.each(oldArray, function(item, index, array) {
-                if(newArray.indexOf(item) === -1) {
+                if (newArray.indexOf(item) === -1) {
                     delete(Ext.ComponentQuery.query('functree')[0].tempBatchProduct[item]);
                 }
             });
@@ -382,10 +385,10 @@ Ext.define('EIM.controller.Etscuxes', {
     /**
      * 弹出“新增产品”的表单，并视情况把已经填的工厂的值放进表单里
      */
-    popUpProductFormAndSetVendorUnitValue: function(button){
+    popUpProductFormAndSetVendorUnitValue: function(button) {
         var me = this;
         var value;
-        if(button.up('expandable_product_combo')) {
+        if (button.up('expandable_product_combo')) {
             value = button.up('expandable_product_combo').down('combo', false).getRawValue();
         }
 
@@ -393,14 +396,16 @@ Ext.define('EIM.controller.Etscuxes', {
         var form = Ext.widget('product_mini_add_form');
         form.show('', function() {
             var expand_vendor_unit = button.up('form').down('expandable_vendor_unit_combo', false);
-            if(expand_vendor_unit) {
+            if (expand_vendor_unit) {
                 var vendor_unit_combo = expand_vendor_unit.down('combo');
-                if(vendor_unit_combo.getValue() === vendor_unit_combo.getRawValue()) {
+                if (vendor_unit_combo.getValue() === vendor_unit_combo.getRawValue()) {
                     //如果两个值相等，说明是个假值(还没有这个工厂)，则弹出的表单里不预填写
-                }else{
+                } else {
                     //否则把工厂的值传过去
                     var target_combo = form.down('expandable_vendor_unit_combo').down('combo');
-                    target_combo.getStore().loadData([[vendor_unit_combo.getValue(), vendor_unit_combo.getRawValue()]]);
+                    target_combo.getStore().loadData([
+                        [vendor_unit_combo.getValue(), vendor_unit_combo.getRawValue()]
+                    ]);
 
                     target_combo.setValue(vendor_unit_combo.getValue());
                 }
@@ -413,20 +418,22 @@ Ext.define('EIM.controller.Etscuxes', {
     /**
      * 弹出“新增供方联系人”的表单，并视情况把已经填的工厂的值放进表单里
      */
-    popUpVendorFormAndSetVendorUnitValue: function(button){
+    popUpVendorFormAndSetVendorUnitValue: function(button) {
         var me = this;
         load_uniq_controller(me, 'Vendors');
         var form = Ext.widget('vendor_mini_add_form');
         form.show('', function() {
             var expand_vendor_unit = button.up('form').down('expandable_vendor_unit_combo[fieldLabel=供应商]', false);
-            if(expand_vendor_unit) {
+            if (expand_vendor_unit) {
                 var vendor_unit_combo = expand_vendor_unit.down('combo');
-                if(vendor_unit_combo.getValue() === vendor_unit_combo.getRawValue()) {
+                if (vendor_unit_combo.getValue() === vendor_unit_combo.getRawValue()) {
                     //如果两个值相等，说明是个假值(还没有这个工厂)，则弹出的表单里不预填写
-                }else{
+                } else {
                     //否则把工厂的值传过去
                     var target_combo = form.down('expandable_vendor_unit_combo').down('combo');
-                    target_combo.getStore().loadData([[vendor_unit_combo.getValue(), vendor_unit_combo.getRawValue()]]);
+                    target_combo.getStore().loadData([
+                        [vendor_unit_combo.getValue(), vendor_unit_combo.getRawValue()]
+                    ]);
 
                     target_combo.setValue(vendor_unit_combo.getValue());
                 }
@@ -440,7 +447,7 @@ Ext.define('EIM.controller.Etscuxes', {
      */
     passParamsToBusinessContactCombo: function(combo, records, eOpts) {
         var expandable_combo = combo.up('form').down('expandable_business_contact_combo', false);
-        if(expandable_combo) {
+        if (expandable_combo) {
             var business_combo = expandable_combo.down('combo', false);
             business_combo.getStore().getProxy().setExtraParam('business_unit_id', records[0]["data"]["id"])
         }
@@ -456,7 +463,7 @@ Ext.define('EIM.controller.Etscuxes', {
         load_uniq_controller(me, 'BusinessUnits');
         //把已经填的值带给弹出的窗口
         var form = Ext.widget('business_unit_form');
-        form.show('', function(){
+        form.show('', function() {
             form.down('[name=name|en_name|unit_aliases>unit_alias]').setValue(value);
             form.down('[name=source_element_id]').setValue(button.id);
         });
@@ -467,7 +474,7 @@ Ext.define('EIM.controller.Etscuxes', {
      */
     passParamsToPopCombo: function(combo, records, eOpts) {
         var expandable_combo = combo.up('form').down('expandable_pop_combo', false);
-        if(expandable_combo) {
+        if (expandable_combo) {
             var pop_combo = expandable_combo.down('combo', false);
             pop_combo.getStore().getProxy().setExtraParam('pop_unit_id', records[0]["data"]["id"])
         }
@@ -483,7 +490,7 @@ Ext.define('EIM.controller.Etscuxes', {
         load_uniq_controller(me, 'PopUnits');
         //把已经填的值带给弹出的窗口
         var form = Ext.widget('pop_unit_form');
-        form.show('', function(){
+        form.show('', function() {
             form.down('[name=name|en_name|unit_aliases>unit_alias]').setValue(value);
             form.down('[name=source_element_id]').setValue(button.id);
         });
@@ -507,18 +514,18 @@ Ext.define('EIM.controller.Etscuxes', {
      * @param numberfield
      */
     validateCurrencyComponent: function(combo, numberfield) {
-        if(numberfield.allowZero != undefined) {
+        if (numberfield.allowZero != undefined) {
             //设定了允许为零
             combo.clearInvalid();
-        }else{
-            if(combo.allowBlank === false) {
+        } else {
+            if (combo.allowBlank === false) {
                 //设定了不能为空
-                if(combo.getValue() === null || combo.getValue() === 0) combo.markInvalid("此项值不能为空！");
-                if(numberfield.getValue() === null || numberfield.getValue() === 0) {
+                if (combo.getValue() === null || combo.getValue() === 0) combo.markInvalid("此项值不能为空！");
+                if (numberfield.getValue() === null || numberfield.getValue() === 0) {
                     numberfield.markInvalid("此项值不能为空！");
-                    numberfield.setValue("");//防止是“0”的时候被validate通过而提交
+                    numberfield.setValue(""); //防止是“0”的时候被validate通过而提交
                 }
-            }else{
+            } else {
                 if ((combo.getValue() != null || combo.getValue() != 0) && numberfield.getValue() === null) {
                     numberfield.markInvalid("有币种时必须填写金额！");
                 } else {
@@ -540,51 +547,54 @@ Ext.define('EIM.controller.Etscuxes', {
         var receiver_type_field = form.down('hidden[name=receiver_type]', false);
         receiver_type_field.setValue(source_grid.xtype.substr(0, source_grid.xtype.length - 5));
 
-//        var receiver_ids_field = form.down('hidden[name=receiver_ids]', false);
+        //        var receiver_ids_field = form.down('hidden[name=receiver_ids]', false);
         var dragged_receivers = source_grid.getStore()['data']['items'];
-//        receiver_ids_field.setValue(Ext.Array.map(dragged_receivers, function(item) {return item.get("id");}).join("|"));
-//        console.log(receiver_ids_field.getValue());
+        //        receiver_ids_field.setValue(Ext.Array.map(dragged_receivers, function(item) {return item.get("id");}).join("|"));
+        //        console.log(receiver_ids_field.getValue());
         target_grid.getStore().removeAll();
         Ext.Array.each(dragged_receivers, function(item) {
             var receiver_id = item.get("id");
             var receiver_name = item.get("name");
 
-            target_grid.getStore().add({"receiver_id": receiver_id, "receiver_name": receiver_name});
+            target_grid.getStore().add({
+                "receiver_id": receiver_id,
+                "receiver_name": receiver_name
+            });
         });
 
-//
-//        var target_hidden = form.down('hidden[name=customer_ids]', false);
-//        var target_express_id = form.down('[name=express_id]', false);
-//        if(button.up('form')) {
-//            var source_hidden = button.up('form').down('hidden[name=customer_ids]', false);
-//            var source_express_id = button.up('form').down('[name=express_id]', false);
-//            target_hidden.setValue(source_hidden.getValue());
-//            target_express_id.setValue(source_express_id.getValue());
-//        }else{
-//            //从“客户管理”进的话没有这个form，用grid里的数据
-//            var grid = button.up('grid');
-//            var store = grid.getStore();
-//            var customer_ids = Ext.Array.pluck(store.data.items, "internalId");
-//            target_hidden.setValue(customer_ids.join("|"));
-//        }
+        //
+        //        var target_hidden = form.down('hidden[name=customer_ids]', false);
+        //        var target_express_id = form.down('[name=express_id]', false);
+        //        if(button.up('form')) {
+        //            var source_hidden = button.up('form').down('hidden[name=customer_ids]', false);
+        //            var source_express_id = button.up('form').down('[name=express_id]', false);
+        //            target_hidden.setValue(source_hidden.getValue());
+        //            target_express_id.setValue(source_express_id.getValue());
+        //        }else{
+        //            //从“客户管理”进的话没有这个form，用grid里的数据
+        //            var grid = button.up('grid');
+        //            var store = grid.getStore();
+        //            var customer_ids = Ext.Array.pluck(store.data.items, "internalId");
+        //            target_hidden.setValue(customer_ids.join("|"));
+        //        }
     },
-//    popUpExpressSimpleForm: function(button) {
-//        var form = Ext.widget('express_sheet_simple_form').show();
-//        var target_hidden = form.down('hidden[name=customer_ids]', false);
-//        var target_express_id = form.down('[name=express_id]', false);
-//        if(button.up('form')) {
-//            var source_hidden = button.up('form').down('hidden[name=customer_ids]', false);
-//            var source_express_id = button.up('form').down('[name=express_id]', false);
-//            target_hidden.setValue(source_hidden.getValue());
-//            target_express_id.setValue(source_express_id.getValue());
-//        }else{
-//            //从“客户管理”进的话没有这个form，用grid里的数据
-//            var grid = button.up('grid');
-//            var store = grid.getStore();
-//            var customer_ids = Ext.Array.pluck(store.data.items, "internalId");
-//            target_hidden.setValue(customer_ids.join("|"));
-//        }
-//    },
+    //    popUpExpressSimpleForm: function(button) {
+    //        var form = Ext.widget('express_sheet_simple_form').show();
+    //        var target_hidden = form.down('hidden[name=customer_ids]', false);
+    //        var target_express_id = form.down('[name=express_id]', false);
+    //        if(button.up('form')) {
+    //            var source_hidden = button.up('form').down('hidden[name=customer_ids]', false);
+    //            var source_express_id = button.up('form').down('[name=express_id]', false);
+    //            target_hidden.setValue(source_hidden.getValue());
+    //            target_express_id.setValue(source_express_id.getValue());
+    //        }else{
+    //            //从“客户管理”进的话没有这个form，用grid里的数据
+    //            var grid = button.up('grid');
+    //            var store = grid.getStore();
+    //            var customer_ids = Ext.Array.pluck(store.data.items, "internalId");
+    //            target_hidden.setValue(customer_ids.join("|"));
+    //        }
+    //    },
 
     popUpPayModeFormAndSetValue: function(button) {
         var me = this;
@@ -592,7 +602,7 @@ Ext.define('EIM.controller.Etscuxes', {
         load_uniq_controller(me, 'PayModes');
         //把已经填的值带给弹出的窗口
         var form = Ext.widget('pay_mode_form');
-        form.show('', function(){
+        form.show('', function() {
             form.down('[name=name]').setValue(value);
             form.down('[name=source_element_id]').setValue(button.id);
         });
@@ -604,7 +614,7 @@ Ext.define('EIM.controller.Etscuxes', {
         load_uniq_controller(me, 'MaterialCodes');
         //把已经填的值带给弹出的窗口
         var form = Ext.widget('material_code_form');
-        form.show('', function(){
+        form.show('', function() {
             form.down('[name=code]').setValue(value);
             form.down('[name=source_element_id]').setValue(button.id);
         });

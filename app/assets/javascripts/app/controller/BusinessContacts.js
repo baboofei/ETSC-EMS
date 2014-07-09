@@ -18,16 +18,13 @@ Ext.define('EIM.controller.BusinessContacts', {
         'business_contact.Form'
     ],
 
-    refs: [
-        {
-            ref: 'sourceGrid',
-            selector: 'business_contact_grid[name=source_grid]'
-        },
-        {
-            ref: 'targetGrid',
-            selector: 'business_contact_grid[name=target_grid]'
-        }
-    ],
+    refs: [{
+        ref: 'sourceGrid',
+        selector: 'business_contact_grid[name=source_grid]'
+    }, {
+        ref: 'targetGrid',
+        selector: 'business_contact_grid[name=target_grid]'
+    }],
 
     init: function() {
         var me = this;
@@ -66,12 +63,12 @@ Ext.define('EIM.controller.BusinessContacts', {
         var btn_delete = Ext.ComponentQuery.query('business_contact_grid[name=target_grid] button[action=deleteSelection]')[0];
         var true_select = selected;
         //有时会拖到一个空行下来，变成选中一个空行，导致判断出错，所以再过滤一下
-        if(true_select.length > 0 && selected[0].internalId === undefined) {
+        if (true_select.length > 0 && selected[0].internalId === undefined) {
             true_select = selected.slice(1);
         }
-        if(true_select.length > 0) {
+        if (true_select.length > 0) {
             btn_delete.enable();
-        }else{
+        } else {
             btn_delete.disable();
         }
         me.checkTargetGrid();
@@ -86,9 +83,9 @@ Ext.define('EIM.controller.BusinessContacts', {
         var print_button = target_grid.down('button[action=selectExpress]', false);
         var hidden = target_grid.down('hidden[name=business_contact_ids]', false);
         var business_contact_id_array = Ext.Array.pluck(Ext.Array.pluck(target_grid.getStore().data.items, 'data'), 'id');
-        if(target_data_length > 0) {
+        if (target_data_length > 0) {
             print_button.enable();
-        }else{
+        } else {
             print_button.disable();
         }
         hidden.setValue(business_contact_id_array.join("|"));
@@ -103,9 +100,9 @@ Ext.define('EIM.controller.BusinessContacts', {
      */
     checkHoldingData: function(node, data) {
         var holding_data = [];
-        for(var i = 0; i < data.records.length; i++) {
+        for (var i = 0; i < data.records.length; i++) {
             //地址不为空的才算数
-            if(!Ext.isEmpty(data.records[i]['data']['addr'])) {
+            if (!Ext.isEmpty(data.records[i]['data']['addr'])) {
                 holding_data.push(data.records[i]);
             }
         }
@@ -137,7 +134,7 @@ Ext.define('EIM.controller.BusinessContacts', {
         ]);
         business_unit_field.setValue(record.get('business_unit>id'));
 
-        if(!record.get('editable')) {
+        if (!record.get('editable')) {
             view.down('button[action=save]', false).hide();
         }
     },
@@ -162,7 +159,7 @@ Ext.define('EIM.controller.BusinessContacts', {
         var win = button.up('window');
         var form = win.down('form', false);
 
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.submit({
@@ -173,7 +170,7 @@ Ext.define('EIM.controller.BusinessContacts', {
                     var msg = Ext.decode(response.responseText);
                     var target_by_id = form.down('[name=source_element_id]', false).getValue();
                     //如果是从小加号来的窗口(也就是source_element_id的值不为空)，则把值回填到小加号前面的combo里
-                    if(!Ext.isEmpty(target_by_id)) {
+                    if (!Ext.isEmpty(target_by_id)) {
                         var target = Ext.getCmp(target_by_id);
                         var target_combo = target.up('container').down("combo", false);
                         target_combo.store.load({
@@ -199,16 +196,16 @@ Ext.define('EIM.controller.BusinessContacts', {
         var form = win.down("form", false);
         //        var values = Ext.encode(form.form.getValues());
         var salecase_id = Ext.ComponentQuery.query("salecase_grid")[0].getSelectionModel().getSelection()[0].get("id");
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.submit({
                 url: 'business_contacts/save_business_contacts_salecases',
                 params: {
                     //                    value: values,
-                    salecase_id : salecase_id
+                    salecase_id: salecase_id
                 },
-                success: function(response){
+                success: function(response) {
                     //                    var text = Ext.decode(response.responseText);
                     win.close();
                     Ext.getStore('MiniBusinessContacts').load();
@@ -224,7 +221,7 @@ Ext.define('EIM.controller.BusinessContacts', {
         var form = combo.up('form');
         var mobile = form.down('[name=mobile]', false);
         var phone = form.down('[name=phone]', false);
-        var fax = form.down('[name=fax]',false);
+        var fax = form.down('[name=fax]', false);
         console.log("A");
         mobile.setValue(record[0].get("mobile"));
         phone.setValue(record[0].get("phone"));

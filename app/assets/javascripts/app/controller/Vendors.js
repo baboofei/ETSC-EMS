@@ -5,50 +5,47 @@ Ext.define('EIM.controller.Vendors', {
         'GridVendors',
         'ComboVendorUnits',
         'EmptyGridVendors'
-//        'dict.Applications'
-//        'GridVendors'
+        //        'dict.Applications'
+        //        'GridVendors'
     ],
     models: [
         'GridVendor',
         'ComboVendorUnit'
-//        'dict.Application'
-//        'GridVendor'
+        //        'dict.Application'
+        //        'GridVendor'
     ],
 
     views: [
         'vendor.Panel',
         'vendor.Grid',
         'vendor.Form',
-        'vendor.MiniAddForm'/*,
+        'vendor.MiniAddForm'
+        /*,
         'express_sheet.Form'*/
-//        'vendor.Grid',
-//        'vendor.Detail',
-//        'vendor.VendorInfoForm',
-//        'vendor.VendorPriceForm',
-//        'vendor.VendorDescriptionForm'
+        //        'vendor.Grid',
+        //        'vendor.Detail',
+        //        'vendor.VendorInfoForm',
+        //        'vendor.VendorPriceForm',
+        //        'vendor.VendorDescriptionForm'
     ],
 
-    refs: [
-        {
-            ref: 'sourceGrid',
-            selector: 'vendor_grid[name=source_grid]'
-        },
-        {
-            ref: 'targetGrid',
-            selector: 'vendor_grid[name=target_grid]'
-        },
-        {
-            ref: 'form',
-            selector: 'vendor_mini_add_form'
-        }
-    ],
+    refs: [{
+        ref: 'sourceGrid',
+        selector: 'vendor_grid[name=source_grid]'
+    }, {
+        ref: 'targetGrid',
+        selector: 'vendor_grid[name=target_grid]'
+    }, {
+        ref: 'form',
+        selector: 'vendor_mini_add_form'
+    }],
 
     init: function() {
         var me = this;
         me.control({
-//            '[allowPrivilege=true]': {
-//                click: this.editVendor
-//            },
+            //            '[allowPrivilege=true]': {
+            //                click: this.editVendor
+            //            },
             'vendor_grid[name=target_grid]': {
                 selectionchange: this.targetSelectionChange
             },
@@ -77,7 +74,7 @@ Ext.define('EIM.controller.Vendors', {
     editVendor: function(button) {
         var me = this;
         var form = button.up('form');
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             form.submit({
                 url: 'vendors/save_vendor',
                 success: function(the_form, action) {
@@ -112,11 +109,11 @@ Ext.define('EIM.controller.Vendors', {
         );
         submit_params['producer_vendor_unit_id'] = panel.down('[name=producer>(name|short_name|short_code)] combo', false).getValue();
         submit_params['seller_vendor_unit_id'] = panel.down('[name=seller>(name|short_name|short_code)] combo', false).getValue();
-        if(info_form.form.isValid() && price_form.form.isValid() && description_form.form.isValid()) {
+        if (info_form.form.isValid() && price_form.form.isValid() && description_form.form.isValid()) {
             //防双击
             button.disable();
             info_form.submit({
-                url:'vendors/save_as_new_vendor',
+                url: 'vendors/save_as_new_vendor',
                 params: submit_params,
                 submitEmptyText: false,
                 success: function(the_form, action) {
@@ -135,12 +132,12 @@ Ext.define('EIM.controller.Vendors', {
         var btn_delete = Ext.ComponentQuery.query('vendor_grid[name=target_grid] button[action=deleteSelection]')[0];
         var true_select = selected;
         //有时会拖到一个空行下来，变成选中一个空行，导致判断出错，所以再过滤一下
-        if(true_select.length > 0 && selected[0].internalId === undefined) {
+        if (true_select.length > 0 && selected[0].internalId === undefined) {
             true_select = selected.slice(1);
         }
-        if(true_select.length > 0) {
+        if (true_select.length > 0) {
             btn_delete.enable();
-        }else{
+        } else {
             btn_delete.disable();
         }
         me.checkTargetGrid();
@@ -155,9 +152,9 @@ Ext.define('EIM.controller.Vendors', {
         var print_button = target_grid.down('button[action=selectExpress]', false);
         var hidden = target_grid.down('hidden[name=vendor_ids]', false);
         var vendor_id_array = Ext.Array.pluck(Ext.Array.pluck(target_grid.getStore().data.items, 'data'), 'id');
-        if(target_data_length > 0) {
+        if (target_data_length > 0) {
             print_button.enable();
-        }else{
+        } else {
             print_button.disable();
         }
         hidden.setValue(vendor_id_array.join("|"));
@@ -172,9 +169,9 @@ Ext.define('EIM.controller.Vendors', {
      */
     checkHoldingData: function(node, data) {
         var holding_data = [];
-        for(var i = 0; i < data.records.length; i++) {
+        for (var i = 0; i < data.records.length; i++) {
             //地址不为空的才算数
-            if(!Ext.isEmpty(data.records[i]['data']['addr'])) {
+            if (!Ext.isEmpty(data.records[i]['data']['addr'])) {
                 holding_data.push(data.records[i]);
             }
         }
@@ -197,36 +194,38 @@ Ext.define('EIM.controller.Vendors', {
     },
 
     editVendor: function(view, record) {
-        if(record.get('editable')) {
+        if (record.get('editable')) {
             //            var record = this.getSourceGrid().getSelectedVendor();
             var view = Ext.widget('vendor_form').show();
             view.down('form', false).loadRecord(record);
             //给combo做一个假的store以正确显示值
             var vendor_unit_field = view.down('[name=vendor_unit_id]', false);
-            vendor_unit_field.getStore().loadData([[record.get('vendor_unit>id'), record.get('vendor_unit>(name|en_name|unit_aliases>unit_alias|short_code)')]]);
+            vendor_unit_field.getStore().loadData([
+                [record.get('vendor_unit>id'), record.get('vendor_unit>(name|en_name|unit_aliases>unit_alias|short_code)')]
+            ]);
             vendor_unit_field.setValue(record.get('vendor_unit>id'));
         }
     },
 
     sourceSelectionChange: function(selectionModel, selected) {
-//        var grid = this.getSourceGrid();
-//        var btn_share = grid.down('button[action=shareCustomer]', false);
-//        var btn_trans = grid.down('button[action=transferCustomer]', false);
-//        if(selected.length > 0) {
-//            btn_share.enable();
-//            btn_trans.enable();
-//            Ext.Array.each(selected, function(item) {
-//                //                console.log(item.get('editable'));
-//                if(!item.get('editable')) {
-//                    btn_share.disable();
-//                    btn_trans.disable();
-//                    return false;
-//                }
-//            });
-//        }else{
-//            btn_share.disable();
-//            btn_trans.disable();
-//        }
+        //        var grid = this.getSourceGrid();
+        //        var btn_share = grid.down('button[action=shareCustomer]', false);
+        //        var btn_trans = grid.down('button[action=transferCustomer]', false);
+        //        if(selected.length > 0) {
+        //            btn_share.enable();
+        //            btn_trans.enable();
+        //            Ext.Array.each(selected, function(item) {
+        //                //                console.log(item.get('editable'));
+        //                if(!item.get('editable')) {
+        //                    btn_share.disable();
+        //                    btn_trans.disable();
+        //                    return false;
+        //                }
+        //            });
+        //        }else{
+        //            btn_share.disable();
+        //            btn_trans.disable();
+        //        }
     },
 
     addVendor: function() {
@@ -245,7 +244,7 @@ Ext.define('EIM.controller.Vendors', {
         var win = button.up('window');
         var form = win.down('form', false);
 
-        if(Ext.isEmpty(form.down('[name=email]', false).getValue()) &&
+        if (Ext.isEmpty(form.down('[name=email]', false).getValue()) &&
             Ext.isEmpty(form.down('[name=mobile]', false).getValue()) &&
             Ext.isEmpty(form.down('[name=phone]', false).getValue())) {
             Ext.example.msg('不行', EIM_multi_field_invalid + '<br />“电子邮件”、“移动电话”、“固定电话”一个都没填呢！');
@@ -255,7 +254,7 @@ Ext.define('EIM.controller.Vendors', {
             return false;
         }
 
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.submit({
@@ -266,7 +265,7 @@ Ext.define('EIM.controller.Vendors', {
                     var msg = Ext.decode(response.responseText);
                     var target_by_id = form.down('[name=source_element_id]', false).getValue();
                     //如果是从小加号来的窗口(也就是source_element_id的值不为空)，则把值回填到小加号前面的combo里
-                    if(!Ext.isEmpty(target_by_id)) {
+                    if (!Ext.isEmpty(target_by_id)) {
                         var target = Ext.getCmp(target_by_id);
                         var target_combo = target.up('container').down("combo", false);
                         target_combo.store.load({
@@ -287,8 +286,8 @@ Ext.define('EIM.controller.Vendors', {
         var win = button.up('window');
         var form = win.down('form', false);
         var vendor_unit_id = form.down('[name=vendor_unit_id] textfield', false);
-        if(form.form.isValid() &&
-            (vendor_unit_id.getValue() != vendor_unit_id.getRawValue())){
+        if (form.form.isValid() &&
+            (vendor_unit_id.getValue() != vendor_unit_id.getRawValue())) {
             //防双击
             button.disable();
             form.submit({
@@ -297,23 +296,23 @@ Ext.define('EIM.controller.Vendors', {
                 success: function(the_form, action) {
                     //TODO
                     //现在没有把新填的选上，死活有BUG的样子。以后再加吧……
-//                    console.log(form.down('[name=source_element_id]', false));
-//                    console.log(form.items.items);
-//                    console.log("C");
+                    //                    console.log(form.down('[name=source_element_id]', false));
+                    //                    console.log(form.items.items);
+                    //                    console.log("C");
                     var response = action.response;
                     var msg = Ext.decode(response.responseText);
-//                    var target_by_id = form.down('[name=source_element_id]', false).getValue();
-//                    //如果是从小加号来的窗口(也就是source_element_id的值不为空)，则把值回填到小加号前面的combo里
-//                    if(!Ext.isEmpty(target_by_id)) {
-//                        var target = Ext.getCmp(target_by_id);
-//                        var target_combo = target.up('container').down("combo", false);
-//                        target_combo.store.load({
-//                            callback: function(records, operation, success) {
-//                                target_combo.select(msg['id']);
-//                                console.log(msg['id']);
-//                            }
-//                        });
-//                    }
+                    //                    var target_by_id = form.down('[name=source_element_id]', false).getValue();
+                    //                    //如果是从小加号来的窗口(也就是source_element_id的值不为空)，则把值回填到小加号前面的combo里
+                    //                    if(!Ext.isEmpty(target_by_id)) {
+                    //                        var target = Ext.getCmp(target_by_id);
+                    //                        var target_combo = target.up('container').down("combo", false);
+                    //                        target_combo.store.load({
+                    //                            callback: function(records, operation, success) {
+                    //                                target_combo.select(msg['id']);
+                    //                                console.log(msg['id']);
+                    //                            }
+                    //                        });
+                    //                    }
                     win.close();
                     Ext.example.msg('成功', msg.message);
                 }

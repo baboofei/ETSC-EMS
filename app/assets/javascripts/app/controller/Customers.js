@@ -3,7 +3,7 @@ Ext.define('EIM.controller.Customers', {
 
     stores: [
         //'MiniCustomers',
-//        'Customers',
+        //        'Customers',
         'dict.Applications',
         'GridCustomers',
         'ComboOurCompanies',
@@ -13,7 +13,7 @@ Ext.define('EIM.controller.Customers', {
     ],
     models: [
         //'MiniCustomer',
-//        'Customer',
+        //        'Customer',
         'dict.Application',
         'GridCustomer',
         'ComboOurCompany',
@@ -26,22 +26,19 @@ Ext.define('EIM.controller.Customers', {
         'customer.Panel',
         'customer.Grid',
         'customer.Form',
-//        'express_sheet.Form',
-//        'express_sheet.SimpleForm',
+        //        'express_sheet.Form',
+        //        'express_sheet.SimpleForm',
         'customer.ShareForm',
         'customer.TransferForm'
     ],
 
-    refs: [
-        {
-            ref: 'sourceGrid',
-            selector: 'customer_grid[name=source_grid]'
-        },
-        {
-            ref: 'targetGrid',
-            selector: 'customer_grid[name=target_grid]'
-        }
-    ],
+    refs: [{
+        ref: 'sourceGrid',
+        selector: 'customer_grid[name=source_grid]'
+    }, {
+        ref: 'targetGrid',
+        selector: 'customer_grid[name=target_grid]'
+    }],
 
     init: function() {
         var me = this;
@@ -75,7 +72,7 @@ Ext.define('EIM.controller.Customers', {
                 select: this.applyAddress
             },
             'customer_form button[action=save]': {
-            	click: this.saveCustomer
+                click: this.saveCustomer
             },
             'customer_share_form button[action=save]': {
                 click: this.shareCustomerSubmit
@@ -100,12 +97,12 @@ Ext.define('EIM.controller.Customers', {
         var btn_delete = Ext.ComponentQuery.query('customer_grid[name=target_grid] button[action=deleteSelection]')[0];
         var true_select = selected;
         //有时会拖到一个空行下来，变成选中一个空行，导致判断出错，所以再过滤一下
-        if(true_select.length > 0 && selected[0].internalId === undefined) {
+        if (true_select.length > 0 && selected[0].internalId === undefined) {
             true_select = selected.slice(1);
         }
-        if(true_select.length > 0) {
+        if (true_select.length > 0) {
             btn_delete.enable();
-        }else{
+        } else {
             btn_delete.disable();
         }
         me.checkTargetGrid();
@@ -120,9 +117,9 @@ Ext.define('EIM.controller.Customers', {
         var print_button = target_grid.down('button[action=selectExpress]', false);
         var hidden = target_grid.down('hidden[name=customer_ids]', false);
         var customer_id_array = Ext.Array.pluck(Ext.Array.pluck(target_grid.getStore().data.items, 'data'), 'id');
-        if(target_data_length > 0) {
+        if (target_data_length > 0) {
             print_button.enable();
-        }else{
+        } else {
             print_button.disable();
         }
         hidden.setValue(customer_id_array.join("|"));
@@ -137,9 +134,9 @@ Ext.define('EIM.controller.Customers', {
      */
     checkHoldingData: function(node, data) {
         var holding_data = [];
-        for(var i = 0; i < data.records.length; i++) {
+        for (var i = 0; i < data.records.length; i++) {
             //地址不为空的才算数
-            if(!Ext.isEmpty(data.records[i]['data']['addr'])) {
+            if (!Ext.isEmpty(data.records[i]['data']['addr'])) {
                 holding_data.push(data.records[i]);
             }
         }
@@ -168,20 +165,24 @@ Ext.define('EIM.controller.Customers', {
         view.down('form', false).loadRecord(record);
         //boxselect里的值单独赋
         var app_ids = record.data["prod_applications>id"];
-        var app_array = Ext.Array.map(app_ids.split("|"), function(value){
+        var app_array = Ext.Array.map(app_ids.split("|"), function(value) {
             return Number(value);
         });
         view.down('form', false).down('boxselect').setValue(app_array);
         //给combo做一个假的store以正确显示值
         var customer_unit_field = view.down('[name=customer_unit_id]', false);
-        customer_unit_field.getStore().loadData([[record.get('customer_unit>id'), record.get('customer_unit>(name|unit_aliases>unit_alias)')]]);
+        customer_unit_field.getStore().loadData([
+            [record.get('customer_unit>id'), record.get('customer_unit>(name|unit_aliases>unit_alias)')]
+        ]);
         customer_unit_field.setValue(record.get('customer_unit>id'));
 
         var group_field = view.down('[name=group_id]', false);
-        group_field.getStore().loadData([[record.get('group_id'), record.get('group_name')]]);
+        group_field.getStore().loadData([
+            [record.get('group_id'), record.get('group_name')]
+        ]);
         group_field.setValue(record.get('group_id'));
 
-        if(!record.get('editable')) {
+        if (!record.get('editable')) {
             view.down('button[action=save]', false).hide();
         }
     },
@@ -190,18 +191,18 @@ Ext.define('EIM.controller.Customers', {
         var grid = this.getSourceGrid();
         var btn_share = grid.down('button[action=shareCustomer]', false);
         var btn_trans = grid.down('button[action=transferCustomer]', false);
-        if(selected.length > 0) {
+        if (selected.length > 0) {
             btn_share.enable();
             btn_trans.enable();
             Ext.Array.each(selected, function(item) {
-//                console.log(item.get('editable'));
-                if(!item.get('editable')) {
+                //                console.log(item.get('editable'));
+                if (!item.get('editable')) {
                     btn_share.disable();
                     btn_trans.disable();
                     return false;
                 }
             });
-        }else{
+        } else {
             btn_share.disable();
             btn_trans.disable();
         }
@@ -221,7 +222,7 @@ Ext.define('EIM.controller.Customers', {
         var integer_array = Ext.Array.map(already_shared_to_array[0].split("|"), function(item) {
             return eval(item);
         });
-        if(already_shared_to_array.length === 1) {
+        if (already_shared_to_array.length === 1) {
             //只有一项，说明全部一样，则在boxselect里显示出来
             form.down('boxselect', false).setValue(integer_array);
         }
@@ -266,7 +267,7 @@ Ext.define('EIM.controller.Customers', {
         var win = button.up('window');
         var form = win.down('form', false);
 
-        if(Ext.isEmpty(form.down('[name=email]', false).getValue()) &&
+        if (Ext.isEmpty(form.down('[name=email]', false).getValue()) &&
             Ext.isEmpty(form.down('[name=mobile]', false).getValue()) &&
             Ext.isEmpty(form.down('[name=phone]', false).getValue())) {
             Ext.example.msg('不行', EIM_multi_field_invalid + '<br />“电子邮件”、“移动电话”、“固定电话”一个都没填呢！');
@@ -276,14 +277,15 @@ Ext.define('EIM.controller.Customers', {
             return false;
         }
 
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.submit({
                 url: "customers/save_customer",
                 params: {
                     application_ids: form.down('boxselect', false).getValue().join("|"),
-                    application_names: form.down('boxselect', false).getRawValue()/*,
+                    application_names: form.down('boxselect', false).getRawValue()
+                    /*,
                     detail: form.down('[name=detail]', false).getValue()*/
                 },
                 submitEmptyText: false,
@@ -292,7 +294,7 @@ Ext.define('EIM.controller.Customers', {
                     var msg = Ext.decode(response.responseText);
                     var target_by_id = form.down('[name=source_element_id]', false).getValue();
                     //如果是从小加号来的窗口(也就是source_element_id的值不为空)，则把值回填到小加号前面的combo里
-                    if(!Ext.isEmpty(target_by_id)) {
+                    if (!Ext.isEmpty(target_by_id)) {
                         var target = Ext.getCmp(target_by_id);
                         var target_combo = target.up('container').down("combo", false);
                         target_combo.store.load({
@@ -319,8 +321,8 @@ Ext.define('EIM.controller.Customers', {
         var customer_ids = Ext.Array.pluck(Ext.Array.pluck(selection, "data"), "id");
         var customer_ids_str = customer_ids.join("|");
 
-//        console.log()
-        if(form.form.isValid()) {
+        //        console.log()
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             //去掉当前用户再提交
@@ -332,8 +334,8 @@ Ext.define('EIM.controller.Customers', {
                     customer_ids: customer_ids_str,
                     share_to: share_to
                 },
-                submitEmptyText:false,
-                success: function(the_form, action){
+                submitEmptyText: false,
+                success: function(the_form, action) {
                     var response = action.response;
                     var msg = Ext.decode(response.responseText);
                     win.close();
@@ -349,16 +351,16 @@ Ext.define('EIM.controller.Customers', {
         var form = win.down('form', false);
         var source_field = form.down('[name=source_function]', false);
 
-        if(source_field.getValue() === "inquire") {
+        if (source_field.getValue() === "inquire") {
             var source_form = Ext.ComponentQuery.query('customer_check_dup_form')[0];
             var source_win = Ext.ComponentQuery.query('customer_check_dup_form')[0];
             var inquire_id = source_form.down('[name=inquire_id]').getValue();
-            if(source_form.down('[name=inquire_type]').getValue() === 'MInquires') {
+            if (source_form.down('[name=inquire_type]').getValue() === 'MInquires') {
                 var inquire_str = 'm_inquires';
-            } else if(source_form.down('[name=inquire_type]').getValue() === 'PInquires') {
+            } else if (source_form.down('[name=inquire_type]').getValue() === 'PInquires') {
                 var inquire_str = 'p_inquires';
             }
-            if(form.form.isValid()) {
+            if (form.form.isValid()) {
                 //防双击
                 button.disable();
 
@@ -367,8 +369,8 @@ Ext.define('EIM.controller.Customers', {
                     params: {
                         inquire_id: inquire_id
                     },
-                    submitEmptyText:false,
-                    success: function(the_form, action){
+                    submitEmptyText: false,
+                    success: function(the_form, action) {
                         var response = action.response;
                         var msg = Ext.decode(response.responseText);
                         win.close();
@@ -377,24 +379,25 @@ Ext.define('EIM.controller.Customers', {
                     }
                 });
             }
-        } else if(source_field.getValue() === "customer") {
+        } else if (source_field.getValue() === "customer") {
             var grid = Ext.ComponentQuery.query('customer_panel [name=source_grid]')[0];
             var selection = grid.getSelectionModel().getSelection();
             var customer_ids = Ext.Array.pluck(Ext.Array.pluck(selection, "data"), "id");
             var customer_ids_str = customer_ids.join("|");
 
-            if(form.form.isValid()) {
+            if (form.form.isValid()) {
                 //防双击
                 button.disable();
 
                 form.submit({
                     url: '/customers/trans_to',
                     params: {
-                        customer_ids: customer_ids_str/*,
+                        customer_ids: customer_ids_str
+                        /*,
                          user_id: share_to*/
                     },
-                    submitEmptyText:false,
-                    success: function(the_form, action){
+                    submitEmptyText: false,
+                    success: function(the_form, action) {
                         var response = action.response;
                         var msg = Ext.decode(response.responseText);
                         win.close();
@@ -414,7 +417,7 @@ Ext.define('EIM.controller.Customers', {
         var me = this;
         var win = button.up('window');
         var form = win.down('form', false);
-//        console.log();
+        //        console.log();
         var grid = me.getTargetGrid();
         var target_customer_ids = Ext.Array.pluck(Ext.Array.pluck(grid.getStore().data.items, "data"), "id");
         var target_customer_ids_str = target_customer_ids.join("|");
@@ -422,16 +425,16 @@ Ext.define('EIM.controller.Customers', {
         var express_id = form.down('[name=express_id]', false).getValue();
         var our_company_id = form.down('[name=our_company_id]', false).getValue();
 
-        if(target_customer_ids.length === 0){
+        if (target_customer_ids.length === 0) {
             Ext.example.msg("错误", "表格中还没有数据！");
-        }else{
-            if(form.form.isValid()) {
+        } else {
+            if (form.form.isValid()) {
                 button.disable();
                 Ext.Msg.alert('好了', '去拿单子吧', function() {
                     win.close();
                 });
                 Ext.Ajax.request({
-                    url:'servlet/ExpressPrintServlet',
+                    url: 'servlet/ExpressPrintServlet',
                     params: {
                         customer_ids: target_customer_ids_str,
                         express_id: express_id,
@@ -454,19 +457,19 @@ Ext.define('EIM.controller.Customers', {
     addToMiniCustomer: function(button) {
         var win = button.up("window");
         var form = win.down("form", false);
-//        var values = Ext.encode(form.form.getValues());
+        //        var values = Ext.encode(form.form.getValues());
         var salecase_id = Ext.ComponentQuery.query("salecase_grid")[0].getSelectionModel().getSelection()[0].get("id");
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.submit({
                 url: 'customers/save_customers_salecases',
                 params: {
-//                    value: values,
-                    salecase_id : salecase_id
+                    //                    value: values,
+                    salecase_id: salecase_id
                 },
-                success: function(response){
-//                    var text = Ext.decode(response.responseText);
+                success: function(response) {
+                    //                    var text = Ext.decode(response.responseText);
                     win.close();
                     Ext.getStore('MiniCustomers').load();
                     Ext.getStore("Salelogs").load()
@@ -481,8 +484,8 @@ Ext.define('EIM.controller.Customers', {
         var form = combo.up('form');
         var mobile = form.down('[name=mobile]', false);
         var phone = form.down('[name=phone]', false);
-        var fax = form.down('[name=fax]',false);
-        
+        var fax = form.down('[name=fax]', false);
+
         mobile.setValue(record[0].get("mobile"));
         phone.setValue(record[0].get("phone"));
         fax.setValue(record[0].get("fax"));

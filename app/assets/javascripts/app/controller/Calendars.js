@@ -5,7 +5,7 @@ Ext.define('EIM.controller.Calendars', {
         'calendar.Panel'
     ],
     stores: [
-//        'CalendarLists'
+        //        'CalendarLists'
     ],
 
     init: function() {
@@ -23,16 +23,16 @@ Ext.define('EIM.controller.Calendars', {
 
     updateEventCalendar: function(datepicker, date) {
         var event_calendar = datepicker.up('calendar_panel').down('panel[title=日程安排]', false);
-//        console.log(datepicker.up('calendar_panel').down('panel', false));
-//        console.log(datepicker.up('calendar_panel').down('panel[title=日程安排]', false));
-//        console.log(event_calendar);
+        //        console.log(datepicker.up('calendar_panel').down('panel', false));
+        //        console.log(datepicker.up('calendar_panel').down('panel[title=日程安排]', false));
+        //        console.log(event_calendar);
         event_calendar.setStartDate(date);
     },
 
     confirmDelete: function(calendar_panel, record) {
         var me = this;
         Ext.Msg.confirm('确认删除', '真的要删除选中的日程？', function(button) {
-            if(button === 'yes') {
+            if (button === 'yes') {
                 Ext.Ajax.request({
                     url: '/calendars/rest_calendar',
                     method: 'DELETE',
@@ -47,7 +47,7 @@ Ext.define('EIM.controller.Calendars', {
                         me.reloadView(calendar_panel);
                     },
                     failure: function() {
-                        Ext.Msg.alert('错误','可能是网络问题，请找Terry处理');
+                        Ext.Msg.alert('错误', '可能是网络问题，请找Terry处理');
                     }
                 });
             }
@@ -59,8 +59,8 @@ Ext.define('EIM.controller.Calendars', {
     reloadView: function(calendar_panel) {
         calendar_panel.store.load({
             params: {
-                startDate: Ext.Date.add(calendar_panel.startDate,Ext.Date.DAY,-30),
-                endDate: Ext.Date.add(calendar_panel.startDate,Ext.Date.DAY,30)
+                startDate: Ext.Date.add(calendar_panel.startDate, Ext.Date.DAY, -30),
+                endDate: Ext.Date.add(calendar_panel.startDate, Ext.Date.DAY, 30)
             }
         });
     }

@@ -1,13 +1,10 @@
 Ext.define('EIM.model.ComboPopUnit', {
     extend: 'Ext.data.Model',
-    fields: [
-        {
-            name: 'id',
-            type: 'int'
-        },
-        {
-            name: 'name',
-            type: 'string'
-        }
-    ]
+    fields: [{
+        name: 'id',
+        type: 'int'
+    }, {
+        name: 'name',
+        type: 'string'
+    }]
 });

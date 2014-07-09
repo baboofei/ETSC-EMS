@@ -28,16 +28,13 @@ Ext.define('EIM.controller.AdminInventories', {
         'admin_inventory.Grid'
     ],
 
-    refs: [
-        {
-            ref: 'sourceGrid',
-            selector: 'admin_inventory_grid[name=source_grid]'
-        },
-        {
-            ref: 'targetGrid',
-            selector: 'admin_inventory_grid[name=target_grid]'
-        }
-    ],
+    refs: [{
+        ref: 'sourceGrid',
+        selector: 'admin_inventory_grid[name=source_grid]'
+    }, {
+        ref: 'targetGrid',
+        selector: 'admin_inventory_grid[name=target_grid]'
+    }],
 
     shiftStatus: 'released',
     isBlocked: false,
@@ -52,18 +49,18 @@ Ext.define('EIM.controller.AdminInventories', {
             'admin_inventory_grid[name=source_grid]': {
                 selectionchange: this.sourceSelectionChange,
                 render: function() {
-                    new Ext.util.KeyMap(Ext.getBody(), [
-                        {
-                            key: Ext.EventObject.SHIFT,
-                            fn: function(){ me.shiftStatus = 'pressed'; }
+                    new Ext.util.KeyMap(Ext.getBody(), [{
+                        key: Ext.EventObject.SHIFT,
+                        fn: function() {
+                            me.shiftStatus = 'pressed';
                         }
-                    ], 'keydown');
-                    new Ext.util.KeyMap(Ext.getBody(), [
-                        {
-                            key: Ext.EventObject.SHIFT,
-                            fn: function(){ me.shiftStatus = 'released'; }
+                    }], 'keydown');
+                    new Ext.util.KeyMap(Ext.getBody(), [{
+                        key: Ext.EventObject.SHIFT,
+                        fn: function() {
+                            me.shiftStatus = 'released';
                         }
-                    ], 'keyup');
+                    }], 'keyup');
                 }
             },
             'admin_inventory_grid[name=target_grid] dataview': {
@@ -80,7 +77,7 @@ Ext.define('EIM.controller.AdminInventories', {
             },
             'admin_inventory_grid button[action=apply_for_use]': {
                 click: this.popApplyForUseForm
-//                click: this.applyForUse
+                //                click: this.applyForUse
             },
             'admin_inventory_grid button[action=apply_for_loan]': {
                 click: this.popApplyForLoanForm
@@ -120,12 +117,12 @@ Ext.define('EIM.controller.AdminInventories', {
         var btn_delete = Ext.ComponentQuery.query('admin_inventory_grid[name=target_grid] button[action=deleteSelection]')[0];
         var true_select = selected;
         //有时会拖到一个空行下来，变成选中一个空行，导致判断出错，所以再过滤一下
-        if(true_select.length > 0 && selected[0].internalId === undefined) {
+        if (true_select.length > 0 && selected[0].internalId === undefined) {
             true_select = selected.slice(1);
         }
-        if(true_select.length > 0) {
+        if (true_select.length > 0) {
             btn_delete.enable();
-        }else{
+        } else {
             btn_delete.disable();
         }
         me.checkTargetGrid();
@@ -150,18 +147,18 @@ Ext.define('EIM.controller.AdminInventories', {
         apply_for_sell_button.disable();
         apply_for_reject_button.disable();
         return_button.disable();
-        if(target_data_length > 0) {
-            if(Ext.Array.unique(admin_inventory_state_array).toString() === 'b_stocking') {
+        if (target_data_length > 0) {
+            if (Ext.Array.unique(admin_inventory_state_array).toString() === 'b_stocking') {
                 //全是“库存中”则可以“申请领用”“申请租借”“申请售出”“申请退货”
                 apply_for_use_button.enable();
                 apply_for_loan_button.enable();
                 apply_for_sell_button.enable();
                 apply_for_reject_button.enable();
-            } else if(Ext.Array.unique(admin_inventory_state_array).toString() === 'h_loaned') {
+            } else if (Ext.Array.unique(admin_inventory_state_array).toString() === 'h_loaned') {
                 //全是“租借中”则可以“申请售出”
                 apply_for_sell_button.enable();
             }
-            if(Ext.Array.unique(admin_inventory_state_array).indexOf('b_stocking') === -1) {
+            if (Ext.Array.unique(admin_inventory_state_array).indexOf('b_stocking') === -1) {
                 //没有“库存中”则可以“归还”
                 return_button.enable();
             }
@@ -174,7 +171,7 @@ Ext.define('EIM.controller.AdminInventories', {
      * 检查是否选中某条数据，以决定能否“报损”、“报废”、“充抵”等操作
      */
     sourceSelectionChange: function() {
-//        console.log();
+        //        console.log();
         var source_grid = this.getSourceGrid();
         var selection = source_grid.getSelectedItems();
         var damage_button = source_grid.down('button[action=damage]', false);
@@ -186,7 +183,7 @@ Ext.define('EIM.controller.AdminInventories', {
         var fix_button = source_grid.down('button[action=fix]', false);
         var modify_button = source_grid.down('button[action=modify]', false);
 
-        if(selection.length === 1 && selection[0].get('state') === 'b_stocking') {
+        if (selection.length === 1 && selection[0].get('state') === 'b_stocking') {
             damage_button.enable();
             scrap_button.enable();
             charge_button.enable();
@@ -203,7 +200,7 @@ Ext.define('EIM.controller.AdminInventories', {
             change_ownership_button.disable();
             modify_button.disable();
         }
-        if(selection.length === 1 && selection[0].get('state') === 'x_damaged') {
+        if (selection.length === 1 && selection[0].get('state') === 'x_damaged') {
             fix_button.enable();
         } else {
             fix_button.disable();
@@ -213,11 +210,11 @@ Ext.define('EIM.controller.AdminInventories', {
     checkHoldingData: function(node, data) {
         var me = this;
         var holding_data = [];
-        for(var i = 0; i < data.records.length; i++) {
+        for (var i = 0; i < data.records.length; i++) {
             //状态为“库存中”的才算
             //“已领用”、“已租借”的也算，因为可以选归还
             //但这两种情况还要判断保管人是不是自己
-            if(data.records[i]['data']['state'] === 'b_stocking' ||
+            if (data.records[i]['data']['state'] === 'b_stocking' ||
                 (data.records[i]['data']['state'] === 'h_loaned' && data.records[i]['data']['keeper>id'] === userId) ||
                 (data.records[i]['data']['state'] === 'g_using' && data.records[i]['data']['keeper>id'] === userId)) {
                 holding_data.push(data.records[i]);
@@ -230,7 +227,7 @@ Ext.define('EIM.controller.AdminInventories', {
         var target_id_array;
 
         //如果按住SHIFT，则视为拆分，弹框问分多少
-        if(me.shiftStatus === 'pressed') {
+        if (me.shiftStatus === 'pressed') {
             //SHIFT的时候可以拖重复的id
             target_id_array = [];
             for (var i = 0; i < target_id_array.length; i++) {
@@ -274,7 +271,7 @@ Ext.define('EIM.controller.AdminInventories', {
         var view = Ext.widget('admin_inventory_for_stock_form').show();
         Ext.getStore('GridForStockAdminInventories').removeAll();
         //默认RMB
-//        view.down('[name=buy_price] combo', false).setValue(11);
+        //        view.down('[name=buy_price] combo', false).setValue(11);
     },
 
     /**
@@ -284,7 +281,7 @@ Ext.define('EIM.controller.AdminInventories', {
         var me = this;
         load_uniq_controller(me, 'admin_inventory.HistoryForm');
         var view = Ext.widget('admin_inventory_history_form').show();
-//        Ext.getStore('GridAdminInventoryHistories').removeAll();
+        //        Ext.getStore('GridAdminInventoryHistories').removeAll();
     },
 
     /**
@@ -302,7 +299,7 @@ Ext.define('EIM.controller.AdminInventories', {
     submit: function(button) {
         var grid = button.up('grid');
 
-        if(grid.getStore().count() === 0) {
+        if (grid.getStore().count() === 0) {
             Ext.example.msg("错误", "表格中还没有数据！");
         } else {
             //防双击
@@ -318,10 +315,9 @@ Ext.define('EIM.controller.AdminInventories', {
                 success: function(response) {
                     var msg = Ext.decode(response.responseText);
                     Ext.example.msg('成功', msg.message);
-//                    Ext.getStore('GridAdminInventories').load();
+                    //                    Ext.getStore('GridAdminInventories').load();
                 },
-                failure: function() {
-                }
+                failure: function() {}
             });
         }
     },
@@ -355,20 +351,20 @@ Ext.define('EIM.controller.AdminInventories', {
         load_uniq_controller(me, 'admin_inventory.ForReturnForm');
         var view = Ext.widget('admin_inventory_for_return_form').show();
     },
-//    /**
-//     * “入库”窗口
-//     */
-//    popInStockForm: function() {
-//        var me = this;
-//        load_uniq_controller(me, 'admin_inventory.InStockForm');
-//        var view = Ext.widget('admin_inventory_in_stock_form').show();
-//        //默认RMB
-//        view.down('[name=buy_price] combo', false).setValue(11);
-//        //默认东隆
-//        var owner_field = view.down('expandable_vendor_unit_combo combo', false);
-//        owner_field.getStore().loadData([[42, 'ETSC Technologies Co.(东隆科技有限公司)']]);
-//        owner_field.setValue(42);
-//    },
+    //    /**
+    //     * “入库”窗口
+    //     */
+    //    popInStockForm: function() {
+    //        var me = this;
+    //        load_uniq_controller(me, 'admin_inventory.InStockForm');
+    //        var view = Ext.widget('admin_inventory_in_stock_form').show();
+    //        //默认RMB
+    //        view.down('[name=buy_price] combo', false).setValue(11);
+    //        //默认东隆
+    //        var owner_field = view.down('expandable_vendor_unit_combo combo', false);
+    //        owner_field.getStore().loadData([[42, 'ETSC Technologies Co.(东隆科技有限公司)']]);
+    //        owner_field.setValue(42);
+    //    },
 
     /**
      * “出库”窗口
@@ -378,11 +374,14 @@ Ext.define('EIM.controller.AdminInventories', {
         var grid = me.getGrid();
         var selection = grid.getSelectedItem();
         var target_array = [];
-//        console.log(selection);
-//        console.log(selection.get('number'));
-        if(!Ext.isEmpty(selection.get('number'))) {
+        //        console.log(selection);
+        //        console.log(selection.get('number'));
+        if (!Ext.isEmpty(selection.get('number'))) {
             Ext.Array.each(selection.get('number').split('、'), function(item, index) {
-                target_array.push({id: index, name: item});
+                target_array.push({
+                    id: index,
+                    name: item
+                });
             });
         }
         load_uniq_controller(me, 'admin_inventory.OutStockForm');
@@ -404,20 +403,22 @@ Ext.define('EIM.controller.AdminInventories', {
         load_uniq_controller(me, 'admin_inventory.DamageScrapChargeForm');
         var grid = me.getSourceGrid();
         var selection = grid.getSelectedItem();
-//        console.log(grid);
-//        console.log(grid.getSelectedAdminInventory());
+        //        console.log(grid);
+        //        console.log(grid.getSelectedAdminInventory());
 
         var form = Ext.widget('admin_inventory_damage_scrap_charge_form');
         form.show('', function() {
-//            console.log(button.action);
-//            console.log(form.title);
+            //            console.log(button.action);
+            //            console.log(form.title);
             var ownership_field = form.down('expandable_vendor_unit_combo combo', false);
-            ownership_field.getStore().loadData([[selection.get('ownership'), selection.get('ownership_name')]]);
+            ownership_field.getStore().loadData([
+                [selection.get('ownership'), selection.get('ownership_name')]
+            ]);
             ownership_field.setValue(selection.get('ownership'));
 
-//            var vendor_unit_field = form.down('expandable_vendor_unit_combo combo', false);
-//            vendor_unit_field.getStore().loadData([[selection.get('vendor_unit_id'), selection.get('vendor_unit_name')]]);
-//            vendor_unit_field.setValue(selection.get('vendor_unit_id'));
+            //            var vendor_unit_field = form.down('expandable_vendor_unit_combo combo', false);
+            //            vendor_unit_field.getStore().loadData([[selection.get('vendor_unit_id'), selection.get('vendor_unit_name')]]);
+            //            vendor_unit_field.setValue(selection.get('vendor_unit_id'));
             switch (button.action) {
                 case "damage":
                     form.setTitle("报损");
@@ -449,7 +450,7 @@ Ext.define('EIM.controller.AdminInventories', {
                     return false;
                 case "change_ownership":
                     form.setTitle("变更所有权");
-//                    form.setHeight(204);
+                    //                    form.setHeight(204);
                     form.down('[name=keep_at]', false).hide();
                     me.hideAllButton();
                     form.down('[text=+]', false).show();
@@ -461,17 +462,17 @@ Ext.define('EIM.controller.AdminInventories', {
         var number_array = selection.get('number').split("、");
         var sn_array = selection.get('sn').split(",");
         var combine_array = [];
-//        var id_field = selection.down('[name=id]', false);
-//        id_field.setValue(record.get('id'));
+        //        var id_field = selection.down('[name=id]', false);
+        //        id_field.setValue(record.get('id'));
         var loop_array = (number_array.length > sn_array.length ? number_array : sn_array)
         Ext.Array.each(loop_array, function(item, index) {
             var display = [];
-            if(!Ext.isEmpty(number_array[index])) display.push("资产编号：" + number_array[index]);
-            if(!Ext.isEmpty(sn_array[index])) display.push("序列号：" + sn_array[index]);
+            if (!Ext.isEmpty(number_array[index])) display.push("资产编号：" + number_array[index]);
+            if (!Ext.isEmpty(sn_array[index])) display.push("序列号：" + sn_array[index]);
             combine_array[index] = [index, display.join(" ")];
         });
         var number_field = form.down('combo[name=outstock_numbers]', false);
-        if(combine_array[0][1] != "") {
+        if (combine_array[0][1] != "") {
             number_field.getStore().loadData(combine_array);
         }
 
@@ -497,12 +498,12 @@ Ext.define('EIM.controller.AdminInventories', {
         var loop_array = (number_array.length > sn_array.length ? number_array : sn_array)
         Ext.Array.each(loop_array, function(item, index) {
             var display = [];
-            if(!Ext.isEmpty(number_array[index])) display.push("资产编号：" + number_array[index]);
-            if(!Ext.isEmpty(sn_array[index])) display.push("序列号：" + sn_array[index]);
+            if (!Ext.isEmpty(number_array[index])) display.push("资产编号：" + number_array[index]);
+            if (!Ext.isEmpty(sn_array[index])) display.push("序列号：" + sn_array[index]);
             combine_array[index] = [index, display.join(" ")];
         });
         var number_field = form.down('combo[name=outstock_numbers]', false);
-        if(combine_array[0][1] != "") {
+        if (combine_array[0][1] != "") {
             number_field.getStore().loadData(combine_array);
         }
 
@@ -520,7 +521,9 @@ Ext.define('EIM.controller.AdminInventories', {
         view.down('form', false).loadRecord(record);
         //给combo做一个假的store以正确显示值
         var inventory_type_field = view.down('[name=inventory_type]', false);
-        inventory_type_field.getStore().loadData([[record.get('material_code>id'), record.get('material_code>(name|code|description)')]]);
+        inventory_type_field.getStore().loadData([
+            [record.get('material_code>id'), record.get('material_code>(name|code|description)')]
+        ]);
         inventory_type_field.setValue(record.get('material_code>id'));
 
         view.down('[name=inventory_level]', false).setValue(record.get('inventory_level') + "");

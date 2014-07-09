@@ -53,7 +53,7 @@ Ext.define('EIM.controller.Users', {
 
     editUser: function() {
         var record = this.getGrid().getSelectedItem();
-        if(record.get('editable') === true) {
+        if (record.get('editable') === true) {
             var view = Ext.widget('user_form').show();
             view.down('form', false).loadRecord(record);
         }
@@ -63,12 +63,12 @@ Ext.define('EIM.controller.Users', {
         var win = button.up('window');
         var form = win.down('form', false);
 
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.submit({
-                url:'users/save_user',
-//                params: submit_params,
+                url: 'users/save_user',
+                //                params: submit_params,
                 submitEmptyText: false,
                 success: function(the_form, action) {
                     win.close();
@@ -82,23 +82,23 @@ Ext.define('EIM.controller.Users', {
     },
 
     selectionChange: function(selectionModel, selections) {
-//        var grid = this.getGrid();
-//
-//        if (selections.length > 0) {
-//            grid.enableRecordButtons();
-//        } else {
-//            grid.disableRecordButtons();
-//        }
+        //        var grid = this.getGrid();
+        //
+        //        if (selections.length > 0) {
+        //            grid.enableRecordButtons();
+        //        } else {
+        //            grid.disableRecordButtons();
+        //        }
     },
 
     checkSamePassword: function(text) {
         var form = text.up('form');
         var new_password_field = form.down('[name=new_password]', false);
         var confirm_password_field = form.down('[name=confirm_password]', false);
-        if(new_password_field.getValue() != confirm_password_field.getValue()) {
+        if (new_password_field.getValue() != confirm_password_field.getValue()) {
             new_password_field.markInvalid('两次输入的密码不一致！');
             confirm_password_field.markInvalid('两次输入的密码不一致！');
-        }else{
+        } else {
             new_password_field.clearInvalid();
             confirm_password_field.clearInvalid();
         }
@@ -108,12 +108,12 @@ Ext.define('EIM.controller.Users', {
         var win = button.up('window');
         var form = win.down('form', false);
 
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.submit({
                 url: '/users/change_password',
-                submitEmptyText:false,
+                submitEmptyText: false,
                 success: function(the_form, action) {
                     var response = action.response;
                     var msg = Ext.decode(response.responseText);
@@ -138,8 +138,8 @@ Ext.define('EIM.controller.Users', {
         var surname = newValue.split(" ")[1];
         var given_name = newValue.split(" ")[0];
         reg_name_field.setValue(given_name.toLocaleLowerCase());
-        if(surname) {
-            var pre = (surname[1] === "h" ? surname.substr(0,2) : surname[0]);
+        if (surname) {
+            var pre = (surname[1] === "h" ? surname.substr(0, 2) : surname[0]);
             etsc_email_field.setValue(given_name.toLocaleLowerCase() + pre.toLocaleLowerCase() + "@etsc-tech.com");
         } else {
             etsc_email_field.setValue(given_name.toLocaleLowerCase() + "@etsc-tech.com");
@@ -156,18 +156,18 @@ Ext.define('EIM.controller.Users', {
                 reg_name: newValue
             },
             success: function(response) {
-//                console.log("Y");
+                //                console.log("Y");
                 var msg = Ext.decode(response.responseText);
-//                Ext.example.msg('失败', msg.message);
-//                button.enable();
-                if(msg.success === true) {
+                //                Ext.example.msg('失败', msg.message);
+                //                button.enable();
+                if (msg.success === true) {
                     text.clearInvalid();
                 } else {
                     text.markInvalid('此登录名已经被占用了，请换一个');
                 }
             },
             failure: function() {
-//                console.log("N");
+                //                console.log("N");
             }
         });
     },
@@ -175,10 +175,10 @@ Ext.define('EIM.controller.Users', {
     printTest: function() {
         Ext.Ajax.request({
             url: '/users/etsc_print',
-            success: function(response){
+            success: function(response) {
                 var text = Ext.decode(response.responseText);
                 console.log(text);
-//        Ext.MessageBox.alert("ok", "打印好了");
+                //        Ext.MessageBox.alert("ok", "打印好了");
             }
         });
     }

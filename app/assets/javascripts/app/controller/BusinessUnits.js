@@ -4,13 +4,13 @@ Ext.define('EIM.controller.BusinessUnits', {
     stores: [
         'BusinessUnits',
         'GridBusinessUnits',
-//        'dict.BusinessUnitSorts',
+        //        'dict.BusinessUnitSorts',
         'dict.Cities'
     ],
     models: [
         'BusinessUnit',
         'GridBusinessUnit',
-//        'dict.BusinessUnitSort',
+        //        'dict.BusinessUnitSort',
         'dict.City'
     ],
 
@@ -28,7 +28,7 @@ Ext.define('EIM.controller.BusinessUnits', {
         var me = this;
         me.control({
             'business_unit_grid': {
-//                render: this.loadBusinessUnits,
+                //                render: this.loadBusinessUnits,
                 itemdblclick: this.editBusinessUnit,
                 selectionchange: this.selectionChange
             },
@@ -36,7 +36,7 @@ Ext.define('EIM.controller.BusinessUnits', {
                 click: this.addBusinessUnit
             },
             'business_unit_form button[action=save]': {
-            	click: this.saveBusinessUnit
+                click: this.saveBusinessUnit
             }
         });
     },
@@ -44,11 +44,11 @@ Ext.define('EIM.controller.BusinessUnits', {
     addBusinessUnit: function() {
         Ext.widget('business_unit_form').show();
     },
-    
+
     saveBusinessUnit: function(button) {
         var win = button.up('window');
         var form = win.down('form', false);
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.submit({
@@ -59,7 +59,7 @@ Ext.define('EIM.controller.BusinessUnits', {
                     var msg = Ext.decode(response.responseText);
                     var target_by_id = form.down('[name=source_element_id]', false).getValue();
                     //如果是从小加号来的窗口(也就是source_element_id的值不为空)，则把值回填到小加号前面的combo里
-                    if(!Ext.isEmpty(target_by_id)) {
+                    if (!Ext.isEmpty(target_by_id)) {
                         var target = Ext.getCmp(target_by_id);
                         var target_combo = target.up('container').down("combo", false);
                         var text = response.request.options.params.name;
@@ -71,9 +71,9 @@ Ext.define('EIM.controller.BusinessUnits', {
                                 target_combo.select(msg['id']);
                                 //如果有带加号的客户选择组件，则为其加一个过滤参数
                                 var business_contact_combo_array = Ext.ComponentQuery.query("expandable_business_contact_combo");
-                                if(business_contact_combo_array.length > 0) {
+                                if (business_contact_combo_array.length > 0) {
                                     Ext.Array.each(business_contact_combo_array, function(item) {
-                                        if(item.up('form') === target_combo.up('form')) {
+                                        if (item.up('form') === target_combo.up('form')) {
                                             item.down('combo', false).getStore().getProxy().setExtraParam('business_unit_id', msg['id'])
                                         }
                                     });
@@ -97,7 +97,7 @@ Ext.define('EIM.controller.BusinessUnits', {
 
     loadBusinessUnits: function() {
         Ext.getStore("BusinessUnits").load();
-//        Ext.getStore("dict.Cities").load();
+        //        Ext.getStore("dict.Cities").load();
     },
 
     editBusinessUnit: function() {

@@ -32,7 +32,7 @@ Ext.define('EIM.controller.Reminds', {
                 click: this.markAsRead
             },
             'remind_form button[action=save]': {
-//                click: function() {console.log("AGD");}
+                //                click: function() {console.log("AGD");}
                 click: this.submit
             }
         });
@@ -40,9 +40,9 @@ Ext.define('EIM.controller.Reminds', {
 
     selectionChange: function(selectionModel, selected) {
         var btn_mark = Ext.ComponentQuery.query('remind_grid button[action=markAsRead]')[0];
-        if(selected.length > 0) {
+        if (selected.length > 0) {
             btn_mark.enable();
-        }else{
+        } else {
             btn_mark.disable();
         }
     },
@@ -50,14 +50,14 @@ Ext.define('EIM.controller.Reminds', {
     loadRemindController: function() {
         var me = this;
         load_uniq_controller(me, 'Reminds');
-//        var salecase_number = Ext.ComponentQuery.query("salecase_grid")[0].getSelectionModel().getSelection()[0].get("number");
+        //        var salecase_number = Ext.ComponentQuery.query("salecase_grid")[0].getSelectionModel().getSelection()[0].get("number");
         var view = Ext.widget('remind_form').show();
-//        view.down('[name=source]', false).setValue(salecase_number);
+        //        view.down('[name=source]', false).setValue(salecase_number);
     },
 
     markThisAsRead: function(table, td, cellIndex, record) {
         var td_inner = td.innerHTML;
-        if(td_inner.indexOf("<a href=") != -1 && td_inner.indexOf("filterStr") != -1){
+        if (td_inner.indexOf("<a href=") != -1 && td_inner.indexOf("filterStr") != -1) {
             //如果点击的这一行有一个“外tag链接”，则点完算已读
             Ext.Ajax.request({
                 url: 'reminds/mark_as_read',
@@ -74,7 +74,7 @@ Ext.define('EIM.controller.Reminds', {
     markAsRead: function(button) {
         var grid = button.up('grid');
         var selected_reminds = Ext.Array.pluck(Ext.Array.pluck(grid.getSelectedItems(), 'data'), 'id');
-//        console.log(selected);
+        //        console.log(selected);
         Ext.Ajax.request({
             url: 'reminds/mark_as_read',
             params: {
@@ -86,15 +86,15 @@ Ext.define('EIM.controller.Reminds', {
         });
     },
 
-    submit: function(button){
+    submit: function(button) {
         var win = button.up('window');
         var form = win.down('form', false);
 
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.submit({
-                url:"reminds/save_remind",
+                url: "reminds/save_remind",
                 submitEmptyText: false,
                 success: function(the_form, action) {
                     win.close();
