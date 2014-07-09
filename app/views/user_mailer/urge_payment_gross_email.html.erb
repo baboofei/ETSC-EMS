@@ -1,43 +1,42 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
-</head>
-<body>
-
-<table style="border:1px solid #038; position: static; z-index: auto; ">
-  <thead>
-  <tr style="background-color: #038; color: #FFF;">
-    <th>币种</th>
-    <th>1~30天</th>
-    <th>31~60天</th>
-    <th>61~90天</th>
-    <th>91~120天</th>
-    <th>121~360天</th>
-    <th>360天以上</th>
-    <th>合计</th>
-  </tr>
-  </thead>
-  <tbody>
-  <% @array.each_with_index do |line, index| %>
-      <tr style="border:solid #999;border-width:0 1px 1px 0;">
-        <% if index % 2 == 0 %>
-            <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @currencies[index] %></td>
-            <% line.each_with_index do |col, index_j| %>
-                <td style="text-align: right; width: 150px; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= "%.2f" % @array[index][index_j] %></td>
-            <% end %>
-            <td style="text-align: right; width: 200px; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= "%.2f" % @array[index].sum %></td>
-        <% else %>
-            <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @currencies[index] %></td>
-            <% line.each_with_index do |col, index_j| %>
-                <td style="text-align: right; width: 150px; background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= "%.2f" % @array[index][index_j] %></td>
-            <% end %>
-            <td style="text-align: right; width: 200px; background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= "%.2f" % @array[index].sum %></td>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <table style="border:1px solid #038; position: static; z-index: auto; ">
+      <thead>
+        <tr style="background-color: #038; color: #FFF;">
+          <th>币种</th>
+          <th>1~30天</th>
+          <th>31~60天</th>
+          <th>61~90天</th>
+          <th>91~120天</th>
+          <th>121~360天</th>
+          <th>360天以上</th>
+          <th>合计</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @array.each_with_index do |line, index| %>
+        <tr style="border:solid #999;border-width:0 1px 1px 0;">
+          <% if index % 2 == 0 %>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @currencies[index] %></td>
+          <% line.each_with_index do |col, index_j| %>
+          <td style="text-align: right; width: 150px; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= "%.2f" % @array[index][index_j] %></td>
+          <% end %>
+          <td style="text-align: right; width: 200px; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= "%.2f" % @array[index].sum %></td>
+          <% else %>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @currencies[index] %></td>
+          <% line.each_with_index do |col, index_j| %>
+          <td style="text-align: right; width: 150px; background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= "%.2f" % @array[index][index_j] %></td>
+          <% end %>
+          <td style="text-align: right; width: 200px; background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= "%.2f" % @array[index].sum %></td>
+          <% end %>
+        </tr>
         <% end %>
-      </tr>
-  <% end %>
-  </tbody>
-</table>
-<p>共计欠款RMB<%= "%.2f" % $total_rmb %>(依汇率可能有少许出入)。</p>
-</body>
+      </tbody>
+    </table>
+    <p>共计欠款RMB<%= "%.2f" % $total_rmb %>(依汇率可能有少许出入)。</p>
+  </body>
 </html>

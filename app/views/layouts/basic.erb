@@ -8,111 +8,105 @@
     <%= javascript_include_tag "ext/bootstrap" %>
     <%= javascript_include_tag "ext/locale/ext-lang-zh_CN" %>
     <style type="text/css">
-      .details-info {
-        background: none repeat scroll 0 0 #F9F9F9;
-        border: 1px dotted #999999;
-        color: #555555;
-        margin: 15px;
-        padding: 15px;
-      }
-      a {
-        text-decoration: none;
-        color: #000;
-      }
+    .details-info {
+    background: none repeat scroll 0 0 #F9F9F9;
+    border: 1px dotted #999999;
+    color: #555555;
+    margin: 15px;
+    padding: 15px;
+    }
+    a {
+    text-decoration: none;
+    color: #000;
+    }
     </style>
     <script type="text/javascript">
-      Ext.BLANK_IMAGE_URL = '/stylesheets/ext/resources/images/default/s.gif';
+    Ext.BLANK_IMAGE_URL = '/stylesheets/ext/resources/images/default/s.gif';
     </script>
     <script type="text/javascript">
-      Ext.Loader.setConfig({enabled: true});
-
-      Ext.require(['*']);
-      Ext.onReady(function() {
-        //远程树所用到的store
-        var store = Ext.create('Ext.data.TreeStore', {
-          proxy: {
-            type: 'ajax',
-            url: '/basic/terry_tree/tree.json'
-          },
-          root: {
-            text: 'Ext JS',
-            id: 'root',
-            expanded: true,
-            draggable: true
-          },
-          folderSort: true,
-          sorters: [{
-              property: 'text',
-              direction: 'ASC'
-            }]
-        });
-
-        //建立树
-        var treePanel = Ext.create('Ext.tree.Panel', {
-          id: 'tree_panel',
-          title: '功能面板',
-          region:'north',
-          split: true,
-          height: 360,
-          minSize: 150,
-          rootVisible: false,
-          autoScroll: true,
-          store: store
-        });
-
-        var messagePanel = Ext.create("Ext.panel.Panel", {
-          id: 'details_panel',
-          title: '消息面板',
-          region: 'center',
-          bodyStyle: 'padding-bottom:15px;background:#eee;',
-          autoScroll: true,
-          html: '<p class="details-info">你有 0 条新消息。</p> '
-        });
-
-        //tb.suspendLayout = true;
-
-        Ext.create('Ext.Viewport', {
-          layout: 'border',
-          items: [{
-              id: 'header',
-              region: 'north',
-              height: 34,
-              items: top_bar
-            },{
-              layout: 'border',
-              id: 'layout-browser',
-              region:'west',
-              border: false,
-              split:true,
-              margins: '2 0 5 5',
-              width: 175,
-              minSize: 100,
-              maxSize: 500,
-              items: [treePanel, messagePanel]
-            },{
-              region:'center',
-              <%#*deferredRender: true,%>
-              contentEl: 'main',
-              id: 'main_layer',
-              autoScroll: true,
-              margins: '2 5 5 0',
-              border: false//,
-              //layout: 'fit'
-/*            },{
-              region: 'south',
-              contentEl: 'south',
-              split: false,
-              height: 100,
-              minSize: 100,
-              maxSize: 200,
-              collapsible: true,
-              collapsed: true,
-              margins: '0 0 0 0'*/
-            }],
-          renderTo: Ext.getBody()
-        });
-
-      });
+    Ext.Loader.setConfig({enabled: true});
+    Ext.require(['*']);
+    Ext.onReady(function() {
+    //远程树所用到的store
+    var store = Ext.create('Ext.data.TreeStore', {
+    proxy: {
+    type: 'ajax',
+    url: '/basic/terry_tree/tree.json'
+    },
+    root: {
+    text: 'Ext JS',
+    id: 'root',
+    expanded: true,
+    draggable: true
+    },
+    folderSort: true,
+    sorters: [{
+    property: 'text',
+    direction: 'ASC'
+    }]
+    });
+    //建立树
+    var treePanel = Ext.create('Ext.tree.Panel', {
+    id: 'tree_panel',
+    title: '功能面板',
+    region:'north',
+    split: true,
+    height: 360,
+    minSize: 150,
+    rootVisible: false,
+    autoScroll: true,
+    store: store
+    });
+    var messagePanel = Ext.create("Ext.panel.Panel", {
+    id: 'details_panel',
+    title: '消息面板',
+    region: 'center',
+    bodyStyle: 'padding-bottom:15px;background:#eee;',
+    autoScroll: true,
+    html: '<p class="details-info">你有 0 条新消息。</p> '
+    });
+    //tb.suspendLayout = true;
+    Ext.create('Ext.Viewport', {
+    layout: 'border',
+    items: [{
+    id: 'header',
+    region: 'north',
+    height: 34,
+    items: top_bar
+    },{
+    layout: 'border',
+    id: 'layout-browser',
+    region:'west',
+    border: false,
+    split:true,
+    margins: '2 0 5 5',
+    width: 175,
+    minSize: 100,
+    maxSize: 500,
+    items: [treePanel, messagePanel]
+    },{
+    region:'center',
+    <%#*deferredRender: true,%>
+    contentEl: 'main',
+    id: 'main_layer',
+    autoScroll: true,
+    margins: '2 5 5 0',
+    border: false//,
+    //layout: 'fit'
+    /*            },{
+    region: 'south',
+    contentEl: 'south',
+    split: false,
+    height: 100,
+    minSize: 100,
+    maxSize: 200,
+    collapsible: true,
+    collapsed: true,
+    margins: '0 0 0 0'*/
+    }],
+    renderTo: Ext.getBody()
+    });
+    });
     </script>
   </head>
   <body>

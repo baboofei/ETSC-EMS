@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-</head>
-<body>
-<h3>安装通知</h3>
-
-<p>已经签署了合同<%= @contract.number %>，需要工程师上门安装，预定安装日期为<%= (@contract.signed_at + 15.days).strftime("%Y-%m-%d") %>，请相应人员做好出差安排。</p>
-</body>
+	<head>
+		<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+	</head>
+	<body>
+		<h3>安装通知</h3>
+		<p>已经签署了合同<%= @contract.number %>，需要工程师上门安装，预定安装日期为<%= (@contract.signed_at + 15.days).strftime("%Y-%m-%d") %>，请相应人员做好出差安排。</p>
+	</body>
 </html>

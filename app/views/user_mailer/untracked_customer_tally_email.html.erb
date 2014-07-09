@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
-</head>
-<body>
-<h3></h3>
-<table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
-  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
-    <th style="width: 200px;">客户单位</th>
-    <th style="width: 120px;">客户</th>
-    <th style="width: 120px;">销售</th>
-    <th style="width: 85px;">区域</th>
-    <th style="width: 85px;">单位类型</th>
-  </tr>
-  <% @customers.each do |customer| %>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <h3></h3>
+    <table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
+      <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+        <th style="width: 200px;">客户单位</th>
+        <th style="width: 120px;">客户</th>
+        <th style="width: 120px;">销售</th>
+        <th style="width: 85px;">区域</th>
+        <th style="width: 85px;">单位类型</th>
+      </tr>
+      <% @customers.each do |customer| %>
       <tr style="text-align: right;">
         <td style="text-align: center;"><%= customer.customer_unit.name unless customer.customer_unit.blank? %></td>
         <td style="text-align: center;"><%= customer.name %></td>
@@ -21,7 +21,7 @@
         <td style="text-align: center;"><%= customer.customer_unit.blank? ? "资料有误" : customer.customer_unit.city.prvc.area.name %></td>
         <td style="text-align: center;"><%= customer.customer_unit.blank? ? "资料有误" : Dictionary.where("data_type = ? and value = ?", "unit_properties", customer.customer_unit.cu_sort).first.display %></td>
       </tr>
-  <% end %>
-</table>
-</body>
+      <% end %>
+    </table>
+  </body>
 </html>

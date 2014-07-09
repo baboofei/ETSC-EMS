@@ -1,47 +1,47 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-</head>
-<body>
-<h3>销售工作周报</h3>
-<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">
-  <thead>
-  <tr style="background-color: #038; color: #FFF;">
-    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">个案描述</th>
-    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:60px;">客户单位</th>
-    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:50px;">客户</th>
-    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:180px;">进展日期</th>
-    <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;">进展描述</th>
-  </tr>
-  </thead>
-  <tbody>
-  <% @salelogs.group_by(&:salecase_id).each_with_index do |salelogs_in_same_case, o_index | %>
-      <% salelogs_in_same_case[1].group_by(&:id).each_with_index do |salelog, index| %>
-          <tr style="border:solid #999;border-width:0 1px 1px 0;">
-            <% if index == 0 %>
-                <% salecase = Salecase.find(salelogs_in_same_case[0]) %>
-                <% if o_index % 2 == 0 %>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salelogs_in_same_case[1].size %>><%= salecase.comment %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salelogs_in_same_case[1].size %>><%= salecase.customer_units.map(&:name).join("、") %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salelogs_in_same_case[1].size %>><%= salecase.customers.map(&:name).join("、") %></td>
-                <% else %>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salelogs_in_same_case[1].size %>><%= salecase.comment %></td>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salelogs_in_same_case[1].size %>><%= salecase.customer_units.map(&:name).join("、") %></td>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salelogs_in_same_case[1].size %>><%= salecase.customers.map(&:name).join("、") %></td>
-                <% end %>
-            <% end %>
-            <% if o_index % 2 == 0 %>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= salelog[1][0]['contact_at'].strftime('%Y-%m-%d') %></td>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= raw strip_links(salelog[1][0]['natural_language']) %><%= salelog[1][0]['comment'].blank? ? "" : salelog[1][0]['comment'] %></td>
-            <% else %>
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= salelog[1][0]['contact_at'].strftime('%Y-%m-%d') %></td>
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= raw strip_links(salelog[1][0]['natural_language']) %><%= salelog[1][0]['comment'].blank? ? "" : salelog[1][0]['comment'] %></td>
-            <% end %>
-          </tr>
-      <% end %>
-  <% end  %>
-  </tbody>
-</table>
-</body>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  </head>
+  <body>
+    <h3>销售工作周报</h3>
+    <table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">
+      <thead>
+        <tr style="background-color: #038; color: #FFF;">
+          <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">个案描述</th>
+          <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:60px;">客户单位</th>
+          <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:50px;">客户</th>
+          <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:180px;">进展日期</th>
+          <th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;">进展描述</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @salelogs.group_by(&:salecase_id).each_with_index do |salelogs_in_same_case, o_index | %>
+        <% salelogs_in_same_case[1].group_by(&:id).each_with_index do |salelog, index| %>
+        <tr style="border:solid #999;border-width:0 1px 1px 0;">
+          <% if index == 0 %>
+          <% salecase = Salecase.find(salelogs_in_same_case[0]) %>
+          <% if o_index % 2 == 0 %>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salelogs_in_same_case[1].size %>><%= salecase.comment %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salelogs_in_same_case[1].size %>><%= salecase.customer_units.map(&:name).join("、") %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salelogs_in_same_case[1].size %>><%= salecase.customers.map(&:name).join("、") %></td>
+          <% else %>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salelogs_in_same_case[1].size %>><%= salecase.comment %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salelogs_in_same_case[1].size %>><%= salecase.customer_units.map(&:name).join("、") %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salelogs_in_same_case[1].size %>><%= salecase.customers.map(&:name).join("、") %></td>
+          <% end %>
+          <% end %>
+          <% if o_index % 2 == 0 %>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= salelog[1][0]['contact_at'].strftime('%Y-%m-%d') %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= raw strip_links(salelog[1][0]['natural_language']) %><%= salelog[1][0]['comment'].blank? ? "" : salelog[1][0]['comment'] %></td>
+          <% else %>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= salelog[1][0]['contact_at'].strftime('%Y-%m-%d') %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= raw strip_links(salelog[1][0]['natural_language']) %><%= salelog[1][0]['comment'].blank? ? "" : salelog[1][0]['comment'] %></td>
+          <% end %>
+        </tr>
+        <% end %>
+        <% end  %>
+      </tbody>
+    </table>
+  </body>
 </html>

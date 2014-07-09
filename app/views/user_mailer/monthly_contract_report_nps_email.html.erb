@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
-</head>
-<body>
-
-<table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
-  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
-    <th style="width: 150px;">销售</th>
-    <th style="width: 120px;">合同数量</th>
-    <th style="width: 225px;">合同金额(RMB)</th>
-    <th style="width: 225px;">合同利润(RMB)</th>
-    <th style="width: 180px;">利润率</th>
-  </tr>
-  <% @groups.each do |group| %>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
+      <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+        <th style="width: 150px;">销售</th>
+        <th style="width: 120px;">合同数量</th>
+        <th style="width: 225px;">合同金额(RMB)</th>
+        <th style="width: 225px;">合同利润(RMB)</th>
+        <th style="width: 180px;">利润率</th>
+      </tr>
+      <% @groups.each do |group| %>
       <tr style="text-align: right;">
         <% group_member = group.users.map(&:id) %>
         <% group_vendor_unit = group.vendor_units.map(&:id) %>
@@ -22,9 +21,8 @@
         <% contracts = @all_contracts.where("users.id in #{member_str}", *group_member).includes(:signer) %>
         <% if group_vendor_unit == [] %>
         <% else %>
-            <% contracts = contracts.where("vendor_units.id in #{vendor_unit_str}", *group_vendor_unit).includes(:contract_items => {:product => :producer}) %>
+        <% contracts = contracts.where("vendor_units.id in #{vendor_unit_str}", *group_vendor_unit).includes(:contract_items => {:product => :producer}) %>
         <% end %>
-
         <% rmb = contracts.map { |p| p.rmb.blank? ? 0 : p.rmb }.sum %>
         <% profit = contracts.map { |p| p.profit.blank? ? 0 : p.profit }.sum %>
         <td style="text-align: center;"><%= group.name %></td>
@@ -33,16 +31,16 @@
         <td><%= "%.2f" % profit %></td>
         <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
       </tr>
-  <% end %>
-  <% @sales.each do |sale| %>
+      <% end %>
+      <% @sales.each do |sale| %>
       <tr style="text-align: right; background-color: #F4F4F4;">
         <% vendor_units_through_group = VendorUnit.where("users.id = ?", sale.id).includes(:groups => :users).map(&:id) %>
         <% if vendor_units_through_group.size == 0 %>
-            <% contracts = @all_contracts.where("contracts.signer_user_id = ?", sale.id) %>
+        <% contracts = @all_contracts.where("contracts.signer_user_id = ?", sale.id) %>
         <% else %>
-            <% vendor_units_str = "(" + vendor_units_through_group.map { "?" }.join(",") + ")" %>
-            <% pre_sql = Contract.where("vendor_units.id in #{vendor_units_str}", *vendor_units_through_group).select("contracts.id").joins("LEFT JOIN contract_items ON contract_items.contract_id = contracts.id").joins("LEFT JOIN products ON contract_items.product_id = products.id").joins("LEFT JOIN vendor_units ON products.seller_vendor_unit_id = vendor_units.id") %>
-            <% contracts = @all_contracts.where("contracts.id <> ALL (#{pre_sql.to_sql}) and contracts.signer_user_id = ?", sale.id) %>
+        <% vendor_units_str = "(" + vendor_units_through_group.map { "?" }.join(",") + ")" %>
+        <% pre_sql = Contract.where("vendor_units.id in #{vendor_units_str}", *vendor_units_through_group).select("contracts.id").joins("LEFT JOIN contract_items ON contract_items.contract_id = contracts.id").joins("LEFT JOIN products ON contract_items.product_id = products.id").joins("LEFT JOIN vendor_units ON products.seller_vendor_unit_id = vendor_units.id") %>
+        <% contracts = @all_contracts.where("contracts.id <> ALL (#{pre_sql.to_sql}) and contracts.signer_user_id = ?", sale.id) %>
         <% end %>
         <% rmb = contracts.map { |p| p.rmb.blank? ? 0 : p.rmb }.sum %>
         <% profit = contracts.map { |p| p.profit.blank? ? 0 : p.profit }.sum %>
@@ -52,7 +50,7 @@
         <td><%= "%.2f" % profit %></td>
         <td><%= rmb == 0 ? "-" : ("%.2f" % (profit * 100 / rmb))+"%" %></td>
       </tr>
-  <% end %>
-</table>
-</body>
+      <% end %>
+    </table>
+  </body>
 </html>

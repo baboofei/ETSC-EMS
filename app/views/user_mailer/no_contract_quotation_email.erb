@@ -1,88 +1,86 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-</head>
-<body>
-
-<table style="border:1px solid #038; width: 1000px; position: static; z-index: auto; ">
-  <thead>
-  <tr style="background-color: #038; color: #FFF;">
-    <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
-    <th>型号</th>
-    <th>报价编号</th>
-    <th>客户单位</th>
-    <th>客户姓名</th>
-    <th>数量</th>
-    <th>报价币种</th>
-  </tr>
-  </thead>
-  <tbody>
-  <% all_index = 0 %>
-  <% @product_model_array.each_with_index do |product_model, o_index| %>
-      <% quote_items = QuoteItem.get_no_contract_quotes_with(product_model) %>
-      <% quote_items.each_with_index do |quote_item, index| %>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  </head>
+  <body>
+    <table style="border:1px solid #038; width: 1000px; position: static; z-index: auto; ">
+      <thead>
+        <tr style="background-color: #038; color: #FFF;">
+          <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
+          <th>型号</th>
+          <th>报价编号</th>
+          <th>客户单位</th>
+          <th>客户姓名</th>
+          <th>数量</th>
+          <th>报价币种</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% all_index = 0 %>
+        <% @product_model_array.each_with_index do |product_model, o_index| %>
+        <% quote_items = QuoteItem.get_no_contract_quotes_with(product_model) %>
+        <% quote_items.each_with_index do |quote_item, index| %>
         <% quote = quote_item.quote %>
         <% if index == 0 %>
-            <% if o_index % 2 == 0 %>
-                  <tr style="border:solid #999;border-width:0 1px 1px 0;">
-                    <% if all_index % 2 == 0 %>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= product_model %></td>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.number %></td>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer_unit.name %></td>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer.name %></td>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2 == 0 || quote_item.quantity_2.blank?) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.currency.name %></td>
-                    <% else %>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= product_model %></td>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.number %></td>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer_unit.name %></td>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer.name %></td>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2 == 0 || quote_item.quantity_2.blank?) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.currency.name %></td>
-                    <% end %>
-                  </tr>
-            <% else %>
-                  <tr style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;">
-                    <% if all_index % 2 == 0 %>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= product_model %></td>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.number %></td>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer_unit.name %></td>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer.name %></td>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2 == 0 || quote_item.quantity_2.blank?) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.currency.name %></td>
-                    <% else %>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= product_model %></td>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.number %></td>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer_unit.name %></td>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer.name %></td>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2 == 0 || quote_item.quantity_2.blank?) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.currency.name %></td>
-                    <% end %>
-                  </tr>
-            <% end %>
+        <% if o_index % 2 == 0 %>
+        <tr style="border:solid #999;border-width:0 1px 1px 0;">
+          <% if all_index % 2 == 0 %>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= product_model %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.number %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer_unit.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2 == 0 || quote_item.quantity_2.blank?) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.currency.name %></td>
+          <% else %>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= product_model %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.number %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer_unit.name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer.name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2 == 0 || quote_item.quantity_2.blank?) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.currency.name %></td>
+          <% end %>
+        </tr>
         <% else %>
-          <tr>
-            <% if all_index % 2 == 0 %>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.number %></td>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer_unit.name %></td>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer.name %></td>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2 == 0 || quote_item.quantity_2.blank?) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.currency.name %></td>
-            <% else %>
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.number %></td>
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer_unit.name %></td>
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer.name %></td>
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2 == 0 || quote_item.quantity_2.blank?) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.currency.name %></td>
-            <% end %>
-          </tr>
+        <tr style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;">
+          <% if all_index % 2 == 0 %>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= product_model %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.number %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer_unit.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2 == 0 || quote_item.quantity_2.blank?) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.currency.name %></td>
+          <% else %>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= product_model %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.number %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer_unit.name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer.name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2 == 0 || quote_item.quantity_2.blank?) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.currency.name %></td>
+          <% end %>
+        </tr>
         <% end %>
-          <% all_index += 1 %>
-      <% end %>
-  <% end %>
-  </tbody>
-</table>
-
-</body>
+        <% else %>
+        <tr>
+          <% if all_index % 2 == 0 %>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.number %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer_unit.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2 == 0 || quote_item.quantity_2.blank?) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.currency.name %></td>
+          <% else %>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.number %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer_unit.name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.customer.name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2 == 0 || quote_item.quantity_2.blank?) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote.currency.name %></td>
+          <% end %>
+        </tr>
+        <% end %>
+        <% all_index += 1 %>
+        <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </body>
 </html>

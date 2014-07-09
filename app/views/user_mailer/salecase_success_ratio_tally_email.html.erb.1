@@ -1,69 +1,69 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
-</head>
-<body>
-<h3>按销售/项目组</h3>
-<table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
-  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
-    <th rowspan="2">销售/项目组</th>
-    <th colspan="<%= @cancel_reason_array.size %>">结案暂无后续</th>
-    <th rowspan="2">结案后有后续</th>
-  </tr>
-  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
-    <% @cancel_reason_array.each do |reason| %>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <h3>按销售/项目组</h3>
+    <table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
+      <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+        <th rowspan="2">销售/项目组</th>
+        <th colspan="<%= @cancel_reason_array.size %>">结案暂无后续</th>
+        <th rowspan="2">结案后有后续</th>
+      </tr>
+      <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+        <% @cancel_reason_array.each do |reason| %>
         <th width="60px"><%= reason[1] %></th>
-    <% end %>
-  </tr>
-  <% @groups.each do |group| %>
+        <% end %>
+      </tr>
+      <% @groups.each do |group| %>
       <tr>
         <td><%= group.name %></td>
         <% @cancel_reason_array.each do |reason| %>
-            <td><%= Salelog.salecase_success_ratio_tally_via_user(@start_at, @end_at, reason[0].to_i, "group", group.id) %></td>
+        <td><%= Salelog.salecase_success_ratio_tally_via_user(@start_at, @end_at, reason[0].to_i, "group", group.id) %></td>
         <% end %>
         <td><%= Salelog.salecase_success_ratio_tally_via_user(@start_at, @end_at, nil, "group", group.id) %></td>
       </tr>
-  <% end %>
-  <% @sales.each do |user| %>
+      <% end %>
+      <% @sales.each do |user| %>
       <tr>
         <td><%= user.name %></td>
         <% @cancel_reason_array.each do |reason| %>
-            <td><%= Salelog.salecase_success_ratio_tally_via_user(@start_at, @end_at, reason[0].to_i, "user", user.id) %></td>
+        <td><%= Salelog.salecase_success_ratio_tally_via_user(@start_at, @end_at, reason[0].to_i, "user", user.id) %></td>
         <% end %>
         <td><%= Salelog.salecase_success_ratio_tally_via_user(@start_at, @end_at, nil, "user", user.id) %></td>
       </tr>
-  <% end %>
-  <tr>
-    <td>合计</td>
-    <% @cancel_reason_array.each do |reason| %>
+      <% end %>
+      <tr>
+        <td>合计</td>
+        <% @cancel_reason_array.each do |reason| %>
         <td><%= Salelog.salecase_success_ratio_tally_via_user(@start_at, @end_at, reason[0].to_i, "user", nil) %></td>
-    <% end %>
-    <td><%= Salelog.salecase_success_ratio_tally_via_user(@start_at, @end_at, nil, "user", nil) %></td>
-  </tr>
-</table>
-<h3>按区域</h3>
-<table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
-  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
-    <th rowspan="2">区域</th>
-    <th colspan="<%= @cancel_reason_array.size %>">结案暂无后续</th>
-    <th rowspan="2">结案后有后续</th>
-  </tr>
-  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
-    <% @cancel_reason_array.each do |reason| %>
+        <% end %>
+        <td><%= Salelog.salecase_success_ratio_tally_via_user(@start_at, @end_at, nil, "user", nil) %></td>
+      </tr>
+    </table>
+    <h3>按区域</h3>
+    <table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
+      <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+        <th rowspan="2">区域</th>
+        <th colspan="<%= @cancel_reason_array.size %>">结案暂无后续</th>
+        <th rowspan="2">结案后有后续</th>
+      </tr>
+      <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+        <% @cancel_reason_array.each do |reason| %>
         <th width="60px"><%= reason[1] %></th>
-    <% end %>
-  </tr>
-  <% @areas.each do |area| %>
+        <% end %>
+      </tr>
+      <% @areas.each do |area| %>
       <tr>
         <td><%= area.name %></td>
         <% @cancel_reason_array.each do |reason| %>
-            <td><%= Salelog.salecase_success_ratio_tally_via_area(@start_at, @end_at, reason[0].to_i, area.id) %></td>
+        <td><%= Salelog.salecase_success_ratio_tally_via_area(@start_at, @end_at, reason[0].to_i, area.id) %></td>
         <% end %>
         <td><%= Salelog.salecase_success_ratio_tally_via_area(@start_at, @end_at, nil, area.id) %></td>
       </tr>
-  <% end %>
-  </tr>
-</table>
+      <% end %>
+    </tr>
+  </table>
 </body>
 </html>

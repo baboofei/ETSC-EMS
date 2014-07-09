@@ -1,51 +1,49 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-</head>
-<body>
-
-<h3>Lead跟进情况(展会/研讨会)月报</h3>
-<table style="border:1px solid #038; width: 1000px; position: static; z-index: auto; ">
-  <!--<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">-->
-  <thead>
-  <tr style="background-color: #038; color: #FFF;">
-    <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
-    <th>开始时间</th>
-    <th>客户单位</th>
-    <th>客户</th>
-    <th>工厂</th>
-    <th>进展时间</th>
-    <th style="width: 250px;">进展</th>
-    <th>销售</th>
-    <th>lead方式</th>
-  </tr>
-  </thead>
-  <tbody>
-  <% @lead_customers_exhibitions.each_with_index do |customer, index| %>
-      <% if index % 2 == 1 %>
-          <tr style="background-color: #ffdab9;">
-      <% else %>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  </head>
+  <body>
+    <h3>Lead跟进情况(展会/研讨会)月报</h3>
+    <table style="border:1px solid #038; width: 1000px; position: static; z-index: auto; ">
+      <!--<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">-->
+      <thead>
+        <tr style="background-color: #038; color: #FFF;">
+          <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
+          <th>开始时间</th>
+          <th>客户单位</th>
+          <th>客户</th>
+          <th>工厂</th>
+          <th>进展时间</th>
+          <th style="width: 250px;">进展</th>
+          <th>销售</th>
+          <th>lead方式</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @lead_customers_exhibitions.each_with_index do |customer, index| %>
+        <% if index % 2 == 1 %>
+        <tr style="background-color: #ffdab9;">
+          <% else %>
           <tr>
-      <% end %>
-        <td><%= customer.created_at.strftime("%Y-%m-%d") %></td>
-        <td><%= customer.customer_unit.name %></td>
-        <td><%= customer.name %></td>
-        <td><%= customer.salecases.map{|q| q.salelogs.map{|r| r.recommends.map{|s| s.producer.name}}}.flatten.uniq.join("、") %></td>
-        <% log = Salelog.where("customers.id = ? and salelogs.created_at < ?", customer.id, "#{0.month.ago.to_s[0..7]}01").order("salelogs.created_at DESC").limit(1).includes(:salecase => :customers)[0] %>
-        <% if !log.blank? %>
+            <% end %>
+            <td><%= customer.created_at.strftime("%Y-%m-%d") %></td>
+            <td><%= customer.customer_unit.name %></td>
+            <td><%= customer.name %></td>
+            <td><%= customer.salecases.map{|q| q.salelogs.map{|r| r.recommends.map{|s| s.producer.name}}}.flatten.uniq.join("、") %></td>
+            <% log = Salelog.where("customers.id = ? and salelogs.created_at < ?", customer.id, "#{0.month.ago.to_s[0..7]}01").order("salelogs.created_at DESC").limit(1).includes(:salecase => :customers)[0] %>
+            <% if !log.blank? %>
             <td><%= log['created_at'].strftime("%Y-%m-%d") %></td>
             <td><%= raw strip_links(log['natural_language']) %></td>
-        <% else %>
+            <% else %>
             <td></td>
             <td></td>
-        <% end %>
-        <td><%= customer.user.name %></td>
-        <td><%= Exhibition.where("lead_id = ?", customer.lead_id)[0].name %></td>
-      </tr>
-  <% end %>
-  </tbody>
-</table>
-
-</body>
-</html>
+            <% end %>
+            <td><%= customer.user.name %></td>
+            <td><%= Exhibition.where("lead_id = ?", customer.lead_id)[0].name %></td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </body>
+  </html>

@@ -1,57 +1,57 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
-</head>
-<body>
-<% if @unpaid_contracts.size >= 0 %>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <% if @unpaid_contracts.size >= 0 %>
     <table style="border:1px solid #038; position: static; z-index: auto; ">
       <!--<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">-->
       <thead>
-      <tr style="background-color: #038; color: #FFF;">
-        <th>合同编号</th>
-        <th>合同摘要</th>
-        <th>付款方式</th>
-        <th>应收时间</th>
-        <th>应收货款</th>
-        <th>账龄(天)</th>
-        <th>应收款单位</th>
-        <th style="width: 48px;">负责人</th>
-      </tr>
+        <tr style="background-color: #038; color: #FFF;">
+          <th>合同编号</th>
+          <th>合同摘要</th>
+          <th>付款方式</th>
+          <th>应收时间</th>
+          <th>应收货款</th>
+          <th>账龄(天)</th>
+          <th>应收款单位</th>
+          <th style="width: 48px;">负责人</th>
+        </tr>
       </thead>
       <tbody>
-      <% index = 0 %>
-      <% @unpaid_contracts.each do |contract| %>
-          <% urge_payment = contract.check_collection(@end_at) %>
-          <% urge_payment.each do |payment| %>
-              <tr style="border:solid #999;border-width:0 1px 1px 0;">
-                <% if index % 2 == 0 %>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.number %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.summary %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.pay_mode.name %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (@end_at.to_date - payment[1].to_i).strftime("%Y-%m-%d") %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px; text-align: right;"><%= contract.currency.name %><%= "%.2f" % payment[0] %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px; text-align: right;"><span style="color: <%= payment[1] < 0 ? '#000000' : '#FF0000' %>"><%= payment[1] %></span></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.customer_unit.name %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.signer.name %></td>
-                <% else %>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.number %></td>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.summary %></td>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.pay_mode.name %></td>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (@end_at.to_date - payment[1].to_i).strftime("%Y-%m-%d") %></td>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px; text-align: right;"><%= contract.currency.name %><%= "%.2f" % payment[0] %></td>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px; text-align: right;"><span style="color: <%= payment[1] < 0 ? '#000000' : '#FF0000' %>"><%= payment[1] %></span></td>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.customer_unit.name %></td>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.signer.name %></td>
-                <% end %>
-              </tr>
-      <% index += 1 %>
+        <% index = 0 %>
+        <% @unpaid_contracts.each do |contract| %>
+        <% urge_payment = contract.check_collection(@end_at) %>
+        <% urge_payment.each do |payment| %>
+        <tr style="border:solid #999;border-width:0 1px 1px 0;">
+          <% if index % 2 == 0 %>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.number %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.summary %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.pay_mode.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (@end_at.to_date - payment[1].to_i).strftime("%Y-%m-%d") %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px; text-align: right;"><%= contract.currency.name %><%= "%.2f" % payment[0] %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px; text-align: right;"><span style="color: <%= payment[1] < 0 ? '#000000' : '#FF0000' %>"><%= payment[1] %></span></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.customer_unit.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.signer.name %></td>
+          <% else %>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.number %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.summary %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.pay_mode.name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (@end_at.to_date - payment[1].to_i).strftime("%Y-%m-%d") %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px; text-align: right;"><%= contract.currency.name %><%= "%.2f" % payment[0] %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px; text-align: right;"><span style="color: <%= payment[1] < 0 ? '#000000' : '#FF0000' %>"><%= payment[1] %></span></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.customer_unit.name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract.signer.name %></td>
           <% end %>
-      <% end %>
+        </tr>
+        <% index += 1 %>
+        <% end %>
+        <% end %>
       </tbody>
     </table>
-<% else %>
+    <% else %>
     <p>很好，你本月没有到期的应收款项。</p>
-<% end %>
-</body>
+    <% end %>
+  </body>
 </html>

@@ -1,43 +1,43 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
-</head>
-<body>
-<h3></h3>
-<table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
-  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
-    <th style="width: 150px;">客户单位</th>
-    <th style="width: 150px;">客户</th>
-    <th style="width: 120px;">销售</th>
-    <th style="width: 225px;">个案描述</th>
-    <th style="width: 80px;">末次联系时间</th>
-    <th style="width: 250px;">末次联系进展</th>
-    <th style="width: 250px;">涉案产品</th>
-    <th style="width: 250px;">涉案工厂</th>
-  </tr>
-  <% @customers.each do |customer| %>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <h3></h3>
+    <table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
+      <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+        <th style="width: 150px;">客户单位</th>
+        <th style="width: 150px;">客户</th>
+        <th style="width: 120px;">销售</th>
+        <th style="width: 225px;">个案描述</th>
+        <th style="width: 80px;">末次联系时间</th>
+        <th style="width: 250px;">末次联系进展</th>
+        <th style="width: 250px;">涉案产品</th>
+        <th style="width: 250px;">涉案工厂</th>
+      </tr>
+      <% @customers.each do |customer| %>
       <% salecase_array = customer.salecases %>
       <% salecase_array.each do |salecase| %>
-          <% last_salelog = salecase.salelogs.sort_by { |p| p.contact_at }[-1] %>
-          <tr style="text-align: right;">
-            <td style="text-align: center;"><%= customer.customer_unit.name unless customer.customer_unit.blank? %></td>
-            <td style="text-align: center;"><%= customer.name %></td>
-            <td style="text-align: center;"><%= customer.user.name %></td>
-            <td style="text-align: center;"><%= salecase['comment'] %></td>
-            <td style="text-align: center;"><%= last_salelog.blank? ? "有问题" : last_salelog.contact_at.strftime("%Y-%m-%d") %></td>
-            <td style="text-align: center;"></td>
-            <td style="text-align: center;">
-              推荐产品：<%= Product.where("salecases.id = ?", salecase.id).includes(:be_recommended_in => :salecase).map(&:model).join("、") %><br />
-              报价产品：<%= Product.where("salecases.id = ?", salecase.id).joins("LEFT OUTER JOIN `quote_items` ON `quote_items`.`product_id` = `products`.`id` LEFT OUTER JOIN `quotes` ON `quotes`.`id` = `quote_items`.`quote_id` LEFT OUTER JOIN salelogs ON (quotes.quotable_type = 'Salelog' AND quotes.quotable_id = salelogs.id) LEFT OUTER JOIN `salecases` ON `salecases`.`id` = `salelogs`.`salecase_id`").map(&:model).join("、") %>
-            </td>
-            <td style="text-align: center;">
-              推荐工厂：<%= (VendorUnit.where("salecases.id = ?", salecase.id).includes(:products => {:be_recommended_in => :salecase}) + VendorUnit.where("salecases.id = ?", salecase.id).includes(:be_recommended_in => :salecase)).uniq.map(&:name).join("、") %><br />
-              报价工厂：<%= VendorUnit.where("salecases.id = ?", salecase.id).joins("LEFT OUTER JOIN products ON products.seller_vendor_unit_id = vendor_units.id LEFT OUTER JOIN `quote_items` ON `quote_items`.`product_id` = `products`.`id` LEFT OUTER JOIN `quotes` ON `quotes`.`id` = `quote_items`.`quote_id` LEFT OUTER JOIN salelogs ON (quotes.quotable_type = 'Salelog' AND quotes.quotable_id = salelogs.id) LEFT OUTER JOIN `salecases` ON `salecases`.`id` = `salelogs`.`salecase_id`").map(&:name).uniq.join("、") %>
-            </td>
-          </tr>
+      <% last_salelog = salecase.salelogs.sort_by { |p| p.contact_at }[-1] %>
+      <tr style="text-align: right;">
+        <td style="text-align: center;"><%= customer.customer_unit.name unless customer.customer_unit.blank? %></td>
+        <td style="text-align: center;"><%= customer.name %></td>
+        <td style="text-align: center;"><%= customer.user.name %></td>
+        <td style="text-align: center;"><%= salecase['comment'] %></td>
+        <td style="text-align: center;"><%= last_salelog.blank? ? "有问题" : last_salelog.contact_at.strftime("%Y-%m-%d") %></td>
+        <td style="text-align: center;"></td>
+        <td style="text-align: center;">
+          推荐产品：<%= Product.where("salecases.id = ?", salecase.id).includes(:be_recommended_in => :salecase).map(&:model).join("、") %><br />
+          报价产品：<%= Product.where("salecases.id = ?", salecase.id).joins("LEFT OUTER JOIN `quote_items` ON `quote_items`.`product_id` = `products`.`id` LEFT OUTER JOIN `quotes` ON `quotes`.`id` = `quote_items`.`quote_id` LEFT OUTER JOIN salelogs ON (quotes.quotable_type = 'Salelog' AND quotes.quotable_id = salelogs.id) LEFT OUTER JOIN `salecases` ON `salecases`.`id` = `salelogs`.`salecase_id`").map(&:model).join("、") %>
+        </td>
+        <td style="text-align: center;">
+          推荐工厂：<%= (VendorUnit.where("salecases.id = ?", salecase.id).includes(:products => {:be_recommended_in => :salecase}) + VendorUnit.where("salecases.id = ?", salecase.id).includes(:be_recommended_in => :salecase)).uniq.map(&:name).join("、") %><br />
+          报价工厂：<%= VendorUnit.where("salecases.id = ?", salecase.id).joins("LEFT OUTER JOIN products ON products.seller_vendor_unit_id = vendor_units.id LEFT OUTER JOIN `quote_items` ON `quote_items`.`product_id` = `products`.`id` LEFT OUTER JOIN `quotes` ON `quotes`.`id` = `quote_items`.`quote_id` LEFT OUTER JOIN salelogs ON (quotes.quotable_type = 'Salelog' AND quotes.quotable_id = salelogs.id) LEFT OUTER JOIN `salecases` ON `salecases`.`id` = `salelogs`.`salecase_id`").map(&:name).uniq.join("、") %>
+        </td>
+      </tr>
       <% end %>
-  <% end %>
-</table>
-</body>
+      <% end %>
+    </table>
+  </body>
 </html>
