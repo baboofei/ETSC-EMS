@@ -1,11 +1,11 @@
-Ext.define('EIM.view.pop_unit.Grid', {
+Ext.define('EIM.view.vip_unit.Grid', {
     extend: 'Ext.grid.Panel',
-    alias: 'widget.pop_unit_grid',
+    alias: 'widget.vip_unit_grid',
 
     requires: 'Ext.ux.grid.FiltersFeature',
 
-    title: '公共单位列表',
-    store: 'GridPopUnits',
+    title: 'VIP单位列表',
+    store: 'GridVipUnits',
     iconCls: 'ttl_grid',
     viewConfig: {enableTextSelection:true},
 
@@ -112,10 +112,10 @@ Ext.define('EIM.view.pop_unit.Grid', {
             }
         ];
 
-        this.addPopUnitButton = Ext.create('Ext.Button', {
+        this.addVipUnitButton = Ext.create('Ext.Button', {
             text: '新增客户单位',
             iconCls: 'btn_add',
-            action: 'addPopUnit'
+            action: 'addVipUnit'
         });
         this.pagingToolbar = Ext.create('Ext.PagingToolbar', {
             store: this.store,
@@ -131,12 +131,12 @@ Ext.define('EIM.view.pop_unit.Grid', {
             }
         ];
 
-        this.bbar = [this.addPopUnitButton, '-', this.pagingToolbar];
+        this.bbar = [this.addVipUnitButton, '-', this.pagingToolbar];
 
         this.callParent(arguments);
     },
 
-    getSelectedPopUnit: function() {
+    getSelectedVipUnit: function() {
         return this.getSelectionModel().getSelection()[0];
     }
 });

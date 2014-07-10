@@ -22,7 +22,8 @@ Ext.define('EIM.controller.Etscuxes', {
         'dict.Currencies',
         'PayModes',
         'dict.MaterialCodes',
-        'ComboPopUnits'
+        'ComboPopUnits',
+        'ComboVipUnits'
     ],
     models: [
         'dict.Lead',
@@ -37,7 +38,8 @@ Ext.define('EIM.controller.Etscuxes', {
         'dict.Currency',
         'PayMode',
         'dict.MaterialCode',
-        'ComboPopUnit'
+        'ComboPopUnit',
+        'ComboVipUnit'
     ],
     views: [
         'etscux.ExpandableCustomerUnitCombo',
@@ -51,6 +53,9 @@ Ext.define('EIM.controller.Etscuxes', {
         'etscux.AmountWithCurrency',
         'etscux.ExpandablePayModeCombo',
         'etscux.ExpandablePopUnitCombo',
+        'etscux.ExpandablePopCombo',
+        'etscux.ExpandableVipUnitCombo',
+        'etscux.ExpandableVipCombo',
 
         'etscux.ReusableSelectExpressButton',
         'etscux.ReusablePopExpressGridButton',
@@ -105,7 +110,7 @@ Ext.define('EIM.controller.Etscuxes', {
              * 生产厂家和产品的组
              */
             'expandable_vendor_unit_combo combo': {
-                select: this.passParamsToProductComboOrBox
+                select: this.addParamsToProductAndVendor
             },
             /**
              * 生产厂家的小加号按钮
@@ -194,6 +199,28 @@ Ext.define('EIM.controller.Etscuxes', {
             },
 
             /**
+             * VIP单位和VIP联系人的组
+             */
+            'expandable_vip_unit_combo combo': {
+                select: this.addParamsToVipCombo
+            },
+            'expandable_vip_unit_combo button[text=+]':{
+                click: this.popUpVipUnitFormAndSetValue
+            },
+            'expandable_vip_combo combo':{
+                beforequery: function(queryEvent, records, eOpts) {
+                    delete queryEvent.combo.lastQuery;
+                }
+            },
+            'expandable_vip_combo button[text=+]':{
+                click: function() {
+                    var me = this;
+                    load_uniq_controller(me, 'Vips');
+                    Ext.widget('vip_form').show();
+                }
+            },
+
+            /**
              * 币种的下拉框，当它有值时，后面的数字框也必须有值
              */
             'amount_with_currency combo':{
@@ -209,7 +236,7 @@ Ext.define('EIM.controller.Etscuxes', {
             /**
              * 选快递公司的按钮
              */
-            'pop_express_grid_button': {
+            'popup_express_grid_button': {
                 click: this.popUpExpressForm
             },
 
@@ -235,10 +262,10 @@ Ext.define('EIM.controller.Etscuxes', {
      * 如果有“地址”在同一表单内，则把返回的地址填进去作为默认值
      */
     addParamsToCustomerStore: function(combo, records, eOpts) {
-        var expand = combo.up('form').down('expandable_customer_combo', false)
-        if(expand){
-            var customer_combo = expand.down('combo', false);
-            customer_combo.getStore().getProxy().setExtraParam('customer_unit_id', records[0]["data"]["id"])
+        var expandable_combo = combo.up('form').down('expandable_customer_combo', false)
+        if(expandable_combo){
+            var customer_combo = expandable_combo.down('combo', false);
+            customer_combo.getStore().getProxy().setExtraParam('customer_unit_id', records[0]["data"]["id"]);
             customer_combo.reset();
         }
         var addr_field = combo.up('form').down('[name=addr]', false);
@@ -255,8 +282,6 @@ Ext.define('EIM.controller.Etscuxes', {
                 addr_combo.setValue();
                 addr_field.setValue(addr);
             } else {
-//                addr_combo.getStore().load();
-
                 var addr_store = [];
                 Ext.Array.each(addr_array, function(item) {
                     addr_store.push({name: item.split("：")[0], address: item.split("：")[1]});
@@ -308,12 +333,16 @@ Ext.define('EIM.controller.Etscuxes', {
         });
     },
 
+    addParamsToProductAndVendor: function(combo, records, eOpts) {
+        this.addParamsToProductComboOrBox(combo, records, eOpts);
+        this.addParamsToVendorStore(combo, records, eOpts);
+    },
     /**
      * 生产厂家的输入下拉框，每次选择后，看和它同级的有哪个框：产品下拉或者产品多选
      * 有哪个就把参数赋给哪个
      * 另外就是和它同级的选择供方联系人的combo
      */
-    passParamsToProductComboOrBox: function(combo, records, eOpts) {
+    addParamsToProductComboOrBox: function(combo, records, eOpts) {
         var product_field = combo.up('form').down('expandable_product_combo', false);
         var product_box_field = combo.up('form').down('expandable_product_box_select', false);
         if(product_field){
@@ -333,6 +362,43 @@ Ext.define('EIM.controller.Etscuxes', {
                 var vendor_combo = vendor_field.down('combo', false);
                 vendor_combo.getStore().getProxy().setExtraParam('vendor_unit_id', records[0]["data"]["id"])
                 vendor_combo.reset();
+            }
+        }
+    },
+    /**
+     * 如果有供应商联系人下拉框在同一表单内(比如本身就是“新增供应商联系人”的表单，则不会有选择供应商联系人的下拉框)，
+     * 则给此供应商联系人下拉框加一个参数：当前选中供应商单位ID
+     * 如果有“地址”在同一表单内，则把返回的地址填进去作为默认值
+     */
+    addParamsToVendorStore: function(combo, records, eOpts) {
+        var expandable_combo = combo.up('form').down('expandable_vendor_combo', false)
+        if(expandable_combo){
+            var vendor_combo = expandable_combo.down('combo', false);
+            vendor_combo.getStore().getProxy().setExtraParam('vendor_unit_id', records[0]["data"]["id"]);
+            vendor_combo.reset();
+        }
+        var addr_field = combo.up('form').down('[name=addr]', false);
+        var addr_combo = combo.up('form').down('[name=addr_combo]', false);
+        //        console.log(addr_field);
+        if(addr_field) {
+            //如果地址是“紫金港校区：西湖区余杭塘路866号；玉泉校区：西湖区浙大路38号”这样的形式，
+            //也即包含分号，则把多地址解析一下放到addr_combo里供选
+            var addr = records[0].get('addr');
+            var addr_array = addr.split("；");
+
+            if(addr_array.length === 1) {
+                addr_combo.getStore().removeAll();
+                addr_combo.setValue();
+                addr_field.setValue(addr);
+            } else {
+                var addr_store = [];
+                Ext.Array.each(addr_array, function(item) {
+                    addr_store.push({name: item.split("：")[0], address: item.split("：")[1]});
+                });
+                addr_combo.getStore().loadData(addr_store);
+                addr_combo.expand();
+                addr_combo.setValue(addr_array[0].split("：")[1]);
+                addr_field.setValue(addr_array[0].split("：")[1]);
             }
         }
     },
@@ -483,6 +549,61 @@ Ext.define('EIM.controller.Etscuxes', {
         load_uniq_controller(me, 'PopUnits');
         //把已经填的值带给弹出的窗口
         var form = Ext.widget('pop_unit_form');
+        form.show('', function(){
+            form.down('[name=name|en_name|unit_aliases>unit_alias]').setValue(value);
+            form.down('[name=source_element_id]').setValue(button.id);
+        });
+    },
+
+    /**
+     * 如果有VIP下拉框在同一表单内(比如本身就是“新增VIP”的表单，则不会有选择VIP的下拉框)，
+     * 则给此VIP下拉框加一个参数：当前选中VIP单位ID
+     * 如果有“地址”在同一表单内，则把返回的地址填进去作为默认值
+     */
+    addParamsToVipCombo: function(combo, records, eOpts) {
+        var expandable_combo = combo.up('form').down('expandable_vip_combo', false);
+        if(expandable_combo) {
+            var vip_combo = expandable_combo.down('combo', false);
+            vip_combo.getStore().getProxy().setExtraParam('vip_unit_id', records[0]["data"]["id"]);
+            vip_combo.reset();
+        }
+        var addr_field = combo.up('form').down('[name=addr]', false);
+        var addr_combo = combo.up('form').down('[name=addr_combo]', false);
+        //        console.log(addr_field);
+        if(addr_field) {
+            //如果地址是“紫金港校区：西湖区余杭塘路866号；玉泉校区：西湖区浙大路38号”这样的形式，
+            //也即包含分号，则把多地址解析一下放到addr_combo里供选
+            var addr = records[0].get('addr');
+            console.log(records);
+            var addr_array = addr.split("；");
+
+            if(addr_array.length === 1) {
+                addr_combo.getStore().removeAll();
+                addr_combo.setValue();
+                addr_field.setValue(addr);
+            } else {
+                var addr_store = [];
+                Ext.Array.each(addr_array, function(item) {
+                    addr_store.push({name: item.split("：")[0], address: item.split("：")[1]});
+                });
+                addr_combo.getStore().loadData(addr_store);
+                addr_combo.expand();
+                addr_combo.setValue(addr_array[0].split("：")[1]);
+                addr_field.setValue(addr_array[0].split("：")[1]);
+            }
+        }
+    },
+
+    /**
+     * 弹出“新增VIP单位”的表单，并把已经填的值放进表彰里
+     * @param button
+     */
+    popUpVipUnitFormAndSetValue: function(button) {
+        var me = this;
+        var value = button.up('expandable_vip_unit_combo').down('combo', false).getRawValue();
+        load_uniq_controller(me, 'VipUnits');
+        //把已经填的值带给弹出的窗口
+        var form = Ext.widget('vip_unit_form');
         form.show('', function(){
             form.down('[name=name|en_name|unit_aliases>unit_alias]').setValue(value);
             form.down('[name=source_element_id]').setValue(button.id);

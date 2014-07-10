@@ -237,7 +237,7 @@ Ext.define('EIM.controller.ExpressSheets', {
                     var msg = Ext.decode(response.responseText);
                     win.close();
                     Ext.example.msg('成功', msg.message);
-                    Ext.getStore('Contracts').load();
+//                    Ext.getStore('Contracts').load();
                 },
                 failure: function() {
                     Ext.Msg.alert('错误','可能是网络问题，请找Terry处理');

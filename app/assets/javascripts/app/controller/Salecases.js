@@ -191,12 +191,12 @@ Ext.define('EIM.controller.Salecases', {
     },
 
     /*
-     * 打开“添加商务相关联系人”窗口时，把客户combo里带的business_contact_unit的过滤条件清除掉
+     * 打开“添加商务相关联系人”窗口时，把客户combo里带的business_unit的过滤条件清除掉
      */
     resetBusinessContactStore: function(window) {
         var expandable_combo = window.down('expandable_business_contact_combo');
         var business_contact_combo = expandable_combo.down('combo', false);
-        business_contact_combo.getStore().getProxy().setExtraParam('business_contact_unit_id', null);
+        business_contact_combo.getStore().getProxy().setExtraParam('business_unit_id', null);
     },
 
     addCustomerFrom: function() {

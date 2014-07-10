@@ -1,23 +1,23 @@
-Ext.define('EIM.view.pop.Panel', {
+Ext.define('EIM.view.vip.Panel', {
     extend: 'Ext.panel.Panel',
-    alias: 'widget.pop_panel',
+    alias: 'widget.vip_panel',
 
     layout: 'border',
     padding: 4,
     items: [
         {
-            xtype: 'pop_grid',
+            xtype: 'vip_grid',
             name: 'source_grid',
             region: 'north',
-            title: '公共联系人列表',
+            title: 'VIP联系人列表',
             flex: 2,
             split: true,
             multiSelect: true,
             viewConfig: {
                 plugins: {
                     ptype: 'gridviewdragdrop',
-                    dragGroup: 'sourceGridPops',
-                    dropGroup: 'targetGridPops'
+                    dragGroup: 'sourceGridVips',
+                    dropGroup: 'targetGridVips'
                 },
                 getRowClass: function(record, index, rowParams) {
                     if(!record.get('editable')) {
@@ -29,25 +29,25 @@ Ext.define('EIM.view.pop.Panel', {
             bbar: [
                 {
                     xtype: 'button',
-                    text: '新增公共联系人',
+                    text: '新增VIP联系人',
                     iconCls: 'btn_add',
-                    action: 'addPop'
+                    action: 'addVip'
                 }
             ]
         },
         {
-            xtype: 'pop_grid',
+            xtype: 'vip_grid',
             name: 'target_grid',
             region: 'center',
-            store: 'EmptyGridPops',
-            title: '待操作公共联系人',
+            store: 'EmptyGridVips',
+            title: '待操作VIP联系人',
             flex: 1,
             multiSelect: true,
             viewConfig: {
                 plugins: {
                     ptype: 'gridviewdragdrop',
-                    dragGroup: 'sourceGridPops',
-                    dropGroup: 'sourceGridPops'
+                    dragGroup: 'sourceGridVips',
+                    dropGroup: 'sourceGridVips'
                 }
             },
             displayPaging: true,
@@ -62,7 +62,7 @@ Ext.define('EIM.view.pop.Panel', {
                 {
                     xtype: 'hidden',
                     hidden: true,
-                    name: 'pop_ids'
+                    name: 'vip_ids'
                 },
                 {
                     xtype: 'popup_express_grid_button',

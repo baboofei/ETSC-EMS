@@ -482,3 +482,4 @@ LEFT JOIN users AS u2 ON gu2.user_id = u2.id").map(&:id) if sale.groups.to_s.mat
         end
     end
 end
+

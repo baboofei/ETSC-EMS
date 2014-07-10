@@ -1,4 +1,4 @@
-Ext.define('EIM.model.ComboVendorUnit', {
+Ext.define('EIM.model.ComboVipUnit', {
     extend: 'Ext.data.Model',
     fields: [
         {

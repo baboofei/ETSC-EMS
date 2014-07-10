@@ -16,7 +16,7 @@ class PopUnitAlias < ActiveRecord::Base
     end
 
     def self.create_or_update_with(params, user_id)
-        item = "客户单位别称"
+        item = "公共单位别称"
         if !params[:id].blank?
             message = $etsc_update_ok
         else

@@ -81,6 +81,10 @@ class User < ActiveRecord::Base
     has_many :pop_units
     has_many :pop_unit_aliases
     has_many :pops
+
+    has_many :vip_units
+    has_many :vip_unit_aliases
+    has_many :vips
     #TODO 在职的和离职的要分开
     scope :at_job, where(:status => 1)
     scope :business, at_job.where("roles.id = 5").includes(:roles)

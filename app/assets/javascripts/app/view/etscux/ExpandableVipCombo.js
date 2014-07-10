@@ -1,10 +1,10 @@
 /**
- * 自定义的组件，包含一个公共联系人的combo框以及一个“+”按钮
+ * 自定义的组件，包含一个VIP联系人的combo框以及一个“+”按钮
  */
 
-Ext.define('EIM.view.etscux.ExpandablePopCombo', {
+Ext.define('EIM.view.etscux.ExpandableVipCombo', {
     extend: 'Ext.container.Container',
-    alias: 'widget.expandable_pop_combo',
+    alias: 'widget.expandable_vip_combo',
 
     initComponent: function() {
         Ext.tip.QuickTipManager.init();
@@ -14,8 +14,8 @@ Ext.define('EIM.view.etscux.ExpandablePopCombo', {
         this.items = [{
             xtype: 'combo',
             fieldLabel: (this.fieldLabel || '供方联系人'),
-            name: 'pop_id',
-            store: 'ComboPops',
+            name: 'vip_id',
+            store: 'ComboVips',
             flex: 1,
             displayField: 'name',
             valueField: 'id',
@@ -29,7 +29,7 @@ Ext.define('EIM.view.etscux.ExpandablePopCombo', {
             fieldLabel: '',
             labelWidth: 0,
             text: '+',
-            action: 'add_pop',
+            action: 'add_vip',
             tooltip: '新增联系人',
             hidden:(this.hiddenPlus || false),
             disabled:(this.disabledPlus || false)

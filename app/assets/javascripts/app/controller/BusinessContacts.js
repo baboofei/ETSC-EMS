@@ -225,7 +225,6 @@ Ext.define('EIM.controller.BusinessContacts', {
         var mobile = form.down('[name=mobile]', false);
         var phone = form.down('[name=phone]', false);
         var fax = form.down('[name=fax]',false);
-        console.log("A");
         mobile.setValue(record[0].get("mobile"));
         phone.setValue(record[0].get("phone"));
         fax.setValue(record[0].get("fax"));

@@ -96,16 +96,20 @@ Ext.define('EIM.controller.Functions', {
      */
     onTabLoad:function (controller) {
         var me = this;
+        load_uniq_controller(me, controller);
         var ux_controllers_array = [
             "Salecases", "Customers", "CustomerUnits", "Contracts", "Quotes", "Products", "AdminInventories", "PersonalMessages",
-            "BusinessContacts", "MaterialCodes", "Vendors", "FlowSheets", "Pops", "ExpressSheets"
+            "BusinessContacts", "MaterialCodes", "Vendors", "FlowSheets", "Pops", "Vips", "ExpressSheets"
         ];
-        load_uniq_controller(me, controller);
-        if (Ext.Array.indexOf(ux_controllers_array, controller) != -1) {
+        if(Ext.Array.indexOf(ux_controllers_array, controller) != -1) {
             load_uniq_controller(me, 'Etscuxes');
         }
-        if(controller === "Customers" || controller === "Salecases" || controller === "Vendors" || controller === "BusinessContacts" || controller === "Pops") {
-            //“客户管理”、“销售个案管理”、“供应商管理”、“商务相关联系人管理”、“公共联系人管理”里要用到打印快递单，没别的地儿加载
+
+        var express_controllers_array = [
+            "Customers", "Salecases", "Vendors", "BusinessContacts", "Pops", "Vips"
+        ];
+        //“客户管理”、“销售个案管理”、“供应商管理”、“商务相关联系人管理”、“公共联系人管理”、“VIP管理”里要用到打印快递单，没别的地儿加载
+        if(Ext.Array.indexOf(express_controllers_array, controller) != -1) {
             load_uniq_controller(me, 'ExpressSheets');
         }
     },

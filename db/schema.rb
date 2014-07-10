@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140708012328) do
+ActiveRecord::Schema.define(:version => 20140708023208) do
 
   create_table "accessories", :force => true do |t|
     t.string   "url"
@@ -1250,6 +1250,14 @@ ActiveRecord::Schema.define(:version => 20140708012328) do
     t.string   "user_id"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
+  end
+
+  create_table "vip_unit_aliases", :force => true do |t|
+    t.string   "unit_alias"
+    t.integer  "vip_unit_id"
+    t.integer  "user_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
 
   create_table "vip_units", :force => true do |t|

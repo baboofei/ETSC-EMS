@@ -79,7 +79,7 @@ Ext.define('EIM.view.vendor.Panel', {
                     name: 'vendor_ids'
                 },
                 {
-                    xtype: 'pop_express_grid_button'/*,
+                    xtype: 'popup_express_grid_button'/*,
                     disabled: true*/
 //                },
 //                {

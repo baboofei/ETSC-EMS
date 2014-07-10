@@ -7,7 +7,7 @@
 
 Ext.define('EIM.view.etscux.ReusablePopExpressGridButton', {
     extend: 'Ext.button.Button',
-    alias: 'widget.pop_express_grid_button',
+    alias: 'widget.popup_express_grid_button',
 
     initComponent: function() {
         Ext.tip.QuickTipManager.init();
