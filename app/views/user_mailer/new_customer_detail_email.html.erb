@@ -1,92 +1,91 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
-</head>
-<body>
-
-<table style="border:1px solid #038; width: 1200px; position: static; z-index: auto; ">
-  <!--<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">-->
-  <thead>
-  <tr style="background-color: #038; color: #FFF;">
-    <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
-    <th width="120px">客户单位</th>
-    <th>客户</th>
-    <th>应用</th>
-    <th>销售</th>
-    <th width="600px">末次联系进展</th>
-    <th>末次联系时间</th>
-  </tr>
-  </thead>
-  <tbody>
-  <% valid_customer_size = 0 %>
-  <% @customers.each_with_index do |customer, o_index| %>
-      <% if o_index % 2 == 0 %>
-          <% salecases = customer.salecases %>
-          <% if salecases.size > 0 %>
-              <tr style="border:solid #999;border-width:0 1px 1px 0;">
-                <% salecases.each_with_index do |salecase, index| %>
-                    <% last_salelog = salecase.salelogs.sort_by { |p| p.contact_at }[-1] %>
-                    <% if index == 0 %>
-                        <% salecase_size = salecases.size %>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.customer_unit.blank? ? "请查数据" : customer.customer_unit.name %></td>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.name %></td>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.prod_applications.map(&:description).join("、") %></td>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.group.blank? ? (customer.user.name) : (customer.group.name) %></td>
-                    <% end %>
-                    <% if salecase.salelogs.map(&:complete_reason).include? 1 %>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" colspan="2">成为非目标客户</td>
-                    <% else %>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= raw strip_links(last_salelog['natural_language']) %><%= last_salelog['comment'].blank? ? "" : last_salelog['comment'] %></td>
-                        <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= last_salelog.blank? ? "无" : last_salelog['contact_at'].strftime("%Y-%m-%d") %></td>
-                    <% end %>
-                    </tr>
-                <% end %>
-                <% valid_customer_size += 1 %>
-          <% else %>
-              <tr style="border:solid #999;border-width:0 1px 1px 0;">
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.customer_unit.blank? ? "请查数据" : customer.customer_unit.name %></td>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.name %></td>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.prod_applications.map(&:description).join("、") %></td>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.group.blank? ? (customer.user.name) : (customer.group.name) %></td>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" colspan="2">暂无个案</td>
-              </tr>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <table style="border:1px solid #038; width: 1200px; position: static; z-index: auto; ">
+      <!--<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">-->
+      <thead>
+        <tr style="background-color: #038; color: #FFF;">
+          <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
+          <th width="120px">客户单位</th>
+          <th>客户</th>
+          <th>应用</th>
+          <th>销售</th>
+          <th width="600px">末次联系进展</th>
+          <th>末次联系时间</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% valid_customer_size = 0 %>
+        <% @customers.each_with_index do |customer, o_index| %>
+        <% if o_index % 2 == 0 %>
+        <% salecases = customer.salecases %>
+        <% if salecases.size > 0 %>
+        <tr style="border:solid #999;border-width:0 1px 1px 0;">
+          <% salecases.each_with_index do |salecase, index| %>
+          <% last_salelog = salecase.salelogs.sort_by { |p| p.contact_at }[-1] %>
+          <% if index == 0 %>
+          <% salecase_size = salecases.size %>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.customer_unit.blank? ? "请查数据" : customer.customer_unit.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.prod_applications.map(&:description).join("、") %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.group.blank? ? (customer.user.name) : (customer.group.name) %></td>
           <% end %>
-      <% else %>
-          <% salecases = customer.salecases %>
-          <% if salecases.size > 0 %>
-              <% salecases.each_with_index do |salecase, index| %>
-                  <tr style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;">
-                    <% last_salelog = salecase.salelogs.sort_by { |p| p.contact_at }[-1] %>
-                    <% if index == 0 %>
-                        <% salecase_size = salecases.size %>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.customer_unit.blank? ? "请查数据" : customer.customer_unit.name %></td>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.name %></td>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.prod_applications.map(&:description).join("、") %></td>
-                        <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.group.blank? ? (customer.user.name) : (customer.group.name) %></td>
-                    <% end %>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= raw strip_links(last_salelog['natural_language']) %><%= last_salelog['comment'].blank? ? "" : last_salelog['comment'] %></td>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= last_salelog.blank? ? "无" : last_salelog['contact_at'].strftime("%Y-%m-%d") %></td>
-                  </tr>
-              <% end %>
-              <% valid_customer_size += 1 %>
+          <% if salecase.salelogs.map(&:complete_reason).include? 1 %>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" colspan="2">成为非目标客户</td>
           <% else %>
-              <tr style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;">
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.customer_unit.blank? ? "请查数据" : customer.customer_unit.name %></td>
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.name %></td>
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.prod_applications.map(&:description).join("、") %></td>
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.group.blank? ? (customer.user.name) : (customer.group.name) %></td>
-                <% if customer.is_obsolete == 0 %>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" colspan="2">非目标客户</td>
-                <% else %>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" colspan="2">暂无个案</td>
-                <% end %>
-              </tr>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= raw strip_links(last_salelog['natural_language']) %><%= last_salelog['comment'].blank? ? "" : last_salelog['comment'] %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= last_salelog.blank? ? "无" : last_salelog['contact_at'].strftime("%Y-%m-%d") %></td>
           <% end %>
-      <% end %>
-  <% end %>
-  </tbody>
-</table>
-<p>共计 <%= @customers.size %> 个客户，其中有效客户 <%= valid_customer_size %> 个。</p>
-</body>
+        </tr>
+        <% end %>
+        <% valid_customer_size += 1 %>
+        <% else %>
+        <tr style="border:solid #999;border-width:0 1px 1px 0;">
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.customer_unit.blank? ? "请查数据" : customer.customer_unit.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.prod_applications.map(&:description).join("、") %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.group.blank? ? (customer.user.name) : (customer.group.name) %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" colspan="2">暂无个案</td>
+        </tr>
+        <% end %>
+        <% else %>
+        <% salecases = customer.salecases %>
+        <% if salecases.size > 0 %>
+        <% salecases.each_with_index do |salecase, index| %>
+        <tr style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;">
+          <% last_salelog = salecase.salelogs.sort_by { |p| p.contact_at }[-1] %>
+          <% if index == 0 %>
+          <% salecase_size = salecases.size %>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.customer_unit.blank? ? "请查数据" : customer.customer_unit.name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.prod_applications.map(&:description).join("、") %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan=<%= salecase_size %>><%= customer.group.blank? ? (customer.user.name) : (customer.group.name) %></td>
+          <% end %>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= raw strip_links(last_salelog['natural_language']) %><%= last_salelog['comment'].blank? ? "" : last_salelog['comment'] %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= last_salelog.blank? ? "无" : last_salelog['contact_at'].strftime("%Y-%m-%d") %></td>
+        </tr>
+        <% end %>
+        <% valid_customer_size += 1 %>
+        <% else %>
+        <tr style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;">
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.customer_unit.blank? ? "请查数据" : customer.customer_unit.name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.prod_applications.map(&:description).join("、") %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= customer.group.blank? ? (customer.user.name) : (customer.group.name) %></td>
+          <% if customer.is_obsolete == 0 %>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" colspan="2">非目标客户</td>
+          <% else %>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" colspan="2">暂无个案</td>
+          <% end %>
+        </tr>
+        <% end %>
+        <% end %>
+        <% end %>
+      </tbody>
+    </table>
+    <p>共计 <%= @customers.size %> 个客户，其中有效客户 <%= valid_customer_size %> 个。</p>
+  </body>
 </html>

@@ -1,50 +1,50 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
-</head>
-<body>
-<h3>按销售</h3>
-<table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
-  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
-    <th>销售/项目组</th>
-    <th>个案数</th>
-    <th>报价数</th>
-    <th>合同数</th>
-  </tr>
-  <% @groups.each do |group| %>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <h3>按销售</h3>
+    <table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
+      <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+        <th>销售/项目组</th>
+        <th>个案数</th>
+        <th>报价数</th>
+        <th>合同数</th>
+      </tr>
+      <% @groups.each do |group| %>
       <tr>
         <td><%= group.name %></td>
         <td><%= Salecase.count_via_user(@start_at, @end_at, "group", group.id) %></td>
         <td><%= Quote.count_via_user(@start_at, @end_at, "group", group.id) %></td>
         <td><%= Contract.count_via_user(@start_at, @end_at, "group", group.id) %></td>
       </tr>
-  <% end %>
-  <% @sales.each do |sale| %>
+      <% end %>
+      <% @sales.each do |sale| %>
       <tr>
         <td><%= sale.name %></td>
         <td><%= Salecase.count_via_user(@start_at, @end_at, "user", sale.id) %></td>
         <td><%= Quote.count_via_user(@start_at, @end_at, "user", sale.id) %></td>
         <td><%= Contract.count_via_user(@start_at, @end_at, "user", sale.id) %></td>
       </tr>
-  <% end %>
-</table>
-<h3>按区域</h3>
-<table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
-  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
-    <th>区域</th>
-    <th>个案数</th>
-    <th>报价数</th>
-    <th>合同数</th>
-  </tr>
-  <% @areas.each do |area| %>
+      <% end %>
+    </table>
+    <h3>按区域</h3>
+    <table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
+      <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+        <th>区域</th>
+        <th>个案数</th>
+        <th>报价数</th>
+        <th>合同数</th>
+      </tr>
+      <% @areas.each do |area| %>
       <tr>
         <td><%= area.name %></td>
         <td><%= Salecase.count_via_area(@start_at, @end_at, area.id) %></td>
         <td><%= Quote.count_via_area(@start_at, @end_at, area.id) %></td>
         <td><%= Contract.count_via_area(@start_at, @end_at, area.id) %></td>
       </tr>
-  <% end %>
-</table>
-</body>
+      <% end %>
+    </table>
+  </body>
 </html>

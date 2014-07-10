@@ -1,20 +1,19 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
-</head>
-<body>
-
-<table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
-  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
-    <th style="width: 100px;">合同号</th>
-    <th style="width: 200px;">客户单位</th>
-    <th style="width: 70px;">签署时间</th>
-    <th style="width: 70px;">销售</th>
-    <th style="width: 200px;">付款方式</th>
-    <th style="width: 70px;">审批人</th>
-  </tr>
-  <% @all_contracts.each do |contract| %>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
+      <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+        <th style="width: 100px;">合同号</th>
+        <th style="width: 200px;">客户单位</th>
+        <th style="width: 70px;">签署时间</th>
+        <th style="width: 70px;">销售</th>
+        <th style="width: 200px;">付款方式</th>
+        <th style="width: 70px;">审批人</th>
+      </tr>
+      <% @all_contracts.each do |contract| %>
       <tr style="text-align: right; background-color: #F4F4F4;">
         <td><%= contract[0].number %></td>
         <td><%= contract[0].customer_unit.name %></td>
@@ -23,7 +22,7 @@
         <td><%= contract[0].pay_mode.name %></td>
         <td><%= contract[1] %></td>
       </tr>
-  <% end %>
-</table>
-</body>
+      <% end %>
+    </table>
+  </body>
 </html>

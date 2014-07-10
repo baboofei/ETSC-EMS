@@ -16,12 +16,10 @@ Ext.define('EIM.controller.MInquires', {
         'm_inquire.TransferForm'
     ],
 
-    refs: [
-        {
-            ref: 'grid',
-            selector: 'm_inquire_grid'
-        }
-    ],
+    refs: [{
+        ref: 'grid',
+        selector: 'm_inquire_grid'
+    }],
 
     init: function() {
         this.control({
@@ -51,7 +49,7 @@ Ext.define('EIM.controller.MInquires', {
 
     editMInquire: function() {
         var record = this.getGrid().getSelectedItem();
-        if(record.get('transferred') === false) {
+        if (record.get('transferred') === false) {
             //转走了的不能编辑
             var view = Ext.widget('m_inquire_form').show();
             view.down('form', false).loadRecord(record);
@@ -62,7 +60,7 @@ Ext.define('EIM.controller.MInquires', {
         var win = button.up('window');
         var form = win.down('form', false);
 
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.submit({
@@ -84,7 +82,7 @@ Ext.define('EIM.controller.MInquires', {
         var grid = this.getGrid();
         var trans_btn = grid.down('button[action=transferMInquire]', false);
 
-        if(selections.length > 0 && selections[0].get('transferred') === false) {
+        if (selections.length > 0 && selections[0].get('transferred') === false) {
             trans_btn.enable();
         } else {
             trans_btn.disable();
@@ -102,7 +100,7 @@ Ext.define('EIM.controller.MInquires', {
         var selection = grid.getSelectionModel().getSelection();
         var customer_ids = Ext.Array.pluck(Ext.Array.pluck(selection, "data"), "id");
         var customer_ids_str = customer_ids.join("|");
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
 
@@ -111,8 +109,8 @@ Ext.define('EIM.controller.MInquires', {
                 params: {
                     customer_ids: customer_ids_str
                 },
-                submitEmptyText:false,
-                success: function(the_form, action){
+                submitEmptyText: false,
+                success: function(the_form, action) {
                     var response = action.response;
                     var msg = Ext.decode(response.responseText);
                     win.close();

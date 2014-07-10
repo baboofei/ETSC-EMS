@@ -1,72 +1,70 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-</head>
-<body>
-<h3>合同通知</h3>
-
-
-<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">
-  <tbody>
-  <tr style="background-color: #038;">
-    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">卖方</td>
-    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.our_company.name %></td>
-  </tr>
-  <tr style="background-color: #038;">
-    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">类型</td>
-    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract_type %></td>
-  </tr>
-  <tr style="background-color: #038;">
-    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">负责工程师</td>
-    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.signer.name %></td>
-  </tr>
-  <tr style="background-color: #038;">
-    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">合同号</td>
-    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.number %></td>
-  </tr>
-  <tr style="background-color: #038;">
-    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">PO 号</td>
-    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"></td>
-  </tr>
-  <tr style="background-color: #038;">
-    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">外部合同号</td>
-    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.customer_number %></td>
-  </tr>
-  <tr style="background-color: #038;">
-    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">合同金额</td>
-    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.currency.name %><%= "%0.2f" % @contract.sum %></td>
-  </tr>
-  <tr style="background-color: #038;">
-    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">人民币金额</td>
-    <% if @contract.rmb.blank? || @contract.rmb == 0 %>
-        <% rmb = @contract.sum %>
-    <% else %>
-        <% rmb = @contract.rmb %>
-    <% end %>
-    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= rmb %></td>
-  </tr>
-  <tr style="background-color: #038;">
-    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">工厂</td>
-    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @vendor_unit_names %></td>
-  </tr>
-  <tr style="background-color: #038;">
-    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">产品概述</td>
-    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.summary %></td>
-  </tr>
-  <tr style="background-color: #038;">
-    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">最终用户</td>
-    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.customer_unit.name %> <%= @contract.end_user.name %></td>
-  </tr>
-  <tr style="background-color: #038;">
-    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">付款方式</td>
-    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.pay_mode.name %></td>
-  </tr>
-  <tr style="background-color: #038;">
-    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">备注</td>
-    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.comment %></td>
-  </tr>
-  </tbody>
-</table>
-</body>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  </head>
+  <body>
+    <h3>合同通知</h3>
+    <table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">
+      <tbody>
+        <tr style="background-color: #038;">
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">卖方</td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.our_company.name %></td>
+        </tr>
+        <tr style="background-color: #038;">
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">类型</td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract_type %></td>
+        </tr>
+        <tr style="background-color: #038;">
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">负责工程师</td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.signer.name %></td>
+        </tr>
+        <tr style="background-color: #038;">
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">合同号</td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.number %></td>
+        </tr>
+        <tr style="background-color: #038;">
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">PO 号</td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"></td>
+        </tr>
+        <tr style="background-color: #038;">
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">外部合同号</td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.customer_number %></td>
+        </tr>
+        <tr style="background-color: #038;">
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">合同金额</td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.currency.name %><%= "%0.2f" % @contract.sum %></td>
+        </tr>
+        <tr style="background-color: #038;">
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">人民币金额</td>
+          <% if @contract.rmb.blank? || @contract.rmb == 0 %>
+          <% rmb = @contract.sum %>
+          <% else %>
+          <% rmb = @contract.rmb %>
+          <% end %>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= rmb %></td>
+        </tr>
+        <tr style="background-color: #038;">
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">工厂</td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @vendor_unit_names %></td>
+        </tr>
+        <tr style="background-color: #038;">
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">产品概述</td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.summary %></td>
+        </tr>
+        <tr style="background-color: #038;">
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">最终用户</td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.customer_unit.name %> <%= @contract.end_user.name %></td>
+        </tr>
+        <tr style="background-color: #038;">
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">付款方式</td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.pay_mode.name %></td>
+        </tr>
+        <tr style="background-color: #038;">
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px; color: #FFF;">备注</td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= @contract.comment %></td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
 </html>

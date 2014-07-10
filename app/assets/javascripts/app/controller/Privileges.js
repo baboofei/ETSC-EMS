@@ -27,20 +27,16 @@ Ext.define('EIM.controller.Privileges', {
         'privilege.DataForm'
     ],
 
-    refs: [
-        {
-            ref: 'functiongrid',
-            selector: 'privilege_function_grid'
-        },
-        {
-            ref: 'elementgrid',
-            selector: 'privilege_element_grid'
-        },
-        {
-            ref: 'datagrid',
-            selector: 'privilege_data_grid'
-        }
-    ],
+    refs: [{
+        ref: 'functiongrid',
+        selector: 'privilege_function_grid'
+    }, {
+        ref: 'elementgrid',
+        selector: 'privilege_element_grid'
+    }, {
+        ref: 'datagrid',
+        selector: 'privilege_data_grid'
+    }],
 
     init: function() {
         var me = this;
@@ -51,7 +47,7 @@ Ext.define('EIM.controller.Privileges', {
                 }
             },
             '#test_privilege, #test_text_field, #function_name': {
-//                beforerender: this.applyPrivilege
+                //                beforerender: this.applyPrivilege
             },
 
             'privilege_function_form [action=save]': {
@@ -95,13 +91,16 @@ Ext.define('EIM.controller.Privileges', {
         var disabled_array = all_elements["elements"]["disabled"];
         var disabled_elements = Ext.Array.pluck(disabled_array, "element_id");
         var default_value_array = Ext.Array.map(disabled_array, function(item, index) {
-            return {"element_id": item.element_id, "default_value": item.default_value};
+            return {
+                "element_id": item.element_id,
+                "default_value": item.default_value
+            };
         });
 
         Ext.Array.each(default_value_array, function(item) {
-            if(item["element_id"] === component["id"]) {
-//                console.log(Ext.isEmpty(item["default_value"]));
-                if(!Ext.isEmpty(item["default_value"])) {
+            if (item["element_id"] === component["id"]) {
+                //                console.log(Ext.isEmpty(item["default_value"]));
+                if (!Ext.isEmpty(item["default_value"])) {
                     var text = item["default_value"];
                     //不同xtype的组件，对“值”的定义不同
                     switch (component.xtype) {
@@ -132,7 +131,7 @@ Ext.define('EIM.controller.Privileges', {
         var role_ids = form.down('[name=visible_to_ids]', false).getValue();
         button.disable();
         form.submit({
-            url:'/functions/function_privileges',
+            url: '/functions/function_privileges',
             method: 'POST',
             submitEmptyText: false,
             params: {
@@ -145,7 +144,7 @@ Ext.define('EIM.controller.Privileges', {
                 Ext.getStore("FunctionPrivileges").load();
             },
             failure: function() {
-                Ext.Msg.alert('错误','可能是网络问题，请找Terry处理');
+                Ext.Msg.alert('错误', '可能是网络问题，请找Terry处理');
             }
         });
     },
@@ -162,7 +161,7 @@ Ext.define('EIM.controller.Privileges', {
         var disable_role_ids = Ext.Array.pluck(Ext.Array.pluck(form.down('[name=disable_to]', false).getStore().data.items, "data"), "id");
         button.disable();
         form.submit({
-            url:'/privileges/element_privileges',
+            url: '/privileges/element_privileges',
             method: 'POST',
             submitEmptyText: false,
             params: {
@@ -174,10 +173,10 @@ Ext.define('EIM.controller.Privileges', {
                 Ext.example.msg('成功', return_message.message);
                 win.close();
                 Ext.getStore("ElementPrivileges").load();
-//                Ext.getStore('Quotes').load();
+                //                Ext.getStore('Quotes').load();
             },
             failure: function() {
-                Ext.Msg.alert('错误','可能是网络问题，请找Terry处理');
+                Ext.Msg.alert('错误', '可能是网络问题，请找Terry处理');
             }
         });
     },
@@ -195,7 +194,7 @@ Ext.define('EIM.controller.Privileges', {
         var partial_editable_role_ids = Ext.Array.pluck(Ext.Array.pluck(form.down('[name=partial_editable_to]', false).getStore().data.items, "data"), "id");
         button.disable();
         form.submit({
-            url:'/stores/store_privileges',
+            url: '/stores/store_privileges',
             submitEmptyText: false,
             params: {
                 visible_role_ids: visible_role_ids.join("|"),
@@ -208,7 +207,7 @@ Ext.define('EIM.controller.Privileges', {
                 Ext.getStore("DataPrivileges").load();
             },
             failure: function() {
-                Ext.Msg.alert('错误','可能是网络问题，请找Terry处理');
+                Ext.Msg.alert('错误', '可能是网络问题，请找Terry处理');
             }
         });
     },
@@ -218,7 +217,7 @@ Ext.define('EIM.controller.Privileges', {
         var view = Ext.widget('privilege_function_form').show();
         //view.down('form', false).loadRecord(record);
         //先loadRecord的话会造成boxselect里的值回填不正常，反正就两个域，不loadRecord了
-        var role_array = Ext.Array.map(record.get('visible_to_ids').split("|"), function(value){
+        var role_array = Ext.Array.map(record.get('visible_to_ids').split("|"), function(value) {
             return Number(value);
         });
         view.down('form', false).down('boxselect').setValue(role_array);
@@ -239,9 +238,12 @@ Ext.define('EIM.controller.Privileges', {
         var invisible_id_array = record.get('invisible_to_ids').split('|');
         var invisible_name_array = record.get('invisible_to_names').split('、');
         var invisible_grid_array = [];
-        if(!Ext.isEmpty(invisible_id_array[0])) {
+        if (!Ext.isEmpty(invisible_id_array[0])) {
             Ext.Array.each(invisible_id_array, function(item, index) {
-                invisible_grid_array.push({id: item, name: invisible_name_array[index]});
+                invisible_grid_array.push({
+                    id: item,
+                    name: invisible_name_array[index]
+                });
                 Ext.getStore('GridRoles').remove(Ext.getStore('GridRoles').getById(Number(item)));
             });
         }
@@ -250,9 +252,12 @@ Ext.define('EIM.controller.Privileges', {
         var disable_id_array = record.get('disable_to_ids').split('|');
         var disable_name_array = record.get('disable_to_names').split('、');
         var disable_grid_array = [];
-        if(!Ext.isEmpty(disable_id_array[0])) {
+        if (!Ext.isEmpty(disable_id_array[0])) {
             Ext.Array.each(disable_id_array, function(item, index) {
-                disable_grid_array.push({id: item, name: disable_name_array[index]});
+                disable_grid_array.push({
+                    id: item,
+                    name: disable_name_array[index]
+                });
                 Ext.getStore('GridRoles').remove(Ext.getStore('GridRoles').getById(Number(item)));
             });
         }
@@ -279,9 +284,12 @@ Ext.define('EIM.controller.Privileges', {
         var visible_id_array = record.get('visible_to_roles>visible_role_id').split('|');
         var visible_name_array = record.get('visible_to_roles>visible_role_name').split('、');
         var visible_grid_array = [];
-        if(!Ext.isEmpty(visible_id_array[0])) {
+        if (!Ext.isEmpty(visible_id_array[0])) {
             Ext.Array.each(visible_id_array, function(item, index) {
-                visible_grid_array.push({id: item, name: visible_name_array[index]});
+                visible_grid_array.push({
+                    id: item,
+                    name: visible_name_array[index]
+                });
                 Ext.getStore('GridRoles').remove(Ext.getStore('GridRoles').getById(Number(item)));
             });
         }
@@ -290,9 +298,12 @@ Ext.define('EIM.controller.Privileges', {
         var editable_id_array = record.get('editable_to_ids').split('|');
         var editable_name_array = record.get('editable_to_names').split('、');
         var editable_grid_array = [];
-        if(!Ext.isEmpty(editable_id_array[0])) {
+        if (!Ext.isEmpty(editable_id_array[0])) {
             Ext.Array.each(editable_id_array, function(item, index) {
-                editable_grid_array.push({id: item, name: editable_name_array[index]});
+                editable_grid_array.push({
+                    id: item,
+                    name: editable_name_array[index]
+                });
                 Ext.getStore('GridRoles').remove(Ext.getStore('GridRoles').getById(Number(item)));
             });
         }
@@ -301,9 +312,12 @@ Ext.define('EIM.controller.Privileges', {
         var partial_editable_id_array = record.get('partial_editable_to_ids').split('|');
         var partial_editable_name_array = record.get('partial_editable_to_names').split('、');
         var partial_editable_grid_array = [];
-        if(!Ext.isEmpty(partial_editable_id_array[0])) {
+        if (!Ext.isEmpty(partial_editable_id_array[0])) {
             Ext.Array.each(partial_editable_id_array, function(item, index) {
-                partial_editable_grid_array.push({id: item, name: partial_editable_name_array[index]});
+                partial_editable_grid_array.push({
+                    id: item,
+                    name: partial_editable_name_array[index]
+                });
                 Ext.getStore('GridRoles').remove(Ext.getStore('GridRoles').getById(Number(item)));
             });
         }

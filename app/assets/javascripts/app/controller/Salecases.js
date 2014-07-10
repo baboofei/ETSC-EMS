@@ -10,7 +10,8 @@ Ext.define('EIM.controller.Salecases', {
         'Customers',
         'MiniCustomers',
         'MiniBusinessContacts',
-        'ComboGroups'/*,
+        'ComboGroups'
+        /*,
         'dict.SalelogProcesses',
         'dict.SalelogPriorities',
         'dict.Expresses'*/
@@ -22,9 +23,9 @@ Ext.define('EIM.controller.Salecases', {
         'MiniCustomer',
         'MiniBusinessContact',
         'ComboGroup',
-//        'dict.SalelogProcess',
-//        'dict.SalelogPriority',
-//        'dict.Express',
+        //        'dict.SalelogProcess',
+        //        'dict.SalelogPriority',
+        //        'dict.Express',
         'ComboUser'
     ],
 
@@ -33,8 +34,8 @@ Ext.define('EIM.controller.Salecases', {
         'salecase.Grid',
         'salelog.Grid',
         'salecase.Detail',
-//        'etscux.ExpandableCustomerUnitCombo',
-//        'etscux.ExpandableCustomerCombo',
+        //        'etscux.ExpandableCustomerUnitCombo',
+        //        'etscux.ExpandableCustomerCombo',
         'customer.MiniGrid',
         'business_contact.MiniGrid',
         'salecase.Form',
@@ -44,8 +45,8 @@ Ext.define('EIM.controller.Salecases', {
     init: function() {
         var me = this;
         var salelog_tip = Ext.create('Ext.tip.ToolTip', {
-            autoHide : false,
-            closable : true,
+            autoHide: false,
+            closable: true,
             draggable: true,
             resizable: true,
             maxWidth: 500
@@ -92,19 +93,19 @@ Ext.define('EIM.controller.Salecases', {
             },
             //个案信息修改的“确定”按钮
             'button[action=salecaseSubmit]': {
-            	click: this.salecaseSubmit
+                click: this.salecaseSubmit
             },
             //“新增个案”表单的“保存”按钮
             'salecase_form button[action=save]': {
                 click: this.salecaseFormSubmit
             },
-//            //“推荐产品”表单的“保存”按钮
-//            'recommend_item_form button[action=save]': {
-//                click: this.recommendItemSubmit
-//            },
+            //            //“推荐产品”表单的“保存”按钮
+            //            'recommend_item_form button[action=save]': {
+            //                click: this.recommendItemSubmit
+            //            },
             'salelog_grid': {
                 cellclick: function(grid, td, cellIndex, record, tr, rowIndex, e) {
-                    if(td.innerHTML.indexOf("</a>") === -1) {
+                    if (td.innerHTML.indexOf("</a>") === -1) {
                         salelog_tip.update(td.innerHTML);
                         salelog_tip.show();
                         salelog_tip.setPosition(e.getXY());
@@ -116,10 +117,10 @@ Ext.define('EIM.controller.Salecases', {
             },
             'salelog_form': {
                 close: function() {
-//                    if(Ext.ComponentQuery.query("recommended_item_grid")) Ext.ComponentQuery.query("recommended_item_grid")[0].destroy();
-//                    if(Ext.ComponentQuery.query("recommend_tab")) Ext.ComponentQuery.query("recommend_tab")[0].destroy();
-//                    if(Ext.ComponentQuery.query("salelog_form")) Ext.ComponentQuery.query("salelog_form")[0].destroy();
-//                    console.log("recommended_item_grid 被销毁了");
+                    //                    if(Ext.ComponentQuery.query("recommended_item_grid")) Ext.ComponentQuery.query("recommended_item_grid")[0].destroy();
+                    //                    if(Ext.ComponentQuery.query("recommend_tab")) Ext.ComponentQuery.query("recommend_tab")[0].destroy();
+                    //                    if(Ext.ComponentQuery.query("salelog_form")) Ext.ComponentQuery.query("salelog_form")[0].destroy();
+                    //                    console.log("recommended_item_grid 被销毁了");
                 }
             },
             'salecase_transfer_form button[action=save]': {
@@ -138,8 +139,8 @@ Ext.define('EIM.controller.Salecases', {
                 render: this.loadWaitController
             }
         });
-//      Ext.create("EIM.view.salecase.Layout", {
-//      });
+        //      Ext.create("EIM.view.salecase.Layout", {
+        //      });
     },
 
     /**
@@ -167,10 +168,10 @@ Ext.define('EIM.controller.Salecases', {
         load_uniq_controller(me, 'Salelogs');
         //新增销售工作日志时加载第一个标签页“推荐”的controller，其它的标签激活时再加载
         load_uniq_controller(me, 'salelog.Recommend');
-//        load_uniq_controller(me, 'Salelogs');
-        Ext.widget('salelog_form').show("", function(){
-//            Ext.ComponentQuery.query("salelog_form>container>tabpanel")[0].items.getAt(3).setDisabled(true);
-//            Ext.ComponentQuery.query("salelog_form>container>tabpanel")[0].setActiveTab(2);
+        //        load_uniq_controller(me, 'Salelogs');
+        Ext.widget('salelog_form').show("", function() {
+            //            Ext.ComponentQuery.query("salelog_form>container>tabpanel")[0].items.getAt(3).setDisabled(true);
+            //            Ext.ComponentQuery.query("salelog_form>container>tabpanel")[0].setActiveTab(2);
             Ext.getStore('MailedSamples').removeAll();
             Ext.getStore('MailedContents').removeAll();
             Ext.getStore('MailedProcessingPieceToVendors').removeAll();
@@ -180,7 +181,7 @@ Ext.define('EIM.controller.Salecases', {
         }, this);
         Ext.getBody().unmask();
     },
-    
+
     /*
      * 打开“添加客户联系人”窗口时，把客户combo里带的customer_unit的过滤条件清除掉
      */
@@ -204,7 +205,7 @@ Ext.define('EIM.controller.Salecases', {
         load_uniq_controller(me, 'Customers');
         Ext.widget('customer_add_to_mini_form').show();
     },
-    
+
     addBusinessContactFrom: function() {
         var me = this;
         load_uniq_controller(me, 'BusinessContacts');
@@ -218,25 +219,25 @@ Ext.define('EIM.controller.Salecases', {
         var salecase_id = Ext.ComponentQuery.query("salecase_grid")[0].getSelectionModel().getSelection()[0].get("id");
 
         Ext.Msg.confirm('请确认', '你真的要删除选中项吗？', function(button) {
-            if(button === 'yes') {
+            if (button === 'yes') {
                 store.remove(selection);
-                Ext.Ajax.request({//AJAX方式提交
+                Ext.Ajax.request({ //AJAX方式提交
                     url: 'customers/delete_customers_salecases',
                     params: {
                         customer_id: selection.get("id"),
-                        salecase_id : salecase_id
+                        salecase_id: salecase_id
                     },
-                    success:function(request){
+                    success: function(request) {
                         Ext.getStore("Salelogs").load()
                     },
-                    failure:function(){
-                        Ext.Msg.alert('错误','你的网貌似有问题，请刷新再说……');
+                    failure: function() {
+                        Ext.Msg.alert('错误', '你的网貌似有问题，请刷新再说……');
                     }
                 });
             }
         });
     },
-    
+
     deleteBusinessContactFrom: function(button) {
         var grid = button.up('grid');
         var store = grid.getStore();
@@ -244,55 +245,55 @@ Ext.define('EIM.controller.Salecases', {
         var salecase_id = Ext.ComponentQuery.query("salecase_grid")[0].getSelectionModel().getSelection()[0].get("id");
 
         Ext.Msg.confirm('请确认', '你真的要删除选中项吗？', function(button) {
-            if(button === 'yes') {
+            if (button === 'yes') {
                 store.remove(selection);
-                Ext.Ajax.request({//AJAX方式提交
+                Ext.Ajax.request({ //AJAX方式提交
                     url: 'business_contacts/delete_business_contacts_salecases',
                     params: {
                         business_contact_id: selection.get("id"),
-                        salecase_id : salecase_id
+                        salecase_id: salecase_id
                     },
-                    success:function(request){
+                    success: function(request) {
                         Ext.getStore("Salelogs").load()
                     },
-                    failure:function(){
-                        Ext.Msg.alert('错误','你的网貌似有问题，请刷新再说……');
+                    failure: function() {
+                        Ext.Msg.alert('错误', '你的网貌似有问题，请刷新再说……');
                     }
                 });
             }
         });
     },
-    
+
     salecaseSubmit: function(button, e, eOpts) {
-//    	var me = button;
-    	var form = button.up('form');
-    	var sale_case_id = Ext.ComponentQuery.query("salecase_grid")[0].getSelectionModel().getSelection()[0].get("id");
-    	form.submit({
-    		url: 'salecases/save_salecase',
-    		params: {
-    			id : sale_case_id
-	    	},
-    		submitEmptyText: false,
-            success: function(the_form, action){
+        //    	var me = button;
+        var form = button.up('form');
+        var sale_case_id = Ext.ComponentQuery.query("salecase_grid")[0].getSelectionModel().getSelection()[0].get("id");
+        form.submit({
+            url: 'salecases/save_salecase',
+            params: {
+                id: sale_case_id
+            },
+            submitEmptyText: false,
+            success: function(the_form, action) {
                 var response = action.response;
                 var msg = Ext.decode(response.responseText);
                 Ext.example.msg('成功', msg.message);
                 Ext.getStore("GridSalecases").load();
-	    	}
-    	});
+            }
+        });
     },
 
     salecaseFormSubmit: function(button, e, eOpts) {
         var me = button;
         var win = me.up('window');
         var form = win.down('form', false);
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.form.submit({
-                url:'salecases/save_salecase',
+                url: 'salecases/save_salecase',
                 submitEmptyText: false,
-                success: function(the_form, action){
+                success: function(the_form, action) {
                     win.close();
                     var response = action.response;
                     var msg = Ext.decode(response.responseText);
@@ -308,7 +309,7 @@ Ext.define('EIM.controller.Salecases', {
      * @param grid
      */
     applyFilter: function(grid) {
-        if(!Ext.isEmpty(globeFilter)) {
+        if (!Ext.isEmpty(globeFilter)) {
             grid.filters.clearFilters();
             var gridFilter = grid.filters.addFilter({
                 active: true,
@@ -340,9 +341,11 @@ Ext.define('EIM.controller.Salecases', {
         add_customer_btn.setDisabled(true);
         add_business_contact_btn.setDisabled(true);
         edit_salecase_btn.setDisabled(true);
-        if(selected.length > 0){
+        if (selected.length > 0) {
             form.loadRecord(selected[0]);
-            var salecase_params = {salecase_id: selected[0].get("id")};
+            var salecase_params = {
+                salecase_id: selected[0].get("id")
+            };
             Ext.getStore('Salelogs').load({
                 params: salecase_params
             });
@@ -352,7 +355,7 @@ Ext.define('EIM.controller.Salecases', {
             Ext.getStore('MiniBusinessContacts').load({
                 params: salecase_params
             });
-            if(selected[0].get("editable")) {
+            if (selected[0].get("editable")) {
                 add_salelog_btn.setDisabled(false);
                 add_remind_btn.setDisabled(false);
                 add_customer_btn.setDisabled(false);
@@ -360,7 +363,7 @@ Ext.define('EIM.controller.Salecases', {
                 edit_salecase_btn.setDisabled(false);
                 transfer_salecase_btn.setDisabled(false);
             }
-        }else{
+        } else {
             form.form.reset();
             Ext.getStore('Salelogs').removeAll();
             Ext.getStore('Customers').removeAll();
@@ -379,9 +382,9 @@ Ext.define('EIM.controller.Salecases', {
     customerMiniSelectionChange: function(grid, selected, eOpts) {
         var root = Ext.ComponentQuery.query("salecase_tab")[0];
         var delete_customer_btn = Ext.ComponentQuery.query("customer_mini_grid button[action=deleteCustomerFrom]", root)[0];
-        if(selected.length > 0){
+        if (selected.length > 0) {
             delete_customer_btn.setDisabled(false);
-        }else{
+        } else {
             delete_customer_btn.setDisabled(true);
         }
     },
@@ -395,9 +398,9 @@ Ext.define('EIM.controller.Salecases', {
     business_contactMiniSelectionChange: function(grid, selected, eOpts) {
         var root = Ext.ComponentQuery.query("salecase_tab")[0];
         var delete_business_contact_btn = Ext.ComponentQuery.query("business_contact_mini_grid button[action=deleteBusinessContactFrom]", root)[0];
-        if(selected.length > 0){
+        if (selected.length > 0) {
             delete_business_contact_btn.setDisabled(false);
-        }else{
+        } else {
             delete_business_contact_btn.setDisabled(true);
         }
     },
@@ -414,16 +417,16 @@ Ext.define('EIM.controller.Salecases', {
         var win = button.up('window');
         var form = win.down('form', false);
         var sale_case_id = Ext.ComponentQuery.query("salecase_grid")[0].getSelectionModel().getSelection()[0].get("id");
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.submit({
                 url: 'salecases/transfer_salecase',
                 params: {
-                    id : sale_case_id
+                    id: sale_case_id
                 },
                 submitEmptyText: false,
-                success: function(the_form, action){
+                success: function(the_form, action) {
                     var response = action.response;
                     var msg = Ext.decode(response.responseText);
                     Ext.example.msg('成功', msg.message);
@@ -431,7 +434,7 @@ Ext.define('EIM.controller.Salecases', {
                     Ext.getStore("GridSalecases").load();
                 },
                 failure: function() {
-                    Ext.Msg.alert('错误','可能是网络问题，请找Terry处理');
+                    Ext.Msg.alert('错误', '可能是网络问题，请找Terry处理');
                 }
             });
         }

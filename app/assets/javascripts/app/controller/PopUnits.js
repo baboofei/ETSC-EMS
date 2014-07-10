@@ -15,12 +15,10 @@ Ext.define('EIM.controller.PopUnits', {
         'pop_unit.Form'
     ],
 
-    refs: [
-        {
-            ref: 'grid',
-            selector: 'pop_unit_grid'
-        }
-    ],
+    refs: [{
+        ref: 'grid',
+        selector: 'pop_unit_grid'
+    }],
 
     init: function() {
         var me = this;
@@ -45,7 +43,7 @@ Ext.define('EIM.controller.PopUnits', {
     savePopUnit: function(button) {
         var win = button.up('window');
         var form = win.down('form', false);
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.submit({
@@ -56,7 +54,7 @@ Ext.define('EIM.controller.PopUnits', {
                     var msg = Ext.decode(response.responseText);
                     var target_by_id = form.down('[name=source_element_id]', false).getValue();
                     //如果是从小加号来的窗口(也就是source_element_id的值不为空)，则把值回填到小加号前面的combo里
-                    if(!Ext.isEmpty(target_by_id)) {
+                    if (!Ext.isEmpty(target_by_id)) {
                         var target = Ext.getCmp(target_by_id);
                         var target_combo = target.up('container').down("combo", false);
                         var text = response.request.options.params.name;
@@ -68,9 +66,9 @@ Ext.define('EIM.controller.PopUnits', {
                                 target_combo.select(msg['id']);
                                 //如果有带加号的客户选择组件，则为其加一个过滤参数
                                 var pop_combo_array = Ext.ComponentQuery.query("expandable_pop_combo");
-                                if(pop_combo_array.length > 0) {
+                                if (pop_combo_array.length > 0) {
                                     Ext.Array.each(pop_combo_array, function(item) {
-                                        if(item.up('form') === target_combo.up('form')) {
+                                        if (item.up('form') === target_combo.up('form')) {
                                             item.down('combo', false).getStore().getProxy().setExtraParam('pop_unit_id', msg['id'])
                                         }
                                     });

@@ -1,62 +1,60 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
-</head>
-<body>
-
-<table style="border:1px solid #038; width: 1000px; position: static; z-index: auto; ">
-  <!--<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">-->
-  <thead>
-  <tr style="background-color: #038; color: #FFF;">
-    <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
-    <th>客户单位</th>
-    <th>最终用户</th>
-    <th>合同号</th>
-    <th>合同描述</th>
-    <th>合同日期</th>
-    <!--<th>合同中该厂产品买价</th>-->
-    <th>型号</th>
-    <th>厂家</th>
-    <th>数量</th>
-    <th>买价</th>
-  </tr>
-  </thead>
-  <tbody>
-  <% @contracts.each_with_index do |contract, o_index| %>
-      <% contract_items = contract.contract_items %>
-      <% contract_items.each_with_index do |contract_item, index| %>
-          <tr style="border:solid #999;border-width:0 1px 1px 0;">
-            <% if o_index % 2 == 0 %>
-                <% if index == 0 %>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.customer_unit.name %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.end_user.name %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.number %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.summary %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.signed_at.strftime("%Y-%m-%d") %></td>
-                <% end %>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract_item.product.display_name %></td>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract_item.product.producer.short_code %></td>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" align="right"><%= contract_item.quantity %></td>
-                <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" align="right"><%= contract_item.product.currency.blank? ? "数据不对？" : contract_item.product.currency.name %><%= "#{"%.2f" % contract_item.product.price_from_vendor.to_i}" %></td>
-            <% else %>
-                <% if index == 0 %>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.customer_unit.name %></td>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.end_user.name %></td>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.number %></td>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.summary %></td>
-                    <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.signed_at.strftime("%Y-%m-%d") %></td>
-                <% end %>
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract_item.product.display_name %></td>
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract_item.product.producer.short_code %></td>
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" align="right"><%= contract_item.quantity %></td>
-                <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" align="right"><%= contract_item.product.currency.blank? ? "数据不对？" : contract_item.product.currency.name %><%= "#{"%.2f" % contract_item.product.price_from_vendor.to_i}" %></td>
-            <% end %>
-          </tr>
-      <% end %>
-  <% end %>
-  </tbody>
-</table>
-
-</body>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <table style="border:1px solid #038; width: 1000px; position: static; z-index: auto; ">
+      <!--<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">-->
+      <thead>
+        <tr style="background-color: #038; color: #FFF;">
+          <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
+          <th>客户单位</th>
+          <th>最终用户</th>
+          <th>合同号</th>
+          <th>合同描述</th>
+          <th>合同日期</th>
+          <!--<th>合同中该厂产品买价</th>-->
+          <th>型号</th>
+          <th>厂家</th>
+          <th>数量</th>
+          <th>买价</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @contracts.each_with_index do |contract, o_index| %>
+        <% contract_items = contract.contract_items %>
+        <% contract_items.each_with_index do |contract_item, index| %>
+        <tr style="border:solid #999;border-width:0 1px 1px 0;">
+          <% if o_index % 2 == 0 %>
+          <% if index == 0 %>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.customer_unit.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.end_user.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.number %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.summary %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.signed_at.strftime("%Y-%m-%d") %></td>
+          <% end %>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract_item.product.display_name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract_item.product.producer.short_code %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" align="right"><%= contract_item.quantity %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" align="right"><%= contract_item.product.currency.blank? ? "数据不对？" : contract_item.product.currency.name %><%= "#{"%.2f" % contract_item.product.price_from_vendor.to_i}" %></td>
+          <% else %>
+          <% if index == 0 %>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.customer_unit.name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.end_user.name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.number %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.summary %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= contract_items.size %>"><%= contract.signed_at.strftime("%Y-%m-%d") %></td>
+          <% end %>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract_item.product.display_name %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= contract_item.product.producer.short_code %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" align="right"><%= contract_item.quantity %></td>
+          <td style="background-color: #DDD;border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" align="right"><%= contract_item.product.currency.blank? ? "数据不对？" : contract_item.product.currency.name %><%= "#{"%.2f" % contract_item.product.price_from_vendor.to_i}" %></td>
+          <% end %>
+        </tr>
+        <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </body>
 </html>

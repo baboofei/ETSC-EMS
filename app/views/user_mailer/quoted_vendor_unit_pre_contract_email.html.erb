@@ -1,83 +1,81 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
-</head>
-<body>
-
-<table style="border:1px solid #038; width: 1500px; position: static; z-index: auto; ">
-  <!--<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">-->
-  <thead>
-  <tr style="background-color: #038; color: #FFF;">
-    <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
-    <th>客户单位</th>
-    <th>客户</th>
-    <th>报价号</th>
-    <th>报价描述</th>
-    <th>报价日期</th>
-    <th>成案率</th>
-    <th>序号</th>
-    <th>型号</th>
-    <th>厂家</th>
-    <th>数量</th>
-    <th>金额</th>
-  </tr>
-  </thead>
-  <tbody>
-  <% @quotes.each_with_index do |quote, o_index| %>
-      <% quote_items = quote.quote_items.sort{|a,b| a.inner_id.split("-").map{|p| "%05d" % p}.join <=> b.inner_id.split("-").map{|p| "%05d" % p}.join} %>
-      <% quote_items.each_with_index do |quote_item, index| %>
-          <tr style="border:solid #999;border-width:0 1px 1px 0;">
-            <% if o_index % 2 == 0 %>
-                <% if index == 0 %>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.customer_unit.name %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.customer.name %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.number %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.summary %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.created_at.strftime("%Y-%m-%d") %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.quotable.class.name == "Salelog" ? quote.quotable.salecase.feasible : "-" %></td>
-                <% end %>
-                <% if quote_item.product %>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.inner_id %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.product.display_name %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.product.producer.short_code %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2.blank? || quote_item.quantity_2.to_i == 0) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.product.currency.blank? ? "数据不对？" : quote_item.product.currency.name %><%= "#{"%.2f" % quote_item.product.price_in_list.to_i}" %></td>
-                <% else %>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
-                    <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
-                <% end %>
-            <% else %>
-                <% if index == 0 %>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.customer_unit.name %></td>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.customer.name %></td>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.number %></td>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.summary %></td>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.created_at.strftime("%Y-%m-%d") %></td>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.quotable.class.name == "Salelog" ? quote.quotable.salecase.feasible : "-" %></td>
-                <% end %>
-                <% if quote_item.product %>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.inner_id %></td>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.product.display_name %></td>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.product.producer.short_code %></td>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2.blank? || quote_item.quantity_2.to_i == 0) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.product.currency.blank? ? "数据不对？" : quote_item.product.currency.name %><%= "#{"%.2f" % quote_item.product.price_in_list.to_i}" %></td>
-                <% else %>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
-                    <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
-                <% end %>
-            <% end %>
-          </tr>
-      <% end %>
-  <% end %>
-  </tbody>
-</table>
-
-</body>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <table style="border:1px solid #038; width: 1500px; position: static; z-index: auto; ">
+      <!--<table style="border-collapse: collapse; border-style: solid; border-color: rgb(153, 153, 153); border-width: 1px 0 0 1px; width: 1000px; position: static; z-index: auto; ">-->
+      <thead>
+        <tr style="background-color: #038; color: #FFF;">
+          <!--<th style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;width:90px;">销售</th>-->
+          <th>客户单位</th>
+          <th>客户</th>
+          <th>报价号</th>
+          <th>报价描述</th>
+          <th>报价日期</th>
+          <th>成案率</th>
+          <th>序号</th>
+          <th>型号</th>
+          <th>厂家</th>
+          <th>数量</th>
+          <th>金额</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @quotes.each_with_index do |quote, o_index| %>
+        <% quote_items = quote.quote_items.sort{|a,b| a.inner_id.split("-").map{|p| "%05d" % p}.join <=> b.inner_id.split("-").map{|p| "%05d" % p}.join} %>
+        <% quote_items.each_with_index do |quote_item, index| %>
+        <tr style="border:solid #999;border-width:0 1px 1px 0;">
+          <% if o_index % 2 == 0 %>
+          <% if index == 0 %>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.customer_unit.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.customer.name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.number %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.summary %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.created_at.strftime("%Y-%m-%d") %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.quotable.class.name == "Salelog" ? quote.quotable.salecase.feasible : "-" %></td>
+          <% end %>
+          <% if quote_item.product %>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.inner_id %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.product.display_name %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.product.producer.short_code %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2.blank? || quote_item.quantity_2.to_i == 0) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.product.currency.blank? ? "数据不对？" : quote_item.product.currency.name %><%= "#{"%.2f" % quote_item.product.price_in_list.to_i}" %></td>
+          <% else %>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
+          <td style="border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
+          <% end %>
+          <% else %>
+          <% if index == 0 %>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.customer_unit.name %></td>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.customer.name %></td>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.number %></td>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.summary %></td>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.created_at.strftime("%Y-%m-%d") %></td>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;" rowspan="<%= quote_items.size %>"><%= quote.quotable.class.name == "Salelog" ? quote.quotable.salecase.feasible : "-" %></td>
+          <% end %>
+          <% if quote_item.product %>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.inner_id %></td>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.product.display_name %></td>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.product.producer.short_code %></td>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= (quote_item.quantity_2.blank? || quote_item.quantity_2.to_i == 0) ? quote_item.quantity : "#{quote_item.quantity}~#{quote_item.quantity_2}" %></td>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;"><%= quote_item.product.currency.blank? ? "数据不对？" : quote_item.product.currency.name %><%= "#{"%.2f" % quote_item.product.price_in_list.to_i}" %></td>
+          <% else %>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
+          <td style="background-color: #DDD; border:solid #999;border-width:0 1px 1px 0;padding:2px 4px;font-size:12px;">产品似乎没选对</td>
+          <% end %>
+          <% end %>
+        </tr>
+        <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </body>
 </html>

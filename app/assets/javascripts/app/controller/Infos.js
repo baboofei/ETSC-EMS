@@ -7,18 +7,18 @@ Ext.define('EIM.controller.Infos', {
     stores: [
         'dict.OurCompanies',
         'RealExchangeRates'
-//        'GridRoles',
-//        'FunctionPrivileges',
-//        'ElementPrivileges',
-//        'DataPrivileges'
+        //        'GridRoles',
+        //        'FunctionPrivileges',
+        //        'ElementPrivileges',
+        //        'DataPrivileges'
     ],
     models: [
         'dict.OurCompany',
         'RealExchangeRate'
-//        'GridRole',
-//        'FunctionPrivilege',
-//        'ElementPrivilege',
-//        'DataPrivilege'
+        //        'GridRole',
+        //        'FunctionPrivilege',
+        //        'ElementPrivilege',
+        //        'DataPrivilege'
     ],
 
     views: [
@@ -28,23 +28,22 @@ Ext.define('EIM.controller.Infos', {
     ],
 
     refs: [
-//        {
-//            ref: 'functiongrid',
-//            selector: 'privilege_function_grid'
-//        },
-//        {
-//            ref: 'elementgrid',
-//            selector: 'privilege_element_grid'
-//        },
-//        {
-//            ref: 'datagrid',
-//            selector: 'privilege_data_grid'
-//        }
+        //        {
+        //            ref: 'functiongrid',
+        //            selector: 'privilege_function_grid'
+        //        },
+        //        {
+        //            ref: 'elementgrid',
+        //            selector: 'privilege_element_grid'
+        //        },
+        //        {
+        //            ref: 'datagrid',
+        //            selector: 'privilege_data_grid'
+        //        }
     ],
 
     init: function() {
         var me = this;
-        me.control({
-        });
+        me.control({});
     }
 });

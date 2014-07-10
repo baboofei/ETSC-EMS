@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
-</head>
-<body>
-<h3>按产品</h3>
-<table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
-  <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
-    <th>产品</th>
-    <th>工厂</th>
-    <th>个案数</th>
-    <th>报价数</th>
-    <th>合同数</th>
-  </tr>
-  <% @products.each do |product| %>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <h3>按产品</h3>
+    <table style="border: 1px solid #5F80B5; position: static; z-index: auto; ">
+      <tr style="background-color: #41659F; border-bottom: 1px solid blue; color: #FFF;">
+        <th>产品</th>
+        <th>工厂</th>
+        <th>个案数</th>
+        <th>报价数</th>
+        <th>合同数</th>
+      </tr>
+      <% @products.each do |product| %>
       <tr>
         <td><%= product.display_name %></td>
         <td><%= product.producer.blank? ? "数据异常" : product.producer.name %></td>
@@ -21,7 +21,7 @@
         <td><%= Quote.count_via_product(@start_at, @end_at, product.id) %></td>
         <td><%= Contract.count_via_product(@start_at, @end_at, product.id) %></td>
       </tr>
-  <% end %>
-</table>
-</body>
+      <% end %>
+    </table>
+  </body>
 </html>

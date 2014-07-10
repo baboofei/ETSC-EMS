@@ -29,7 +29,7 @@ Ext.define('EIM.controller.Purchases', {
                 click: this.addPurchase
             },
             'purchase_form button[action=save]': {
-            	click: this.savePurchase
+                click: this.savePurchase
             }
         });
     },
@@ -37,16 +37,16 @@ Ext.define('EIM.controller.Purchases', {
     addPurchase: function() {
         Ext.widget('purchase_form').show();
     },
-    
+
     savePurchase: function(button) {
         var win = button.up('window');
         var form = win.down('form', false);
-        if(form.form.isValid()) {
+        if (form.form.isValid()) {
             //防双击
             button.disable();
             form.submit({
                 url: "purchases/save_purchase",
-                submitEmptyText:false,
+                submitEmptyText: false,
                 success: function(form, action) {
                     win.close();
                     var response = action.response;
@@ -65,18 +65,18 @@ Ext.define('EIM.controller.Purchases', {
     },
 
     loadPurchases: function() {
-//        Ext.getStore("Purchases").load();
-//        Ext.getStore("dict.Cities").load();
+        //        Ext.getStore("Purchases").load();
+        //        Ext.getStore("dict.Cities").load();
     },
 
     editPurchase: function() {
         var record = this.getGrid().getSelectedItem();
         var view = Ext.widget('purchase_form').show();
         view.down('form', false).loadRecord(record);
-//        //给combo做一个假的store以正确显示值
-//        var city_field = view.down('[name=city_id]', false);
-//        city_field.getStore().loadData([[record.get('city_id'), record.get('city_name')]]);
-//        city_field.setValue(record.get('city_id'));
+        //        //给combo做一个假的store以正确显示值
+        //        var city_field = view.down('[name=city_id]', false);
+        //        city_field.getStore().loadData([[record.get('city_id'), record.get('city_name')]]);
+        //        city_field.setValue(record.get('city_id'));
     },
 
     selectionChange: function() {

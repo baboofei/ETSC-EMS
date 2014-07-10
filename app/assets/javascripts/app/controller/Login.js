@@ -1,43 +1,40 @@
 Ext.define('EIM.controller.Login', {
-    extend:'Ext.app.Controller',
+    extend: 'Ext.app.Controller',
 
     models: [
-//        'User'
+        //        'User'
     ],
     stores: [
-//        'Users'
+        //        'Users'
     ],
     views: [
         'login.Form',
         'login.Display'
     ],
 
-    refs:[
-        {
-            ref:'loginForm',
-            selector:'form'
-        },
-        {
-            ref:'loginButton',
-            selector:'loginform button[action=login]'
-        }
-    ],
+    refs: [{
+        ref: 'loginForm',
+        selector: 'form'
+    }, {
+        ref: 'loginButton',
+        selector: 'loginform button[action=login]'
+    }],
 
-    init:function () {
+    init: function() {
         var me = this;
         if (islogin === false) {
             me.loginWindow = Ext.create('widget.loginform');
             me.control({
-                'loginform textfield':{
-                    keypress:function (textfield, e, eOpts) {
-//                        console.log(e.button === 12);
+                'loginform textfield': {
+                    keypress: function(textfield, e, eOpts) {
+                        //                        console.log(e.button === 12);
                         if (e.button === 12) {
                             this.loginsubmit();
                         }
                     }
                 },
-                'loginform button[action=login]':{
-                    click:function (button) {
+                'loginform button[action=login]': {
+                    click: function(button) {
                         this.loginsubmit(button);
 
                     }
@@ -47,13 +44,13 @@ Ext.define('EIM.controller.Login', {
             me.onFormSubmit();
         }
     },
-    onFormSubmit:function () {
+    onFormSubmit: function() {
         var me = this;
-//        console.log(userName);
+        //        console.log(userName);
         var remind = "";
-        if(unreadReminds > 0){
+        if (unreadReminds > 0) {
             remind = "，你有" + unreadReminds + "条未读提醒。";
-        }else{
+        } else {
             remind = "";
         }
         Ext.example.msg("欢迎登录", userName + remind);
@@ -61,35 +58,35 @@ Ext.define('EIM.controller.Login', {
         load_uniq_controller(me, 'Functions');
 
         Ext.widget('eim_layout', {
-//            这里可以这样传参数过去
-//            padding: 20
+            //            这里可以这样传参数过去
+            //            padding: 20
         }).show();
     },
-    loginsubmit:function (button) {
+    loginsubmit: function(button) {
         var me = this;
         this.getLoginForm().form.submit({
-            waitTitle:'登录中',
-            waitMsg:'正在登录，请稍候……',
-            url:'/login/login',
-            standardSubmit:true,
-            width:200,
-            method:'POST',
-            success:function (form, action) {
+            waitTitle: '登录中',
+            waitMsg: '正在登录，请稍候……',
+            url: '/login/login',
+            standardSubmit: true,
+            width: 200,
+            method: 'POST',
+            success: function(form, action) {
                 me.loginWindow.destroy();
                 //最后还是得这么写才能带上用户名之类
                 location.reload();
-//                me.onFormSubmit();
+                //                me.onFormSubmit();
             },
-            failure:function (form, action) {
+            failure: function(form, action) {
                 Ext.Msg.show({
-                    title:'错误',
-                    msg:'用户名/密码输入错误！',
-                    width:300,
-                    buttons:Ext.Msg.OK,
-                    animateTarget:button,
-                    fn:function () {
-//                        console.log(wrong_time);
-                        if(wrong_time > 1) {
+                    title: '错误',
+                    msg: '用户名/密码输入错误！',
+                    width: 300,
+                    buttons: Ext.Msg.OK,
+                    animateTarget: button,
+                    fn: function() {
+                        //                        console.log(wrong_time);
+                        if (wrong_time > 1) {
                             me.generateThreeLegitimateWindow();
                         }
                         wrong_time = wrong_time + 1;
@@ -97,10 +94,10 @@ Ext.define('EIM.controller.Login', {
                     }
                 });
                 // Ext.MessageBox.alert('错误', "用户名/密码输入错误！");
-//                            },
-//                            params: {
-//                                view: 'sencha',
-//                                json: true
+                //                            },
+                //                            params: {
+                //                                view: 'sencha',
+                //                                json: true
             }
         });
     },
@@ -140,9 +137,9 @@ Ext.define('EIM.controller.Login', {
             item.close();
         });
         var width_array = Ext.Array.pluck(captcha_windows, "width");
-        if(window.width === Ext.Array.max(width_array)) {
+        if (window.width === Ext.Array.max(width_array)) {
             Ext.ComponentQuery.query("loginform [id=Login]")[0].enable();
-        }else{
+        } else {
             me.generateThreeLegitimateWindow();
         }
     },

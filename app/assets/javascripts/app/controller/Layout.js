@@ -56,7 +56,7 @@ Ext.define('EIM.controller.Layout', {
                 tabchange: function(tabPanel, newCard, oldCard, eOpts) {
                     var tree = Ext.ComponentQuery.query("functree")[0];
                     var record = tree.getRootNode().findChild('id', newCard.innerId, true);
-                    if(record) {
+                    if (record) {
                         tree.selectPath(record.getPath());
                     } else {
                         tree.getSelectionModel().deselectAll();
@@ -92,7 +92,7 @@ Ext.define('EIM.controller.Layout', {
                          * ]
                          */
                         var hash = {};
-                        for(var i = 0; i < array.length; i++) {
+                        for (var i = 0; i < array.length; i++) {
                             hash[array[i].split(":")[0]] = array[i].split(":")[1];
                         }
                         /**
@@ -108,11 +108,11 @@ Ext.define('EIM.controller.Layout', {
                         var widget = hash["widget"];
                         globeFilter = hash["filterStr"];
 
-                        if(tabParent) {
-                            if(tabParent.getChildByElement(id)) {
+                        if (tabParent) {
+                            if (tabParent.getChildByElement(id)) {
                                 tabParent.setActiveTab(id);
-                                var grid_name = widget.replace(/_\S+\b/, "_grid");//约定最后都是“xxx_grid”的形式
-//                                console.log(grid_name);
+                                var grid_name = widget.replace(/_\S+\b/, "_grid"); //约定最后都是“xxx_grid”的形式
+                                //                                console.log(grid_name);
                                 var grid = Ext.ComponentQuery.query(grid_name)[0];
                                 me.getController(controller).applyFilter(grid);
                             } else {
@@ -130,25 +130,25 @@ Ext.define('EIM.controller.Layout', {
                                 Ext.getBody().unmask();
                             }
                             //同时判断是哪一类链接，并Ajax把本条设为已读
-                            if(r_sn) {
+                            if (r_sn) {
                                 Ext.Ajax.request({
                                     url: 'reminds/mark_single_as_read',
                                     params: {
                                         sn: r_sn
                                     },
                                     success: function() {
-                                        if(Ext.getStore('GridReminds')) Ext.getStore('GridReminds').load();
+                                        if (Ext.getStore('GridReminds')) Ext.getStore('GridReminds').load();
                                     }
                                 });
                             }
-                            if(m_sn) {
+                            if (m_sn) {
                                 Ext.Ajax.request({
                                     url: 'personal_messages/mark_single_as_read',
                                     params: {
                                         sn: m_sn
                                     },
                                     success: function() {
-                                        if(Ext.getStore('GridPersonalMessages')) Ext.getStore('GridPersonalMessages').load();
+                                        if (Ext.getStore('GridPersonalMessages')) Ext.getStore('GridPersonalMessages').load();
                                     }
                                 });
                             }
@@ -161,7 +161,7 @@ Ext.define('EIM.controller.Layout', {
                      * 给class为innerAuditing的元素(也就是在提醒或者消息里点击弹出一个新窗口要审批的那个链接)加载一个事件代理
                      */
                     Ext.getBody().on('click', function(event, target) {
-//                        console.log("xx");
+                        //                        console.log("xx");
                         /*target大概是这样：
                          有一些物品要入库：<a href="#"  class='innerAuditing' x="m_sn:1366708282424|admin_item_apply_for_sn:buy_in_55_1366792785025">点击查看</a>
                          不是上面那样，扩展成这样：
@@ -170,10 +170,10 @@ Ext.define('EIM.controller.Layout', {
                         var trunked_str = target["attributes"]["x"].nodeValue;
                         var array = trunked_str.split("|");
                         var hash = {};
-                        for(var i = 0; i < array.length; i++) {
+                        for (var i = 0; i < array.length; i++) {
                             hash[array[i].split(":")[0]] = array[i].split(":")[1];
                         }
-//                        console.log(hash);
+                        //                        console.log(hash);
                         var m_sn = hash['m_sn'];
                         var controller = hash['controller'];
                         var sn = hash['item_sn'];
@@ -184,9 +184,9 @@ Ext.define('EIM.controller.Layout', {
                         var sn_sn = sn_array[sn_array.length - 1];
 
 
-                        switch(controller) {
+                        switch (controller) {
                             case "Contracts":
-                                switch(sn_action) {
+                                switch (sn_action) {
                                     case "contract_audit":
                                         load_uniq_controller(me, 'contract.AuditForm');
                                         var view = Ext.widget('contract_audit_form').show();
@@ -213,8 +213,8 @@ Ext.define('EIM.controller.Layout', {
                                             callback: function(records, operation, success) {
                                                 // the operation object
                                                 // contains all of the details of the load operation
-//                                                console.log(id_field);
-//                                                console.log(records[0].get('state'));
+                                                //                                                console.log(id_field);
+                                                //                                                console.log(records[0].get('state'));
                                                 info_form.loadRecord(records[0]);
                                                 content_form.loadRecord(records[0]);
 
@@ -239,7 +239,7 @@ Ext.define('EIM.controller.Layout', {
                                                 end_user_customer_field.setValue(records[0].get('end_user_customer_id'));
                                                 end_user_customer_field.getStore().getProxy().setExtraParam('customer_unit_id', records[0].get('customer_unit>id'));
 
-                                                if(records[0].get('business_unit_id') === 0) {
+                                                if (records[0].get('business_unit_id') === 0) {
                                                     business_unit_field.getStore().removeAll();
                                                     business_unit_field.setValue("");
                                                 } else {
@@ -249,7 +249,7 @@ Ext.define('EIM.controller.Layout', {
                                                     business_unit_field.setValue(records[0].get('business_unit_id'));
                                                 }
 
-                                                if(records[0].get('business_contact_id') === 0) {
+                                                if (records[0].get('business_contact_id') === 0) {
                                                     business_contact_field.getStore().removeAll();
                                                     business_contact_field.setValue("");
                                                 } else {
@@ -271,7 +271,7 @@ Ext.define('EIM.controller.Layout', {
                                                 Ext.getStore("ContractItems").load();
 
                                                 //如果已经签署，则把下面的审批按钮灰掉
-                                                if(records[0].get("state") != "b_auditing") {
+                                                if (records[0].get("state") != "b_auditing") {
                                                     panel.up('panel').up('panel').down('button[text=审批通过]', false).disable();
                                                     panel.up('panel').up('panel').down('button[text=审批驳回]', false).disable();
                                                 }
@@ -279,8 +279,8 @@ Ext.define('EIM.controller.Layout', {
                                         });
 
 
-//                                        Ext.getStore('GridInStockQueryAdminInventories').getProxy().setExtraParam('admin_item_apply_for_sn', sn_sn);
-//                                        Ext.getStore('GridInStockQueryAdminInventories').load();
+                                        //                                        Ext.getStore('GridInStockQueryAdminInventories').getProxy().setExtraParam('admin_item_apply_for_sn', sn_sn);
+                                        //                                        Ext.getStore('GridInStockQueryAdminInventories').load();
                                         break;
                                     default:
 
@@ -288,8 +288,8 @@ Ext.define('EIM.controller.Layout', {
 
                                 break;
                             case "AdminInventories":
-//                                console.log(sn_array, sn_action, sn_sn);
-                                switch(sn_action) {
+                                //                                console.log(sn_array, sn_action, sn_sn);
+                                switch (sn_action) {
                                     case "buy_in":
                                         load_uniq_controller(me, 'admin_inventory.InStockQueryForm');
                                         var view = Ext.widget('admin_inventory_in_stock_query_form').show();
@@ -356,7 +356,7 @@ Ext.define('EIM.controller.Layout', {
                                 sn: m_sn
                             },
                             success: function() {
-                                if(Ext.getStore('GridPersonalMessages')) Ext.getStore('GridPersonalMessages').load();
+                                if (Ext.getStore('GridPersonalMessages')) Ext.getStore('GridPersonalMessages').load();
                             }
                         });
                     }, null, {
@@ -373,14 +373,14 @@ Ext.define('EIM.controller.Layout', {
                         var trunked_str = target["attributes"]["x"].nodeValue;
                         var array = trunked_str.split("|");
                         var hash = {};
-                        for(var i = 0; i < array.length; i++) {
+                        for (var i = 0; i < array.length; i++) {
                             hash[array[i].split(":")[0]] = array[i].split(":")[1];
                         }
                         var m_sn = hash['m_sn'];
                         var controller = hash['controller'];
                         var id = hash['id'];
 
-                        switch(controller) {
+                        switch (controller) {
                             case "MInquires":
                                 load_uniq_controller(me, 'customer.CheckDupForm');
                                 var view = Ext.widget('customer_check_dup_form').show();
@@ -397,13 +397,15 @@ Ext.define('EIM.controller.Layout', {
                                     },
                                     success: function(response) {
                                         var msg = Ext.decode(response.responseText);
-                                        view.down('customer_check_dup_sub_form[title=客户信息(转入)]').loadRecord({"data": msg['customers'][0]});
+                                        view.down('customer_check_dup_sub_form[title=客户信息(转入)]').loadRecord({
+                                            "data": msg['customers'][0]
+                                        });
                                         view.down('textarea[name=detail]').setValue(msg['customers'][0]['detail']);
                                         view.down('[name=inquire_type]').setValue(msg['inquire_type']);
                                         view.down('[name=inquire_id]').setValue(msg['inquire_id']);
                                     },
                                     failure: function() {
-                                        Ext.Msg.alert('错误','可能是网络问题，请找Terry处理');
+                                        Ext.Msg.alert('错误', '可能是网络问题，请找Terry处理');
                                     }
                                 });
                                 break;
@@ -417,7 +419,7 @@ Ext.define('EIM.controller.Layout', {
                                 Ext.getStore("GridPossibleCustomers").load();
                                 //因为两边都要用VendorUnit的store，所以Load一下吧
                                 Ext.getStore("ComboVendorUnits").load();
-//                                console.log(controller, id);
+                                //                                console.log(controller, id);
                                 Ext.Ajax.request({
                                     url: '/customers/load_inquire_info',
                                     params: {
@@ -426,15 +428,17 @@ Ext.define('EIM.controller.Layout', {
                                     },
                                     success: function(response) {
                                         var msg = Ext.decode(response.responseText);
-                                        view.down('customer_check_dup_sub_form[title=客户信息(转入)]').loadRecord({"data": msg['customers'][0]});
-                                        view.down('customer_check_dup_sub_form[title=客户信息(转入)] [name=lead_id]').setValue('6');//默认成“工厂转”
+                                        view.down('customer_check_dup_sub_form[title=客户信息(转入)]').loadRecord({
+                                            "data": msg['customers'][0]
+                                        });
+                                        view.down('customer_check_dup_sub_form[title=客户信息(转入)] [name=lead_id]').setValue('6'); //默认成“工厂转”
                                         view.down('textarea[name=detail]').setValue(msg['customers'][0]['detail']);
                                         view.down('[name=inquire_type]').setValue(msg['inquire_type']);
                                         view.down('[name=inquire_id]').setValue(msg['inquire_id']);
-//                                        console.log(msg['customers'][0]['vendor_unit_id']);
+                                        //                                        console.log(msg['customers'][0]['vendor_unit_id']);
                                     },
                                     failure: function() {
-                                        Ext.Msg.alert('错误','可能是网络问题，请找Terry处理');
+                                        Ext.Msg.alert('错误', '可能是网络问题，请找Terry处理');
                                     }
                                 });
                                 break;
@@ -449,7 +453,7 @@ Ext.define('EIM.controller.Layout', {
                                 sn: m_sn
                             },
                             success: function() {
-                                if(Ext.getStore('GridPersonalMessages')) Ext.getStore('GridPersonalMessages').load();
+                                if (Ext.getStore('GridPersonalMessages')) Ext.getStore('GridPersonalMessages').load();
                             }
                         });
                     }, null, {
@@ -461,23 +465,23 @@ Ext.define('EIM.controller.Layout', {
                      * @type {Object}
                      */
                     var task = {
-                        run:function(){
+                        run: function() {
                             Ext.Ajax.request({
-                                url:'personal_messages/check_new_messages',
-//                                params: {
-//                                    id: abc
-//                                },
+                                url: 'personal_messages/check_new_messages',
+                                //                                params: {
+                                //                                    id: abc
+                                //                                },
                                 success: function(response) {
-//                                    console.log(response.responseText);
-//                                    console.log(Ext.decode(response.responseText));
-//                                    console.log(Ext.decode(response.responseText)['first_content']);
+                                    //                                    console.log(response.responseText);
+                                    //                                    console.log(Ext.decode(response.responseText));
+                                    //                                    console.log(Ext.decode(response.responseText)['first_content']);
                                     var text = Ext.decode(response.responseText);
-                                    if(text['totalRecords'] === 1) {
-                                        if(text['first_content'] != "") {
+                                    if (text['totalRecords'] === 1) {
+                                        if (text['first_content'] != "") {
                                             Ext.example.msg('消息', text['first_content'], 't', 't', 5000);
                                         }
-                                    }else{
-                                        if(text['totalRecords'] > 1) {
+                                    } else {
+                                        if (text['totalRecords'] > 1) {
                                             Ext.example.msg('消息', '你有' + text['totalRecords'] + '条新消息', 't', 't', 5000);
                                         }
                                     }
@@ -500,21 +504,21 @@ Ext.define('EIM.controller.Layout', {
                  * @param eOpts
                  */
                 beforerender: function(thisField, eOpts) {
-                    if(thisField && !thisField.rendered && thisField.isFieldLabelable && thisField.fieldLabel && thisField.allowBlank == false) {
+                    if (thisField && !thisField.rendered && thisField.isFieldLabelable && thisField.fieldLabel && thisField.allowBlank == false) {
                         thisField.fieldLabel += '<span class="req" style="color:#ff0000">*</span>';
                     }
                 }
             },
             'boxselect': {
-                'beforequery':function(e){
+                'beforequery': function(e) {
                     var combo = e.combo;
-                    if(combo.queryMode === "local") {
-                        if(!e.forceAll){
-                            var input = e.query.replace(/[^\wA-Za-z\u4e00-\u9fa5]/g,'');
+                    if (combo.queryMode === "local") {
+                        if (!e.forceAll) {
+                            var input = e.query.replace(/[^\wA-Za-z\u4e00-\u9fa5]/g, '');
                             // 检索的正则
-                            var regExp = new RegExp(".*" + input + ".*", "i");//忽略大小写
+                            var regExp = new RegExp(".*" + input + ".*", "i"); //忽略大小写
                             // 执行检索
-                            combo.store.filterBy(function(record, id){
+                            combo.store.filterBy(function(record, id) {
                                 // 得到每个record的项目名称值
                                 var text = record.get(combo.displayField);
                                 return regExp.test(text);
@@ -534,14 +538,13 @@ Ext.define('EIM.controller.Layout', {
             'button[action=logout]': {
                 click: function() {
                     Ext.Msg.confirm('确认注销', '真的要注销并回到登录界面？', function(button) {
-                        if(button === 'yes') {
+                        if (button === 'yes') {
                             Ext.Ajax.request({
                                 url: '/login/logout',
                                 success: function() {
                                     location.reload();
                                 },
-                                failure: function() {
-                                }
+                                failure: function() {}
                             });
                         }
                     });
