@@ -185,20 +185,16 @@ var add_crown = function() {
     }
     for (var i = 1; i < row_count; i++) {
         if (table.tBodies[0].rows[i].cells[1].innerHTML * 1 === Math.max.apply(null, contract_count_array)) {
-            table.tBodies[0].rows[i].cells[1].innerHTML = "<img src='<%= asset_path("
-            silk_icon / crown.png ") %>'>" + table.tBodies[0].rows[i].cells[1].innerHTML;
+            table.tBodies[0].rows[i].cells[1].innerHTML = "<img src='<%= asset_path("silk_icon/crown.png") %>'>" + table.tBodies[0].rows[i].cells[1].innerHTML;
         }
         if (table.tBodies[0].rows[i].cells[2].innerHTML * 1 === Math.max.apply(null, contract_rmb_array)) {
-            table.tBodies[0].rows[i].cells[2].innerHTML = "<img src='<%= asset_path("
-            silk_icon / crown.png ") %>'>" + table.tBodies[0].rows[i].cells[2].innerHTML;
+            table.tBodies[0].rows[i].cells[2].innerHTML = "<img src='<%= asset_path("silk_icon/crown.png") %>'>" + table.tBodies[0].rows[i].cells[2].innerHTML;
         }
         if (table.tBodies[0].rows[i].cells[3].innerHTML * 1 === Math.max.apply(null, contract_profit_array)) {
-            table.tBodies[0].rows[i].cells[3].innerHTML = "<img src='<%= asset_path("
-            silk_icon / crown.png ") %>'>" + table.tBodies[0].rows[i].cells[3].innerHTML;
+            table.tBodies[0].rows[i].cells[3].innerHTML = "<img src='<%= asset_path("silk_icon/crown.png") %>'>" + table.tBodies[0].rows[i].cells[3].innerHTML;
         }
         if (table.tBodies[0].rows[i].cells[4].innerHTML === (Math.max.apply(null, contract_profit_rate_array) + "%")) {
-            table.tBodies[0].rows[i].cells[4].innerHTML = "<img src='<%= asset_path("
-            silk_icon / crown.png ") %>'>" + table.tBodies[0].rows[i].cells[4].innerHTML;
+            table.tBodies[0].rows[i].cells[4].innerHTML = "<img src='<%= asset_path("silk_icon/crown.png") %>'>" + table.tBodies[0].rows[i].cells[4].innerHTML;
         }
     }
 }
