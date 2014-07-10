@@ -18,9 +18,12 @@ class BusinessContact < ActiveRecord::Base
     alias_method :business_contact_unit, :business_unit
     #alias_method :business_contact_unit_id, :business_unit_id
 
-    #def business_unit_id
-    #    business_unit_id
-    #end
+    def business_contact_unit_id=(business_unit_id)
+        business_unit_id
+    end
+    def business_contact_unit_id
+        business_unit_id
+    end
 
     def self.in_unit(business_unit_id)
         where("business_unit_id = ?", "#{business_unit_id}")
@@ -132,7 +135,7 @@ class BusinessContact < ActiveRecord::Base
 
         #新建一条“增加联系人”的日志
         need_sign = !Salecase.find(params[:salecase_id]).group.nil?
-        process = Dictionary.where("data_type = ? and value = ?", "sales_processes", 19).first.display
+        process = Dictionary.where("data_type = 'sales_processes' and value = ?", 19).first.display
         business_unit = BusinessUnit.find(params[:business_unit_id]).name
         business_contact = BusinessContact.find(params[:business_contact_id]).name
         #如果传来的日期是今天，则存当前时间
