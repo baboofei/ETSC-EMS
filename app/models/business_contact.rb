@@ -18,9 +18,9 @@ class BusinessContact < ActiveRecord::Base
     alias_method :business_contact_unit, :business_unit
     #alias_method :business_contact_unit_id, :business_unit_id
 
-    def business_unit_id
-        business_unit_id
-    end
+    #def business_unit_id
+    #    business_unit_id
+    #end
 
     def self.in_unit(business_unit_id)
         where("business_unit_id = ?", "#{business_unit_id}")
