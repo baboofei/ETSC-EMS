@@ -1,4 +1,4 @@
-Ext.define('EIM.model.ComboGroup', {
+Ext.define('EIM.model.ComboFunction', {
     extend: 'Ext.data.Model',
     fields: [
         {

@@ -168,7 +168,7 @@ class ExpressSheet < ActiveRecord::Base
             new_sheet['description'] = "#{params['quantity']}件#{params['description']}"
             new_sheet['send_at'] = "#{timestamp[0..3]}-#{timestamp[4..5]}-#{timestamp[6..7]} #{timestamp[8..9]}:#{timestamp[10..11]}:#{timestamp[12..13]}".to_datetime
             new_sheet['pdf_url'] = "#{Rails.root}/public/express_sheets/#{single_record['timestamp']}.pdf"
-
+            binding.pry
             receiver = params['receiver_type'].camelcase.constantize.find(single_record['receiver_id'])
             #receiver_addr = receiver.addr.blank? ? receiver.send("#{params[:receiver_type]}_unit").addr : receiver.addr
             #long_addr = receiver.send("#{params[:receiver_type]}_unit").city.prvc.name + receiver.send("#{params[:receiver_type]}_unit").city.name + receiver_addr

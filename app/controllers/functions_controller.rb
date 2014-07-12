@@ -21,4 +21,20 @@ class FunctionsController < ApplicationController
         render :json => {:success => true, :message => "权限修改成功！"}.to_json
     end
 
+    def get_combo_functions
+        user_id = session[:user_id]
+        target_store = action_name.camelize[3..-1]#根据方法名来取模型
+
+        functions = Function.get_available_data(target_store, user_id)#.with_user(user_id)
+
+        respond_to do |format|
+            #binding.pry
+            format.json {
+                render :json => {
+                    :functions => functions.map{|p| p.for_list_json},
+                    :totalRecords => functions.size
+                }
+            }
+        end
+    end
 end

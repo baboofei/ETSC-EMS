@@ -1,11 +1,17 @@
 #encoding: UTF-8
 class Function < ActiveRecord::Base
+    require "reusable"
+    include Reusable
+
     #attr_writer :visible_to_names, :visible_to_ids
 
     has_many :functions_roles
     has_many :roles, :through => :functions_roles
 
     has_many :elements
+
+    has_many :todos
+    has_many :updates
 
     #某用户拥有的功能列表
     #params user_id
@@ -58,6 +64,10 @@ class Function < ActiveRecord::Base
         attr[:visible_to_ids] = self.roles.map(&:id).join("|")
         attr
         #binding.pry
+    end
+
+    def for_list_json
+        attr = attributes
     end
 
     #根据提交过来的参数更新表中数据
