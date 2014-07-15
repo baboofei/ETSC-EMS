@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140710072652) do
+ActiveRecord::Schema.define(:version => 20140715012953) do
 
   create_table "accessories", :force => true do |t|
     t.string   "url"
@@ -114,6 +114,18 @@ ActiveRecord::Schema.define(:version => 20140710072652) do
     t.integer  "salecase_id"
     t.datetime "created_at",          :null => false
     t.datetime "updated_at",          :null => false
+  end
+
+  create_table "business_unit_addrs", :force => true do |t|
+    t.integer  "unit_id"
+    t.string   "name"
+    t.string   "addr"
+    t.string   "en_addr"
+    t.string   "postcode"
+    t.integer  "city_id"
+    t.integer  "user_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "business_unit_aliases", :force => true do |t|
@@ -322,6 +334,18 @@ ActiveRecord::Schema.define(:version => 20140710072652) do
     t.datetime "updated_at",                                   :null => false
   end
 
+  create_table "customer_unit_addrs", :force => true do |t|
+    t.integer  "unit_id"
+    t.string   "name"
+    t.string   "addr"
+    t.string   "en_addr"
+    t.string   "postcode"
+    t.integer  "city_id"
+    t.integer  "user_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "customer_unit_aliases", :force => true do |t|
     t.string   "unit_alias"
     t.integer  "customer_unit_id"
@@ -332,18 +356,14 @@ ActiveRecord::Schema.define(:version => 20140710072652) do
 
   create_table "customer_units", :force => true do |t|
     t.string   "name"
-    t.integer  "city_id"
-    t.string   "addr"
-    t.string   "postcode"
     t.string   "en_name"
-    t.string   "en_addr"
-    t.integer  "cu_sort"
+    t.string   "cu_sort"
     t.integer  "user_id"
     t.string   "site"
-    t.integer  "credit_level", :default => 0
+    t.integer  "credit_level"
     t.text     "comment"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
   end
 
   create_table "customer_units_flow_sheets", :id => false, :force => true do |t|
@@ -708,6 +728,18 @@ ActiveRecord::Schema.define(:version => 20140710072652) do
     t.datetime "read_at"
     t.datetime "created_at",       :null => false
     t.datetime "updated_at",       :null => false
+  end
+
+  create_table "pop_unit_addrs", :force => true do |t|
+    t.integer  "unit_id"
+    t.string   "name"
+    t.string   "addr"
+    t.string   "en_addr"
+    t.string   "postcode"
+    t.integer  "city_id"
+    t.integer  "user_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "pop_unit_aliases", :force => true do |t|
@@ -1156,6 +1188,18 @@ ActiveRecord::Schema.define(:version => 20140710072652) do
     t.datetime "updated_at", :null => false
   end
 
+  create_table "vendor_unit_addrs", :force => true do |t|
+    t.integer  "unit_id"
+    t.string   "name"
+    t.string   "addr"
+    t.string   "en_addr"
+    t.string   "postcode"
+    t.integer  "city_id"
+    t.integer  "user_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "vendor_unit_aliases", :force => true do |t|
     t.string   "unit_alias"
     t.integer  "vendor_unit_id"
@@ -1259,6 +1303,18 @@ ActiveRecord::Schema.define(:version => 20140710072652) do
     t.string   "user_id"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
+  end
+
+  create_table "vip_unit_addrs", :force => true do |t|
+    t.integer  "unit_id"
+    t.string   "name"
+    t.string   "addr"
+    t.string   "en_addr"
+    t.string   "postcode"
+    t.integer  "city_id"
+    t.integer  "user_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "vip_unit_aliases", :force => true do |t|

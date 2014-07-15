@@ -28,7 +28,7 @@ Ext.define('EIM.view.customer_unit.Grid', {
             },
             {
                 header: '所属城市',
-                dataIndex: 'city>name',
+                dataIndex: 'customer_unit_addrs>city>name',
                 width: 50,
                 sortable: true,
                 filter: {
@@ -37,7 +37,7 @@ Ext.define('EIM.view.customer_unit.Grid', {
             },
             {
                 header: '邮政编码',
-                dataIndex: 'postcode',
+                dataIndex: 'customer_unit_addrs>postcode',
                 width: 75,
                 sortable: true,
                 filter: {
@@ -46,7 +46,7 @@ Ext.define('EIM.view.customer_unit.Grid', {
             },
             {
                 header: '地址',
-                dataIndex: 'addr',
+                dataIndex: 'customer_unit_addrs>addr',
                 width: 200,
                 sortable: true,
                 filter: {
@@ -64,7 +64,7 @@ Ext.define('EIM.view.customer_unit.Grid', {
             },
             {
                 header: '英文地址',
-                dataIndex: 'en_addr',
+                dataIndex: 'customer_unit_addrs>en_addr',
                 width: 200,
                 sortable: true,
                 filter: {

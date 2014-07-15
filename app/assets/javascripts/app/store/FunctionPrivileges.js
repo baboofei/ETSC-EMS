@@ -14,8 +14,9 @@ Ext.define('EIM.store.FunctionPrivileges', {
         format: 'json',
         method: 'GET',
         reader: {
-            type: 'json',
-            root: 'function_privileges'
+            root: 'function_privileges',
+            successProperty: 'success',
+            totalProperty: 'totalRecords'
         }
     }
 });

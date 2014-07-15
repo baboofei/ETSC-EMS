@@ -3,12 +3,12 @@ class CustomerUnit < ActiveRecord::Base
     require "reusable"
     include Reusable
 
-    attr_accessible :addr, :city_id, :comment, :credit_level, :cu_sort, :en_addr, :en_name, :name, :postcode, :site, :user_id
+    attr_accessible :comment, :credit_level, :cu_sort, :en_name, :name, :site, :user_id
     has_many :customers
     has_many :quotes
     has_many :contracts
     #has_many :customer_unit_aliases
-    has_many :unit_aliases, :class_name => "CustomerUnitAlias", :foreign_key => "customer_unit_id"
+    has_many :unit_aliases, :class_name => 'CustomerUnitAlias', :foreign_key => 'customer_unit_id'
 
     #个案和客户单位多对多
     has_many :customer_units_salecases
@@ -18,7 +18,9 @@ class CustomerUnit < ActiveRecord::Base
     has_many :customer_units_flow_sheets, :class_name => 'CustomerUnitsFlowSheet', :foreign_key => :customer_unit_id
     has_many :flow_sheets, :through => :customer_units_flow_sheets, :source => :flow_sheet
 
-    belongs_to :city
+    #belongs_to :city
+    has_many :customer_unit_addrs, :class_name => 'CustomerUnitAddr', :foreign_key => 'unit_id'
+
     belongs_to :user
 
     #快递单多态
@@ -32,12 +34,29 @@ class CustomerUnit < ActiveRecord::Base
         attributes
     end
 
+    def city
+        customer_unit_addrs.map(&:city)[0]
+    end
+    def addr
+        customer_unit_addrs.map(&:addr)[0]
+    end
+    def en_addr
+        customer_unit_addrs.map(&:en_addr)[0]
+    end
+    def postcode
+        customer_unit_addrs.map(&:postcode)[0]
+    end
+
     def for_grid_json
         attr = attributes
         #binding.pry if city.nil?
         attr['name|en_name|unit_aliases>unit_alias'] = name
-        attr['city>name'] = city.name if city
-        attr['city_id'] = city.id if city
+        attr['customer_unit_addrs>city>name'] = city.name if city
+
+        attr['customer_unit_addrs>addr'] = addr
+        attr['customer_unit_addrs>en_addr'] = en_addr
+        attr['customer_unit_addrs>postcode'] = postcode
+        #attr['city_id'] = city.id if city
         #名称不显示在别称里
         customer_unit_aliases_id_array = []
         customer_unit_aliases_name_array = []

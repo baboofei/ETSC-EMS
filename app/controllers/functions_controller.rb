@@ -3,12 +3,19 @@ class FunctionsController < ApplicationController
     skip_before_filter :verify_authenticity_token
 
     def get_function_privileges
-        functions = Function.get_data(params)
+        user_id = session[:user_id]
+        limit = params[:limit].to_i
+        start = params[:start].to_i
+        filter = params[:filter]
+        sort = params[:sort]
+
+        functions = Function.updated_filter_by(filter).updated_sort_by(sort, user_id)
+                                                  #binding.pry
 
         respond_to do |format|
             format.json {
                 render :json => {
-                    :function_privileges => functions.map{|p| p.for_grid_json},
+                    :function_privileges => functions.limit(limit).offset(start.to_i).map{|p| p.for_grid_json},
                     :totalRecords => functions.size
                 }
             }

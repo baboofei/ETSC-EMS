@@ -231,7 +231,7 @@ class UserMailer < ActionMailer::Base
         end_at = 0.weeks.ago.strftime("%Y-%m-%d")
         @salelogs = salelogs
         mail(:to => to_user.map{|p| User.find(p).etsc_email},
-             :subject => "#{vendor_unit.name}产品推荐情况表(截至止#{end_at})"
+             :subject => "#{vendor_unit.name}产品推荐情况表(截止至#{end_at})"
         )
         sleep 3
     end
@@ -242,7 +242,7 @@ class UserMailer < ActionMailer::Base
         end_at = 0.weeks.ago.strftime("%Y-%m-%d")
         @quotes = quotes
         mail(:to => to_user.map{|p| User.find(p).etsc_email},
-             :subject => "#{vendor_unit.name}产品已报价未成案情况表(截至止#{end_at})"
+             :subject => "#{vendor_unit.name}产品已报价未成案情况表(截止至#{end_at})"
         )
         sleep 3
     end
@@ -252,7 +252,7 @@ class UserMailer < ActionMailer::Base
         end_at = 0.weeks.ago.strftime("%Y-%m-%d")
         @quotes = quotes
         mail(:to => to_user.map{|p| User.find(p).etsc_email},
-             :subject => "#{vendor_unit.name}产品已报价已预签合同情况表(截至止#{end_at})"
+             :subject => "#{vendor_unit.name}产品已报价已预签合同情况表(截止至#{end_at})"
         )
         sleep 3
     end
@@ -263,7 +263,7 @@ class UserMailer < ActionMailer::Base
         end_at = 0.weeks.ago.strftime("%Y-%m-%d")
         @contracts = contracts
         mail(:to => to_user.map{|p| User.find(p).etsc_email},
-             :subject => "#{vendor_unit.name}产品已合同未下单情况表(截至止#{end_at})"
+             :subject => "#{vendor_unit.name}产品已合同未下单情况表(截止至#{end_at})"
         )
         sleep 3
     end
@@ -697,7 +697,7 @@ class UserMailer < ActionMailer::Base
 
     #TSD出差总天数等统计
     def tsd_business_trip_email
-        #默认发邮件时间为1 4 7 10月的5号吧，反正就是跨季度了
+        #默认发邮件时间为1 4 7 10月的10号吧，反正就是跨季度了
         @from_time = "#{3.month.ago.year}-#{3.month.ago.month}-01".to_date.strftime("%Y-%m-%d")
         @to_time = "#{0.month.ago.year}-#{0.month.ago.month}-01".to_date.strftime("%Y-%m-%d")
         #@users = User.includes(:roles).where("roles.id = 10 and users.id != 2")

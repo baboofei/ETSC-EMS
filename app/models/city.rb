@@ -1,7 +1,7 @@
 class City < ActiveRecord::Base
     attr_accessible :en_name, :name, :prvc_id
 
-    has_many :customer_units
+    has_many :customer_unit_addrs
     has_many :vendor_units
     has_many :pop_units
     has_many :exhibitions
