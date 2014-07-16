@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title>东隆科技</title>
   <!-- These needs to be ported as well -->
   <%= stylesheet_link_tag 'main' %>
@@ -9,238 +9,239 @@
   <%= javascript_include_tag 'lib/jquery-1.4.2' %>
   <%= javascript_include_tag 'easycore/easycore' %>
 </head>
-  <!--
-  In order for any of these stylesheet and script references
-  to work as expected, they need to be ported to the correct
-  location and included with correspondent include tab
-  -->
+<!--
+In order for any of these stylesheet and script references
+to work as expected, they need to be ported to the correct
+location and included with correspondent include tab
+-->
 <body>
-  <div class="header">
-    <div class="logo f_l">
-      <a href="index.html" title="">
-        <img alt="Image" src="images/logo.jpg" align="" />
-      </a>
-    </div>
-    <div class="phone f_r">
-      <p class="phone_one">
-        <a class="china" href="javascript:" title="">中文</a>
-        <a class="english" href="javascript:" title="">ENGLISH</a>
-      </p>
-      <p class="phone_two">
-        <img alt="Image" src="images/phone.png" alt="" />
-      </p>
-    </div>
-    <div style="clear:both"></div>
+<div class="header">
+  <div class="logo f_l">
+    <a href="index.html" title="">
+      <img alt="Image" src="images/logo.jpg" align=""/>
+    </a>
   </div>
-  <div class="nav_bg">
-    <div class="nav">
-      <div class="nav_left f_l">
-        <form method="get" name="" id="" action="" target="_blank">
-          <input type="text" class="t_ipt" value="" />
-          <button type="submit" class="btn"></button>
-        </form>
-      </div>
-      <div class="nav_rit f_r">
-        <ul>
-          <!-- For images to work, they need to be placed in the public directory for direct access
-            For convinence of developement, simply move everything in the image directory to the
-            public directory
-            -->
-          <li class="nor">
-            <a href="index.html" title="">
-              <img alt="Image" src="images/nav_1.jpg" alt="" />
-            </a>
-          </li>
-          <li>
-            <a href="about.html" title="">
-              <img alt="Image" src="images/nav_2.jpg" alt="" />
-            </a>
-          </li>
-          <li>
-            <a href="product.html" title="">
-              <img alt="Image" src="images/nav_3.jpg" alt="" />
-            </a>
-          </li>
-          <li>
-            <a href="index.html" title="">
-              <img alt="Image" src="images/nav_4.jpg" alt="" />
-            </a>
-          </li>
-          <li>
-            <a href="index.html" title="">
-              <img alt="Image" src="images/nav_5.jpg" alt="" />
-            </a>
-          </li>
-          <li>
-            <a href="index.html" title="">
-              <img alt="Image" src="images/nav_6.jpg" alt="" />
-            </a>
-          </li>
-          <li>
-            <a href="index.html" title="">
-              <img alt="Image" src="images/nav_7.jpg" alt="" />
-            </a>
-            bs
-          </li>
-          <li>
-            <a href="index.html" title="">
-              <img alt="Image" src="images/nav_8.jpg" alt="" />
-            </a>
-          </li>
-          s
-        </ul>
-        <div style="clear:both"></div>
-      </div>
-      <div style="clear:both"></div>
-    </div>
+  <div class="phone f_r">
+    <p class="phone_one">
+      <a class="china" href="javascript:" title="">中文</a>
+      <a class="english" href="javascript:" title="">ENGLISH</a>
+    </p>
+
+    <p class="phone_two">
+      <img alt="Image" src="images/phone.png" alt=""/>
+    </p>
   </div>
-  <%= yield %>
-  <div class="fright cleafix">
-    <section id="picBox" class="sliderBox">
-      <ul id="show_pic">
+  <div style="clear:both"></div>
+</div>
+<div class="nav_bg">
+  <div class="nav">
+    <div class="nav_left f_l">
+      <form method="get" name="" id="" action="" target="_blank">
+        <input type="text" class="t_ipt" value=""/>
+        <button type="submit" class="btn"></button>
+      </form>
+    </div>
+    <div class="nav_rit f_r">
+      <ul>
+        <!-- For images to work, they need to be placed in the public directory for direct access
+        For convinence of developement, simply move everything in the image directory to the
+        public directory
+        -->
+        <li class="nor">
+          <a href="index.html" title="">
+            <img alt="Image" src="images/nav_1.jpg" alt=""/>
+          </a>
+        </li>
         <li>
-          <a target="_blank" href="javascript:">
-            <img alt="Image" src="images/banner_1.jpg" width="1002" height="280" border="0" />
+          <a href="about.html" title="">
+            <img alt="Image" src="images/nav_2.jpg" alt=""/>
           </a>
         </li>
-        <li class="hide">
-          <a target="_blank" href="javascript:">
-            <img alt="Image" src="images/banner_1.jpg" width="1002" height="280" border="0" />
+        <li>
+          <a href="product.html" title="">
+            <img alt="Image" src="images/nav_3.jpg" alt=""/>
           </a>
         </li>
-        <li class="hide">
-          <a target="_blank" href="javascript:">
-            <img alt="Image" src="images/banner_1.jpg" width="1002" height="280" border="0" />
+        <li>
+          <a href="index.html" title="">
+            <img alt="Image" src="images/nav_4.jpg" alt=""/>
           </a>
         </li>
-        <li class="hide">
-          <a target="_blank" href="javascript:">
-            <img alt="Image" src="images/banner_1.jpg" width="1002" height="280" border="0" />
+        <li>
+          <a href="index.html" title="">
+            <img alt="Image" src="images/nav_5.jpg" alt=""/>
           </a>
         </li>
-        <li class="hide">
-          <a target="_blank" href="javascript:">
-            <img alt="Image" src="images/banner_1.jpg" width="1002" height="280" border="0" />
+        <li>
+          <a href="index.html" title="">
+            <img alt="Image" src="images/nav_6.jpg" alt=""/>
           </a>
         </li>
-        <li class="hide">
-          <a target="_blank" href="javascript:">
-            <img alt="Image" src="images/banner_1.jpg" width="1002" height="280" border="0" />
+        <li>
+          <a href="index.html" title="">
+            <img alt="Image" src="images/nav_7.jpg" alt=""/>
+          </a>
+        </li>
+        <li>
+          <a href="index.html" title="">
+            <img alt="Image" src="images/nav_8.jpg" alt=""/>
           </a>
         </li>
       </ul>
       <div style="clear:both"></div>
-    </section>
-    <%= javascript_include_tag 'index' %>
-    <div style="text-align:center;clear:both"></div>
+    </div>
+    <div style="clear:both"></div>
   </div>
-  <div class="link">
-    <h2 class="f_l">友情链接</h2>
-    <div class="wid f_l">
-      <div id=demo style="overflow:hidden; width:870px;" class="link_bg" align=center>
-        <table border=0 align=center cellpadding=1 cellspacing=1 cellspace=0 >
-          <tr>
-            <td class="link_one" valign=top id=marquePic1>
-              <table width="900px" border='0' cellspacing='0'>
-                <tr>
-                  <td class="link_img" align=center>
-                    <a href="javascript:" title="">
-                      <img alt="Image" src="images/lj_1.jpg" width="108px" height="36px" />
-                    </a>
-                  </td>
-                  <td class="link_img" align=center>
-                    <a href="javascript:" title="">
-                      <img alt="Image" src="images/lj_2.jpg" width="108px" height="36px" />
-                    </a>
-                  </td>
-                  <td class="link_img" align=center>
-                    <a href="javascript:" title="">
-                      <img alt="Image" src="images/lj_3.jpg" width="108px" height="36px" />
-                    </a>
-                  </td>
-                  <td class="link_img" align=center>
-                    <a href="javascript:" title="">
-                      <img alt="Image" src="images/lj_4.jpg" width="108px" height="36px" />
-                    </a>
-                  </td>
-                  <td class="link_img" align=center>
-                    <a href="javascript:" title="">
-                      <img alt="Image" src="images/lj_5.jpg" width="108px" height="36px" />
-                    </a>
-                  </td>
-                  <td class="link_img" align=center>
-                    <a href="javascript:" title="">
-                      <img alt="Image" src="images/lj_6.jpg" width="108px" height="36px" />
-                    </a>
-                  </td>
-                  <td class="link_img" align=center>
-                    <a href="javascript:" title="">
-                      <img alt="Image" src="images/lj_7.jpg" width="108px" height="36px" />
-                    </a>
-                  </td>
-                  <td class="link_img" align=center>
-                    <a href="javascript:" title="">
-                      <img alt="Image" src="images/lj_1.jpg" width="108px" height="36px" />
-                    </a>
-                  </td>
-                  <td class="link_img" align=center>
-                    <a href="javascript:" title="">
-                      <img alt="Image" src="images/lj_2.jpg" width="108px" height="36px" />
-                    </a>
-                  </td>
-                </tr>
-                <div style="clear:both"></div>
-              </table>
-            </td>
-            <td class="link_one" id="marquePic2" valign="top"></td>
-          </tr>
-        </table>
-      </div>
+</div>
+<div class="fright cleafix">
+  <section id="picBox" class="sliderBox">
+    <ul id="show_pic">
+      <li>
+        <a target="_blank" href="javascript:">
+          <img alt="Image" src="images/banner_1.jpg" width="1002" height="280" border="0"/>
+        </a>
+      </li>
+      <li class="hide">
+        <a target="_blank" href="javascript:">
+          <img alt="Image" src="images/banner_1.jpg" width="1002" height="280" border="0"/>
+        </a>
+      </li>
+      <li class="hide">
+        <a target="_blank" href="javascript:">
+          <img alt="Image" src="images/banner_1.jpg" width="1002" height="280" border="0"/>
+        </a>
+      </li>
+      <li class="hide">
+        <a target="_blank" href="javascript:">
+          <img alt="Image" src="images/banner_1.jpg" width="1002" height="280" border="0"/>
+        </a>
+      </li>
+      <li class="hide">
+        <a target="_blank" href="javascript:">
+          <img alt="Image" src="images/banner_1.jpg" width="1002" height="280" border="0"/>
+        </a>
+      </li>
+      <li class="hide">
+        <a target="_blank" href="javascript:">
+          <img alt="Image" src="images/banner_1.jpg" width="1002" height="280" border="0"/>
+        </a>
+      </li>
+    </ul>
+    <div style="clear:both"></div>
+  </section>
+  <%= javascript_include_tag 'index' %>
+  <div style="text-align:center;clear:both"></div>
+</div>
+<%= yield %>
+<div class="link">
+  <h2 class="f_l">友情链接</h2>
+
+  <div class="wid f_l">
+    <div id=demo style="overflow:hidden; width:870px;" class="link_bg" align=center>
+      <table border=0 align=center cellpadding=1 cellspacing=1 cellspace=0>
+        <tr>
+          <td class="link_one" valign=top id=marquePic1>
+            <table width="900px" border='0' cellspacing='0'>
+              <tr>
+                <td class="link_img" align=center>
+                  <a href="javascript:" title="">
+                    <img alt="Image" src="images/lj_1.jpg" width="108px" height="36px"/>
+                  </a>
+                </td>
+                <td class="link_img" align=center>
+                  <a href="javascript:" title="">
+                    <img alt="Image" src="images/lj_2.jpg" width="108px" height="36px"/>
+                  </a>
+                </td>
+                <td class="link_img" align=center>
+                  <a href="javascript:" title="">
+                    <img alt="Image" src="images/lj_3.jpg" width="108px" height="36px"/>
+                  </a>
+                </td>
+                <td class="link_img" align=center>
+                  <a href="javascript:" title="">
+                    <img alt="Image" src="images/lj_4.jpg" width="108px" height="36px"/>
+                  </a>
+                </td>
+                <td class="link_img" align=center>
+                  <a href="javascript:" title="">
+                    <img alt="Image" src="images/lj_5.jpg" width="108px" height="36px"/>
+                  </a>
+                </td>
+                <td class="link_img" align=center>
+                  <a href="javascript:" title="">
+                    <img alt="Image" src="images/lj_6.jpg" width="108px" height="36px"/>
+                  </a>
+                </td>
+                <td class="link_img" align=center>
+                  <a href="javascript:" title="">
+                    <img alt="Image" src="images/lj_7.jpg" width="108px" height="36px"/>
+                  </a>
+                </td>
+                <td class="link_img" align=center>
+                  <a href="javascript:" title="">
+                    <img alt="Image" src="images/lj_1.jpg" width="108px" height="36px"/>
+                  </a>
+                </td>
+                <td class="link_img" align=center>
+                  <a href="javascript:" title="">
+                    <img alt="Image" src="images/lj_2.jpg" width="108px" height="36px"/>
+                  </a>
+                </td>
+              </tr>
+              <div style="clear:both"></div>
+            </table>
+          </td>
+          <td class="link_one" id="marquePic2" valign="top"></td>
+        </tr>
+      </table>
     </div>
   </div>
-  <div class="foot">
-    <p>东隆科技版权所有©2008 鄂ICP备05008104号</p>
-    <p>
-      电话：86 27 87807177    86 10 88231478     86 755 83015356 邮箱： sales@etsc-tech.com
-    </p>
-  </div>
-  <script type="text/javascript">
+</div>
+<div class="foot">
+  <p>东隆科技版权所有©2008 鄂ICP备05008104号</p>
+
+  <p>
+    电话：86 27 87807177 86 10 88231478 86 755 83015356 邮箱： sales@etsc-tech.com
+  </p>
+</div>
+<script type="text/javascript">
     var speed = 50;
-     marquePic4.innerHTML = marquePic3.innerHTML;
+    marquePic4.innerHTML = marquePic3.innerHTML;
 
     function acc() {
-      if (demo1.scrollLeft >= marquePic3.scrollWidth) {
-        demo1.scrollLeft = 0;
-      } else {
-        demo1.scrollLeft++;
-      }
+        if(demo1.scrollLeft >= marquePic3.scrollWidth) {
+            demo1.scrollLeft = 0;
+        } else {
+            demo1.scrollLeft++;
+        }
     }
     var add = setInterval(acc, speed)
-     demo1.onmouseover = function() {
-      clearInterval(add);
+    demo1.onmouseover = function() {
+        clearInterval(add);
     }
     demo1.onmouseout = function() {
-      add = setInterval(acc, speed);
+        add = setInterval(acc, speed);
     }
-    </script>
-  <script type="text/javascript">
+</script>
+<script type="text/javascript">
     var speed = 50;
-     marquePic2.innerHTML = marquePic1.innerHTML;
+    marquePic2.innerHTML = marquePic1.innerHTML;
 
     function Marquee() {
-      if (demo.scrollLeft >= marquePic1.scrollWidth) {
-        demo.scrollLeft = 0;
-      } else {
-        demo.scrollLeft++;
-      }
+        if(demo.scrollLeft >= marquePic1.scrollWidth) {
+            demo.scrollLeft = 0;
+        } else {
+            demo.scrollLeft++;
+        }
     }
     var MyMar = setInterval(Marquee, speed)
-     demo.onmouseover = function() {
-      clearInterval(MyMar);
+    demo.onmouseover = function() {
+        clearInterval(MyMar);
     }
     demo.onmouseout = function() {
-      MyMar = setInterval(Marquee, speed);
+        MyMar = setInterval(Marquee, speed);
     }
-    </script>
+</script>
 </body>
 </html>
