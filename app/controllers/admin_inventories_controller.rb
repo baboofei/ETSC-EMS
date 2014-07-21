@@ -115,7 +115,8 @@ class AdminInventoriesController < ApplicationController
 
     def save_admin_inventory
         #binding.pry
-        result = AdminInventory.create_or_update_with(params, session[:user_id])
+        is_local = judge_ip
+        result = AdminInventory.create_or_update_with(params, session[:user_id], is_local)
 
         render :json => {:success => result[:success], :message => result[:message]}
     end

@@ -23,6 +23,8 @@ Ext.define('EIM.view.product.Panel', {
     buttons: [
         {
             text: '保存为新产品',
+            id: 'privilege_button_edit_product_save_as',
+            allowPrivilege: true,
             action: 'save_as',
             iconCls: 'btn_save_as'
         }

@@ -397,12 +397,12 @@ Ext.define('EIM.controller.Layout', {
                                     },
                                     success: function(response) {
                                         var msg = Ext.decode(response.responseText);
-                                        view.down('customer_check_dup_sub_form[title=客户信息(转入)]').loadRecord({
+                                        view.down('customer_check_dup_sub_form[title=客户信息(转入)]', false).loadRecord({
                                             "data": msg['customers'][0]
                                         });
-                                        view.down('textarea[name=detail]').setValue(msg['customers'][0]['detail']);
-                                        view.down('[name=inquire_type]').setValue(msg['inquire_type']);
-                                        view.down('[name=inquire_id]').setValue(msg['inquire_id']);
+                                        view.down('textarea[name=detail]', false).setValue(msg['customers'][0]['detail']);
+                                        view.down('[name=inquire_type]', false).setValue(msg['inquire_type']);
+                                        view.down('[name=inquire_id]', false).setValue(msg['inquire_id']);
                                     },
                                     failure: function() {
                                         Ext.Msg.alert('错误', '可能是网络问题，请找Terry处理');
@@ -428,13 +428,13 @@ Ext.define('EIM.controller.Layout', {
                                     },
                                     success: function(response) {
                                         var msg = Ext.decode(response.responseText);
-                                        view.down('customer_check_dup_sub_form[title=客户信息(转入)]').loadRecord({
+                                        view.down('customer_check_dup_sub_form[title=客户信息(转入)]', false).loadRecord({
                                             "data": msg['customers'][0]
                                         });
-                                        view.down('customer_check_dup_sub_form[title=客户信息(转入)] [name=lead_id]').setValue('6'); //默认成“工厂转”
-                                        view.down('textarea[name=detail]').setValue(msg['customers'][0]['detail']);
-                                        view.down('[name=inquire_type]').setValue(msg['inquire_type']);
-                                        view.down('[name=inquire_id]').setValue(msg['inquire_id']);
+                                        view.down('customer_check_dup_sub_form[title=客户信息(转入)] [name=lead_id]', false).setValue('6'); //默认成“工厂转”
+                                        view.down('textarea[name=detail]', false).setValue(msg['customers'][0]['detail']);
+                                        view.down('[name=inquire_type]', false).setValue(msg['inquire_type']);
+                                        view.down('[name=inquire_id]', false).setValue(msg['inquire_id']);
                                         //                                        console.log(msg['customers'][0]['vendor_unit_id']);
                                     },
                                     failure: function() {

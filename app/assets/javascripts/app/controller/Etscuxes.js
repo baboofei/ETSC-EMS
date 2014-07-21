@@ -67,7 +67,9 @@ Ext.define('EIM.controller.Etscuxes', {
         'product.MiniAddForm',
         'business_unit.Form',
         'business_contact.Form',
-        'pop_unit.Form'
+        'pop_unit.Form',
+
+        'etscux.AddrForUnit'
     ],
 //    refs: [{
 //        ref: 'zzform',

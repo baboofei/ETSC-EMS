@@ -5,7 +5,7 @@ class AdminInventory < ActiveRecord::Base
 
     attr_accessible :buy_price, :buyer_user_id, :comment, :count_unit, :currency_id, :current_quantity, :financial_price,
                     :inventory_level, :inventory_type, :keep_at, :keeper_user_id, :model, :name, :number, :ownership, :project,
-                    :rmb, :sn, :state, :vendor_id, :vendor_unit_id
+                    :rmb, :sn, :state, :vendor_id, :vendor_unit_id, :expire_at, :expire_warranty_at
     belongs_to :currency
 
     belongs_to :keeper, :class_name => 'User', :foreign_key => 'keeper_user_id'
@@ -210,7 +210,7 @@ class AdminInventory < ActiveRecord::Base
         attr
     end
 
-    def self.create_or_update_with(params, user_id)
+    def self.create_or_update_with(params, user_id, is_local)
         item = "物品"
         #if params[:id].blank?
         #    admin_item = AdminInventory.new
@@ -268,7 +268,7 @@ class AdminInventory < ActiveRecord::Base
                 end
 
                 #打印入库单
-                gen_stock_in_pdf(grid_data_array)
+                gen_stock_in_pdf(grid_data_array, is_local)
 
             when 'stock_in'
                 message = "已经入库"
@@ -1142,9 +1142,8 @@ class AdminInventory < ActiveRecord::Base
                     PersonalMessage.create_or_update_with(message_params, user_id)
                 end
 
-
                 #打印退货单
-                gen_reject_pdf(grid_data_array)
+                gen_reject_pdf(grid_data_array, is_local)
 
             when 'reject'
                 message = "已经退货成功"
@@ -1348,7 +1347,7 @@ class AdminInventory < ActiveRecord::Base
     #end
 
     #params data [{"id" => 0, "name" => "xxx", ...}, {"id" => 0, "name" => "xxx"}]
-    def self.gen_stock_in_pdf(data)
+    def self.gen_stock_in_pdf(data, is_local)
         pdf_font = "#{Rails.root}/app/assets/fonts/yahei_mono.ttf"
         template_filename = "#{Rails.root}/public/stock_in/template.pdf"
 
@@ -1446,7 +1445,12 @@ class AdminInventory < ActiveRecord::Base
             attachment_array << file_name
             vendor_unit_name_array << VendorUnit.find(vendor_unit_id).name
         end
-        to_user = User.find(data[0]["buyer>id"])
+
+        if is_local
+            to_user = User.find(5)
+        else
+            to_user = User.find(data[0]["buyer>id"])
+        end
         if vendor_unit_name_array.size > 3
             vendor_unit_name = vendor_unit_name_array[0..3].join("、") + "等"
         else
@@ -1455,7 +1459,7 @@ class AdminInventory < ActiveRecord::Base
         UserMailer.stock_in_pdf_email(to_user, "#{Date.today.strftime("%Y-%m-%d")}入库单_#{vendor_unit_name}", attachment_array).deliver
     end
 
-    def self.gen_reject_pdf(data)
+    def self.gen_reject_pdf(data, is_local)
         pdf_font = "#{Rails.root}/app/assets/fonts/yahei_mono.ttf"
         template_filename = "#{Rails.root}/public/stock_in/reject/template.pdf"
 
@@ -1552,7 +1556,11 @@ class AdminInventory < ActiveRecord::Base
             #UserMailer.welcome_email(User.find(1), "", "", "")
             attachment_array << file_name
         end
-        to_user = User.find(data[0]["buyer>id"])
+        if is_local
+            to_user = User.find(5)
+        else
+            to_user = User.find(data[0]["buyer>id"])
+        end
         UserMailer.stock_in_pdf_email(to_user, "#{Date.today.strftime("%Y-%m-%d")}退货单", attachment_array).deliver
     end
 

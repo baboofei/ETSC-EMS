@@ -310,6 +310,18 @@ Ext.define('EIM.view.admin_inventory.Grid', {
                 renderer: Ext.util.Format.dateRenderer("Y-m-d")
             },
             {
+                header: '操作日期',
+                dataIndex: 'created_at',
+                width: 90,
+                sortable: true,
+                filter: {
+                    type: 'date',
+                    dateFormat: 'Y-m-d'
+                },
+                hidden: true,
+                renderer: Ext.util.Format.dateRenderer("Y-m-d")
+            },
+            {
                 header:'备注',
                 dataIndex: 'comment',
                 minWidth: 75,

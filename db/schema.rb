@@ -38,12 +38,12 @@ ActiveRecord::Schema.define(:version => 20140715012953) do
     t.integer  "inventory_type"
     t.integer  "inventory_level"
     t.integer  "keep_at"
-    t.decimal  "current_quantity", :precision => 10, :scale => 2
+    t.decimal  "current_quantity",   :precision => 10, :scale => 2
     t.string   "count_unit"
-    t.decimal  "buy_price",        :precision => 12, :scale => 2
-    t.decimal  "financial_price",  :precision => 12, :scale => 2
+    t.decimal  "buy_price",          :precision => 12, :scale => 2
+    t.decimal  "financial_price",    :precision => 12, :scale => 2
     t.integer  "currency_id"
-    t.decimal  "rmb",              :precision => 12, :scale => 2
+    t.decimal  "rmb",                :precision => 12, :scale => 2
     t.string   "state"
     t.string   "project"
     t.integer  "keeper_user_id"
@@ -56,9 +56,10 @@ ActiveRecord::Schema.define(:version => 20140715012953) do
     t.integer  "in_stock_source"
     t.integer  "out_stock_source"
     t.datetime "expire_at"
+    t.datetime "expire_warranty_at"
     t.integer  "user_id"
-    t.datetime "created_at",                                      :null => false
-    t.datetime "updated_at",                                      :null => false
+    t.datetime "created_at",                                        :null => false
+    t.datetime "updated_at",                                        :null => false
   end
 
   create_table "admin_inventory_histories", :force => true do |t|
@@ -356,14 +357,18 @@ ActiveRecord::Schema.define(:version => 20140715012953) do
 
   create_table "customer_units", :force => true do |t|
     t.string   "name"
+    t.integer  "city_id"
+    t.string   "addr"
+    t.string   "postcode"
     t.string   "en_name"
-    t.string   "cu_sort"
+    t.string   "en_addr"
+    t.integer  "cu_sort"
     t.integer  "user_id"
     t.string   "site"
-    t.integer  "credit_level"
+    t.integer  "credit_level", :default => 0
     t.text     "comment"
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "customer_units_flow_sheets", :id => false, :force => true do |t|

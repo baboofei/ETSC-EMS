@@ -7,7 +7,7 @@ Ext.define('EIM.view.customer_unit.Form', {
     title: '新增/修改客户单位',
     layout: 'fit',
     width: 450,
-    height: 290,
+//    height: 290,
     maximizable: true,
     modal: true,
 
@@ -38,46 +38,28 @@ Ext.define('EIM.view.customer_unit.Form', {
                         allowBlank: false
                     },
                     {
-                        xtype: 'container',
-                        layout: 'hbox',
-                        padding: '0 0 5',
-                        defaults: {
-                            xtype: 'textfield'
-                        },
+                        xtype: 'tabpanel',
+                        name: 'addr_group_tab',
+                        border: false,
+                        height: 146,
                         items: [
                             {
-                                xtype: 'combo',
-                                name: 'city_id',
-                                fieldLabel: '所属城市',
-                                store: 'dict.Cities',
-                                displayField: 'name',
-                                valueField: 'id',
-                                allowBlank: false,
-                                mode: 'remote',
-                                emptyText: '请输入所属城市名称',
-                                triggerAction: 'query',
-                                minChars: 1,
-                                hideTrigger: true, //伪成输入框
-                                forceSelection: true
+                                xtype: 'addr_for_unit',
+                                title: 'test',
+                                addrIndex: 1
                             },
                             {
-                                name: 'postcode',
-                                fieldLabel: '邮政编码'
+                                xtype: 'addr_for_unit',
+                                addrIndex: 2
+                            },
+                            {
+                                title: '+'
                             }
                         ]
                     },
                     {
-                        name: 'addr',
-                        fieldLabel: '地址',
-                        emptyText: '不要写城市名称，因为已经选择了'
-                    },
-                    {
                         name: 'en_name',
                         fieldLabel: '英文名称'
-                    },
-                    {
-                        name: 'en_addr',
-                        fieldLabel: '英文地址'
                     },
                     {
                         xtype: 'container',

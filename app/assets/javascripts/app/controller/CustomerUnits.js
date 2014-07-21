@@ -19,6 +19,7 @@ Ext.define('EIM.controller.CustomerUnits', {
 
     init: function() {
         var me = this;
+        var active_tab_name = "";
         me.control({
             'customer_unit_grid': {
                 itemdblclick: this.editCustomerUnit,
@@ -29,6 +30,30 @@ Ext.define('EIM.controller.CustomerUnits', {
             },
             'customer_unit_form button[action=save]': {
                 click: this.saveCustomerUnit
+            },
+//            'customer_unit_form [name=addr_group_tab] addr_for_unit': {
+//                beforedeactivate: function(tab) {
+//                    active_tab_name = tab.title;
+//                }
+//            },
+            'customer_unit_form [name=addr_group_tab] [title=+]': {
+                activate: function(tab, deactive_tab) {//此处API疑似有误，可以有第二个参数的
+                    //如果有addr_name是空着的tab，则不让新增
+                    var tab_panel = tab.up('tabpanel');
+                    var tabs = tab_panel.items.items;
+                    console.log(tabs);
+                    Ext.Array.each(tabs, function(item, index) {
+                        if(item.xtype === "addr_for_unit" && Ext.isEmpty(item.down('[grossName=addr_name]', false).getValue())) {
+                            Ext.example.msg("错误", "请先把现有地址信息填写完整！");
+                            tab_panel.setActiveTab(index);
+                            return false;
+                        }
+                    });
+
+//                    console.log(tab_panel.getActiveTab());
+//                    console.log(deactive_tab.down('[grossName=addr_name]', false));
+                }
+//                click: this.addNewAddrTab(tab, active_tab_name)
             }
         });
     },
@@ -85,6 +110,13 @@ Ext.define('EIM.controller.CustomerUnits', {
                 }
             });
         }
+    },
+
+    addNewAddrTab: function(tab, active_tab_name) {
+        //如果当前激活标签的“描述”没有填，则不能加
+        var tab_panel = tab.up('tabpanel');
+        console.log(tab_panel.getActiveTab());
+        console.log(active_tab_name);
     },
 
     loadCustomerUnits: function() {
