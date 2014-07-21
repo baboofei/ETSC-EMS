@@ -38,8 +38,10 @@ class SalecasesController < ApplicationController
     end
 
     def get_combo_salecases
+        user_id = session[:user_id]
+        target_store = action_name.camelize[3..-1]#根据方法名来取模型
         customer_id = params[:customer_id]
-        salecases = Salecase.to_customer(customer_id)
+        salecases = Salecase.to_customer(customer_id).get_available_data(target_store, user_id)
 
         respond_to do |format|
             #binding.pry
