@@ -37,7 +37,7 @@ Ext.define('EIM.view.customer.Grid', {
             },
             {
                 header: '客户单位',
-                dataIndex: 'customer_unit>(name|unit_aliases>unit_alias)',
+                dataIndex: 'customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias)',
 //                dataIndex: 'customer_unit>customer_unit_aliases>unit_alias',
                 width: 150,
                 sortable: false,
@@ -57,13 +57,13 @@ Ext.define('EIM.view.customer.Grid', {
             },
             {
                 header: '单位性质',
-                dataIndex: 'customer_unit>cu_sort',
+                dataIndex: 'customer_unit_addr>customer_unit>cu_sort',
                 width: 50,
                 sortable: true,
                 renderer: function(value, metaData, record) {
                     var name;
                     Ext.Array.each(cuSortArray, function(item, index, allItems) {
-                        if(Number(item['value']) === record.get('customer_unit>cu_sort')) {
+                        if(Number(item['value']) === record.get('customer_unit_addr>customer_unit>cu_sort')) {
                             name = item['display'];
                         }
                     });
@@ -79,7 +79,7 @@ Ext.define('EIM.view.customer.Grid', {
             },
             {
                 header: '区域',
-                dataIndex: 'customer_unit>city>prvc>area>id',
+                dataIndex: 'customer_unit_addr>city>prvc>area>id',
                 width: 50,
                 sortable: true,
                 filter: {
@@ -90,12 +90,12 @@ Ext.define('EIM.view.customer.Grid', {
                     })
                 },
                 renderer: function(value, metaData, record) {
-                    return record.get('customer_unit>city>prvc>area>name');
+                    return record.get('customer_unit_addr>city>prvc>area>name');
                 }
             },
             {
                 header: '城市',
-                dataIndex: 'customer_unit>city>name',
+                dataIndex: 'customer_unit_addr>city>name',
                 width: 50,
                 sortable: false,
                 filter: {

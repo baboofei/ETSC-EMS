@@ -41,16 +41,11 @@ Ext.define('EIM.view.customer_unit.Form', {
                         xtype: 'tabpanel',
                         name: 'addr_group_tab',
                         border: false,
-                        height: 146,
+                        height: 150,
                         items: [
                             {
                                 xtype: 'addr_for_unit',
-                                title: 'test',
                                 addrIndex: 1
-                            },
-                            {
-                                xtype: 'addr_for_unit',
-                                addrIndex: 2
                             },
                             {
                                 title: '+'

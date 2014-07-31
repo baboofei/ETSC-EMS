@@ -172,7 +172,7 @@ Ext.define('EIM.controller.Customers', {
         //给combo做一个假的store以正确显示值
         var customer_unit_field = view.down('[name=customer_unit_id]', false);
         customer_unit_field.getStore().loadData([
-            [record.get('customer_unit>id'), record.get('customer_unit>(name|unit_aliases>unit_alias)')]
+            [record.get('customer_unit>id'), record.get('customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias)')]
         ]);
         customer_unit_field.setValue(record.get('customer_unit>id'));
 
@@ -259,8 +259,16 @@ Ext.define('EIM.controller.Customers', {
      */
     applyAddress: function(combo, records) {
         var addr = records[0];
-        var addr_field = combo.up('form').down('[name=addr]', false);
-        addr_field.setValue(addr.get('address'));
+        var form = combo.up('form');
+        var addr_field = form.down('[name=addr]', false);
+        var en_addr_field = form.down('[name=en_addr]', false);
+        var postcode_field = form.down('[name=postcode]', false);
+        if(!Ext.isEmpty(addr_field.getValue())) addr_field.setValue(addr.get('addr'));
+        if(!Ext.isEmpty(en_addr_field.getValue())) en_addr_field.setValue(addr.get('en_addr'));
+        if(!Ext.isEmpty(postcode_field.getValue())) postcode_field.setValue(addr.get('postcode'));
+        form.down('[name=customer_unit_addr_id]', false).setValue(addr.get('customer_unit_addr_id'));
+//        console.log(addr);
+//        console.log(addr.get('customer_unit_addr_id'));
     },
 
     saveCustomer: function(button) {

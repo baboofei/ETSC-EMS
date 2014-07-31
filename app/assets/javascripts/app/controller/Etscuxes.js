@@ -254,6 +254,13 @@ Ext.define('EIM.controller.Etscuxes', {
              */
             'expandable_material_code_combo button[text=+]': {
                 click: this.popUpMaterialCodeFormAndSetValue
+            },
+
+            /**
+             * 客户单位标签里，地址描述的textfield改变时，标签名也跟着变
+             */
+            'addr_for_unit [grossName=addr_name]': {
+                change: this.syncTabTitle
             }
         });
     },
@@ -264,34 +271,48 @@ Ext.define('EIM.controller.Etscuxes', {
      * 如果有“地址”在同一表单内，则把返回的地址填进去作为默认值
      */
     addParamsToCustomerStore: function(combo, records, eOpts) {
-        var expandable_combo = combo.up('form').down('expandable_customer_combo', false)
+        var form = combo.up('form');
+        var expandable_combo = form.down('expandable_customer_combo', false)
         if(expandable_combo){
             var customer_combo = expandable_combo.down('combo', false);
             customer_combo.getStore().getProxy().setExtraParam('customer_unit_id', records[0]["data"]["id"]);
             customer_combo.reset();
         }
-        var addr_field = combo.up('form').down('[name=addr]', false);
-        var addr_combo = combo.up('form').down('[name=addr_combo]', false);
+        var addr_field = form.down('[name=addr]', false);
+        var en_addr_field = form.down('[name=en_addr]', false);
+        var postcode_field = form.down('[name=postcode]', false);
+        var customer_unit_addr_id_field = form.down('[name=customer_unit_addr_id]', false);
+        var addr_combo = form.down('[name=addr_combo]', false);
 //        console.log(addr_field);
         if(addr_field) {
-            //如果地址是“紫金港校区：西湖区余杭塘路866号；玉泉校区：西湖区浙大路38号”这样的形式，
-            //也即包含分号，则把多地址解析一下放到addr_combo里供选
-            var addr = records[0].get('addr');
-            var addr_array = addr.split("；");
+            //如果地址是JSON格式，则解析一下放到addr_combo里供选
+//            console.log(records[0].get('addr'));
+            var addr_array = Ext.JSON.decode(records[0].get('addr'));
 
             if(addr_array.length === 1) {
-                addr_combo.getStore().removeAll();
-                addr_combo.setValue();
-                addr_field.setValue(addr);
+                addr_field.setValue(addr_array[0]['addr']);
+                en_addr_field.setValue(addr_array[0]['en_addr']);
+                postcode_field.setValue(addr_array[0]['postcode']);
+                customer_unit_addr_id_field.setValue(addr_array[0]['customer_unit_addr_id']);
             } else {
                 var addr_store = [];
                 Ext.Array.each(addr_array, function(item) {
-                    addr_store.push({name: item.split("：")[0], address: item.split("：")[1]});
+                    addr_store.push({
+                        name: item['name'],
+                        addr: item['addr'],
+                        postcode: item['postcode'],
+                        en_addr: item['en_addr'],
+                        customer_unit_addr_id: item['customer_unit_addr_id']
+                    });
                 });
+//                console.log(addr_store);
                 addr_combo.getStore().loadData(addr_store);
                 addr_combo.expand();
-                addr_combo.setValue(addr_array[0].split("：")[1]);
-                addr_field.setValue(addr_array[0].split("：")[1]);
+                addr_combo.setValue(addr_array[0]['addr']);
+                if(!Ext.isEmpty(addr_field.getValue())) addr_field.setValue(addr_array[0]['addr']);
+                if(!Ext.isEmpty(en_addr_field.getValue())) en_addr_field.setValue(addr_array[0]['en_addr']);
+                if(!Ext.isEmpty(postcode_field.getValue())) postcode_field.setValue(addr_array[0]['postcode']);
+                customer_unit_addr_id_field.setValue(addr_array[0]['customer_unit_addr_id']);
             }
         }
     },
@@ -731,5 +752,15 @@ Ext.define('EIM.controller.Etscuxes', {
             form.down('[name=code]').setValue(value);
             form.down('[name=source_element_id]').setValue(button.id);
         });
+    },
+
+    syncTabTitle: function(textfield, newValue) {
+        var tab_index = textfield.name.split("_")[2];
+        var tab = textfield.up('tabpanel').items.items[tab_index - 1].tab;
+        if(Ext.isEmpty(newValue)) {
+            tab.setText('新地址');
+        } else {
+            tab.setText(newValue);
+        }
     }
 });

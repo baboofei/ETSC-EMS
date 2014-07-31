@@ -4,7 +4,7 @@ class CustomerUnit < ActiveRecord::Base
     include Reusable
 
     attr_accessible :comment, :credit_level, :cu_sort, :en_name, :name, :site, :user_id
-    has_many :customers
+    #has_many :customers
     has_many :quotes
     has_many :contracts
     #has_many :customer_unit_aliases
@@ -30,32 +30,62 @@ class CustomerUnit < ActiveRecord::Base
         where("customer_unit_aliases.unit_alias like ?", "%#{query}%").includes(:unit_aliases)
     end
 
+    #TODO 似乎发现了了不得的大bug，关于引号的……待测待改
     def for_combo_json
-        attributes
+        attr = attributes
+        if customer_unit_addrs.size > 1
+            attr['addr'] = customer_unit_addrs.map do |p|
+                {
+                    "name" => %Q|#{p['name']}|,#用最不可能出现在地址里的字符“|”当分隔
+                    "postcode" => %Q|#{p['postcode']}|,
+                    "addr" => %Q|#{p['addr']}|,
+                    "en_addr" => %Q|#{p['en_addr']}|,
+                    "customer_unit_addr_id" => "#{p['id']}"
+                }
+            end.to_s.gsub("=>", ":")
+        else
+            attr['addr'] = [{
+                "name" => customer_unit_addrs[0]['name'],
+                "postcode" => customer_unit_addrs[0]['postcode'],
+                "addr" => customer_unit_addrs[0]['addr'],
+                "en_addr" => customer_unit_addrs[0]['en_addr'],
+                "customer_unit_addr_id" => customer_unit_addrs[0]['id']
+            }].to_s.gsub("=>", ":")
+        end
+
+        #attr['addr'] = self.customer_unit_addrs.size > 1 ? (self.customer_unit_addrs.map{|p| "#{p.name}：#{p.addr}"}.join("；")) : (self.customer_unit_addrs[0].addr)
+        attr
     end
 
-    def city
-        customer_unit_addrs.map(&:city)[0]
-    end
-    def addr
-        customer_unit_addrs.map(&:addr)[0]
-    end
-    def en_addr
-        customer_unit_addrs.map(&:en_addr)[0]
-    end
-    def postcode
-        customer_unit_addrs.map(&:postcode)[0]
-    end
+    #def prime
+    #    customer_unit_addrs.select{|p| p["is_prime"]}[0].city
+    #end
+    #
+    #def city
+    #    customer_unit_addrs.select{|p| p["is_prime"]}[0].city
+    #    #customer_unit_addrs.map(&:city)[0]
+    #end
+    #def addr
+    #    customer_unit_addrs.select{|p| p["is_prime"]}[0].addr
+    #    #customer_unit_addrs.map(&:addr)[0]
+    #end
+    #def en_addr
+    #    customer_unit_addrs.select{|p| p["is_prime"]}[0].en_addr
+    #    #customer_unit_addrs.map(&:en_addr)[0]
+    #end
+    #def postcode
+    #    customer_unit_addrs.select{|p| p["is_prime"]}[0].postcode
+    #    #customer_unit_addrs.map(&:postcode)[0]
+    #end
 
     def for_grid_json
         attr = attributes
         #binding.pry if city.nil?
         attr['name|en_name|unit_aliases>unit_alias'] = name
-        attr['customer_unit_addrs>city>name'] = city.name if city
-
-        attr['customer_unit_addrs>addr'] = addr
-        attr['customer_unit_addrs>en_addr'] = en_addr
-        attr['customer_unit_addrs>postcode'] = postcode
+        attr['customer_unit_addrs>city>name'] = customer_unit_addrs.map{|p| p.city.name}.uniq.join("、")
+        attr['customer_unit_addrs>addr'] = customer_unit_addrs.map{|p| p.addr}.uniq.join("、")
+        attr['customer_unit_addrs>en_addr'] = customer_unit_addrs.map{|p| p.en_addr}.uniq.join("/")
+        attr['customer_unit_addrs>postcode'] = customer_unit_addrs.map{|p| p.postcode}.uniq.join("、")
         #attr['city_id'] = city.id if city
         #名称不显示在别称里
         customer_unit_aliases_id_array = []
@@ -68,6 +98,14 @@ class CustomerUnit < ActiveRecord::Base
         end
         attr['unit_aliases>id'] = customer_unit_aliases_id_array.join('|')
         attr['unit_aliases>unit_alias'] = customer_unit_aliases_name_array.join('、')
+
+        attr['all_city_ids'] = customer_unit_addrs.map{|p| p.city_id}.join("||")
+        attr['all_city_names'] = customer_unit_addrs.map{|p| p.city.name}.join("||")
+        attr['all_is_primes'] = customer_unit_addrs.map{|p| p.is_prime}.join("||")
+        attr['all_addr_names'] = customer_unit_addrs.map{|p| p.name}.join("||")
+        attr['all_postcodes'] = customer_unit_addrs.map{|p| p.postcode}.join("||")
+        attr['all_addrs'] = customer_unit_addrs.map{|p| p.addr}.join("||")
+        attr['all_en_addrs'] = customer_unit_addrs.map{|p| p.en_addr}.join("||")
         attr
     end
 
@@ -100,8 +138,8 @@ class CustomerUnit < ActiveRecord::Base
                 message = $etsc_create_ok
             end
         end
-
-        fields_to_be_updated = %w(city_id postcode addr en_name en_addr site cu_sort comment)
+        binding.pry
+        fields_to_be_updated = %w(city_id en_name site cu_sort comment)
         fields_to_be_updated.each do |field|
             customer_unit[field] = params[field]
         end
@@ -110,13 +148,34 @@ class CustomerUnit < ActiveRecord::Base
         customer_unit.name = params['name|en_name|unit_aliases>unit_alias']
         customer_unit.save
 
-        #别称单独存
+        #如果是修改，则先把旧的地址和别称删光
         if params[:id] != ""
             CustomerUnitAlias.delete_all("customer_unit_id = #{params[:id]}")
+            CustomerUnitAddr.delete_all("unit_id = #{params[:id]}")
             customer_unit_id = params[:id].to_i
         else
             customer_unit_id = customer_unit.id
         end
+
+        #存地址
+        params_keys = params.keys
+        addr_list = params_keys.select{|p| p.include?("addr_name")}
+        addr_count = addr_list.size
+
+        1.upto(addr_count) do |index|
+            addr = CustomerUnitAddr.new
+            addr['name'] = params["addr_name_#{index}"]
+            addr['is_prime'] = params["is_prime_#{index}"]
+            addr['city_id'] = params["real_city_id_#{index}"].blank? ? params["city_id_#{index}"] : params["real_city_id_#{index}"]
+            addr['postcode'] = params["postcode_#{index}"]
+            addr['addr'] = params["addr_#{index}"]
+            addr['en_addr'] = params["en_addr_#{index}"]
+            addr['unit_id'] = customer_unit_id
+            addr['user_id'] = user_id
+            addr.save
+        end
+
+        #存别称
         #本名也作为别称的一条存起来
         alias_array = params['unit_aliases>unit_alias'].multi_split << params['name|en_name|unit_aliases>unit_alias']
         alias_array.each do |unit_alias|

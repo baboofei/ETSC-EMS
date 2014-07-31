@@ -1,7 +1,7 @@
 class CreateCustomers < ActiveRecord::Migration
     def change
         create_table :customers do |t|
-            t.integer :customer_unit_id
+            t.integer :customer_unit_addr_id
             t.string :name
             t.string :en_name
             t.string :mobile

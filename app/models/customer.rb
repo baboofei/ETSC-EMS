@@ -3,7 +3,8 @@ class Customer < ActiveRecord::Base
     require "reusable"
     include Reusable
 
-    attr_accessible :addr, :comment, :customer_unit_id, :department, :email, :en_addr, :en_name, :fax, :im, :is_obsolete, :lead_id, :mobile, :name, :phone, :position, :user_id, :postcode
+    attr_accessible :addr, :comment, :customer_unit_addr_id, :department, :email, :en_addr, :en_name, :fax, :im, :is_obsolete,
+                    :lead_id, :mobile, :name, :phone, :position, :user_id, :postcode
 
     #客户的归属用户
     belongs_to :user, :class_name => 'User', :foreign_key => :user_id
@@ -15,7 +16,7 @@ class Customer < ActiveRecord::Base
     has_many :customers_salecases
     has_many :salecases, :through => :customers_salecases
 
-    belongs_to :customer_unit
+    belongs_to :customer_unit_addr
 
     has_many :customers_prod_applications
     has_many :prod_applications, :through => :customers_prod_applications
@@ -56,37 +57,37 @@ class Customer < ActiveRecord::Base
     def for_grid_json(user_id)
         attr = attributes
         #binding.pry if customer_unit.nil?
-        if customer_unit
-            attr['customer_unit>(name|unit_aliases>unit_alias)'] = customer_unit.name
+        if customer_unit_addr
+            attr['customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias)'] = customer_unit_addr.customer_unit.name
             #attr['customer_unit>customer_unit_aliases>unit_alias'] = customer_unit.name
-            attr['customer_unit>id'] = customer_unit.id
+            attr['customer_unit>id'] = customer_unit_addr.customer_unit.id
             #binding.pry if customer_unit.city.nil?
-            attr['customer_unit>city>name'] = customer_unit.city.name
-            attr['customer_unit>city>id'] = customer_unit.city.id
-            if customer_unit.city && customer_unit.city.prvc && customer_unit.city.prvc.area
-                attr['customer_unit>city>prvc>area>name'] = customer_unit.city.prvc.area.name
-                attr['customer_unit>city>prvc>area>id'] = customer_unit.city.prvc.area.id
+            attr['customer_unit_addr>city>name'] = customer_unit_addr.city.name
+            attr['customer_unit_addr>city>id'] = customer_unit_addr.city.id
+            if customer_unit_addr.city && customer_unit_addr.city.prvc && customer_unit_addr.city.prvc.area
+                attr['customer_unit_addr>city>prvc>area>name'] = customer_unit_addr.city.prvc.area.name
+                attr['customer_unit_addr>city>prvc>area>id'] = customer_unit_addr.city.prvc.area.id
             else
-                attr['customer_unit>city>prvc>area>name'] = $etsc_empty_data
-                attr['customer_unit>city>prvc>area>id'] = 0
+                attr['customer_unit_addr>city>prvc>area>name'] = $etsc_empty_data
+                attr['customer_unit_addr>city>prvc>area>id'] = 0
             end
             #名称不显示在别称里
-            customer_unit_aliases = customer_unit.unit_aliases
+            customer_unit_aliases = customer_unit_addr.customer_unit.unit_aliases
             customer_unit_aliases_name_array = []
             customer_unit_aliases.each do |customer_unit_alias|
-                if customer_unit_alias.unit_alias != customer_unit.name
+                if customer_unit_alias.unit_alias != customer_unit_addr.customer_unit.name
                     customer_unit_aliases_name_array << customer_unit_alias.unit_alias
                 end
             end
             attr['customer_unit>unit_aliases>unit_alias'] = customer_unit_aliases_name_array.join("、")
-            attr['customer_unit>cu_sort'] = customer_unit.cu_sort
+            attr['customer_unit_addr>customer_unit>cu_sort'] = customer_unit_addr.customer_unit.cu_sort
         else
-            attr['customer_unit>(name|unit_aliases>unit_alias)'] = $etsc_empty_data
+            attr['customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias)'] = $etsc_empty_data
             #attr['customer_unit>name'] = $etsc_empty_data
             attr['customer_unit>id'] = 0
-            attr['customer_unit>city>name'] = $etsc_empty_data
-            attr['customer_unit>city>id'] = 0
-            attr['customer_unit>cu_sort'] = 0
+            attr['customer_unit_addr>city>name'] = $etsc_empty_data
+            attr['customer_unit_addr>city>id'] = 0
+            attr['customer_unit_addr>customer_unit>cu_sort'] = 0
         end
         attr['prod_applications>id'] = prod_applications.map(&:id).join('|')
         attr['prod_applications>description'] = prod_applications.map(&:description).join('、')
@@ -137,7 +138,7 @@ class Customer < ActiveRecord::Base
             message = $etsc_create_ok
         end
 
-        fields_to_be_updated = %w(customer_unit_id name en_name email mobile phone fax im department position addr
+        fields_to_be_updated = %w(customer_unit_addr_id name en_name email mobile phone fax im department position addr
             postcode en_addr lead_id comment group_id
         )
         fields_to_be_updated.each do |field|

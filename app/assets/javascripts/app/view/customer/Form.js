@@ -135,13 +135,21 @@ Ext.define('EIM.view.customer.Form', {
                                 store: Ext.create('Ext.data.Store', {
                                     fields: [
                                         {name: 'name', type: 'string'},
-                                        {name: 'address', type: 'string'}
+                                        {name: 'postcode', type: 'string'},
+                                        {name: 'addr', type: 'string'},
+                                        {name: 'en_addr', type: 'string'},
+                                        {name: 'customer_unit_addr_id', type: 'string'}
                                     ]
                                 }),
                                 queryMode: 'local',
                                 displayField: 'name',
                                 editable: false,
-                                valueField: 'address'
+                                valueField: 'addr'
+                            },
+                            {
+                                xtype: 'hidden',
+                                name: 'customer_unit_addr_id',
+                                hidden: true
                             },
                             {
                                 xtype: 'textfield',

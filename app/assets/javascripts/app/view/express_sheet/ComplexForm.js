@@ -9,7 +9,6 @@ Ext.define('EIM.view.express_sheet.ComplexForm', {
     height: 262,
     modal: true,
     autoShow: false,
-    closable: false,
 
     initComponent: function() {
         this.items = [
@@ -29,6 +28,12 @@ Ext.define('EIM.view.express_sheet.ComplexForm', {
                         xtype: 'hidden',
                         hidden: true,
                         name: 'receiver_type'
+                    },
+                    {
+                        xtype: 'hidden',
+                        hidden: true,
+                        name: 'print_flag',
+                        value: "false"
                     },
                     {
                         xtype: 'textfield',

@@ -581,18 +581,18 @@ class UserMailer < ActionMailer::Base
         .where("receivables.expected_receive_at >= ? and receivables.expected_receive_at <= ? and
         receivables.is_history is null", @start_at, pre_end_at)\
         .where("contracts.signed_at >= ? and contracts.signed_at <= ?", @start_at, pre_end_at)\
-        .where("contracts.signer_user_id = ?", sender.id)\
+        #.where("contracts.signer_user_id = ?", sender.id)\
         .order("contracts.number")
         #发所有人的总表话，注释掉sender_id那一行
 
         if @unpaid_contracts.size > 0
-            #mail(:to => "terrych@etsc-tech.com",
-            mail(:to => receiver_ids.map{|p| User.find(p).etsc_email},
+            mail(:to => "terrych@etsc-tech.com",
+            #mail(:to => receiver_ids.map{|p| User.find(p).etsc_email},
                 :subject => "合同应收款项_截止至#{@end_at}_#{sender.name}"
             )
         else
-            #mail(:to => "terrych@etsc-tech.com",
-            mail(:to => receiver_ids.map{|p| User.find(p).etsc_email},
+            mail(:to => "terrych@etsc-tech.com",
+            #mail(:to => receiver_ids.map{|p| User.find(p).etsc_email},
                  :subject => "合同应收款项_截止至#{@end_at}_#{sender.name}(无应收款项)"
             )
         end
@@ -637,8 +637,8 @@ class UserMailer < ActionMailer::Base
 
         @array = $urge_payment_big_array
 
-        #mail(:to => "terrych@etsc-tech.com",
-        mail(:to => receiver_ids.map{|p| User.find(p).etsc_email},
+        mail(:to => "terrych@etsc-tech.com",
+        #mail(:to => receiver_ids.map{|p| User.find(p).etsc_email},
              :subject => "合同应催收款项_截止至#{@end_at}"
         )
     end

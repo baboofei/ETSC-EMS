@@ -43,6 +43,7 @@ Ext.define('EIM.view.etscux.AmountWithCurrency', {
                 flex: (this.subFlex ? (Number(this.subFlex.split("|")[1]) || 1) : 1),
                 minValue: (this.minValue || 0),
 //                negativeText:'金额不能为负数！',
+                decimalPrecision: (this.decimalPrecision === 2 ? 2 : 4),
                 allowBlank: (this.allowBlank === false ? false : true),
                 allowZero: (this.allowZero === undefined ? undefined :true),
                 value: (this.value || 0),

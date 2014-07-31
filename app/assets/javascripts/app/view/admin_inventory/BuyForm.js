@@ -94,6 +94,7 @@ Ext.define('EIM.view.admin_inventory.BuyForm', {
                                 emptyText: '购入时的单价',
 //                                padding: '0 0 4 0',
                                 storeHint: 4,
+                                decimalPrecision: 4,
                                 flex: 1,
                                 allowBlank: false,
                                 allowZero: true
@@ -103,6 +104,7 @@ Ext.define('EIM.view.admin_inventory.BuyForm', {
                                 name: 'rmb',
                                 fieldLabel: 'RMB单价',
                                 allowBlank: false,
+                                decimalPrecision: 4,
                                 minText: '请输入折合人民币的单价！',
                                 negativeText: '不能是负的！',
                                 flex: 1

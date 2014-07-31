@@ -12,10 +12,10 @@ class CreateAdminInventories < ActiveRecord::Migration
             t.integer :keep_at
             t.decimal :current_quantity, :precision => 10, :scale => 2 #会有小数的情况，##.##升之类
             t.string :count_unit
-            t.decimal :buy_price, :precision => 12, :scale => 2
-            t.decimal :financial_price, :precision => 12, :scale => 2
+            t.decimal :buy_price, :precision => 12, :scale => 4
+            t.decimal :financial_price, :precision => 12, :scale => 4
             t.integer :currency_id
-            t.decimal :rmb, :precision => 12, :scale => 2
+            t.decimal :rmb, :precision => 12, :scale => 4
             t.string :state #给状态机用字段
             t.string :project
             t.integer :keeper_user_id #保管人。最终负责的人

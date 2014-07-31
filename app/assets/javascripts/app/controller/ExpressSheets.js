@@ -44,6 +44,9 @@ Ext.define('EIM.controller.ExpressSheets', {
             //            'express_sheet_simple_form button[action=printExpressSheet]': {
             //                click: this.printExpressSheet
             //            },
+            'express_sheet_complex_form': {
+                beforeclose: this.checkPrintFlag
+            },
             'express_sheet_complex_form combo[name=express_id]': {
                 select: this.enableExpressButton
             },
@@ -71,90 +74,19 @@ Ext.define('EIM.controller.ExpressSheets', {
         });
     },
 
-    //    /**
-    //     * 选择的时候过滤一下，如果下面store里已经有了就不让选，避免拖拽的时候产生ID重复的问题
-    //     * 如果地址为空也不让选，避免打印没地址
-    //     * @param rowModel
-    //     * @param record
-    //     * @param index
-    //     * @param eOpts
-    //     * @return {Boolean}
-    //     */
-    //    filterDrag: function(rowModel, record, index, eOpts) {
-    //        var target_grid = Ext.ComponentQuery.query('express_sheet_search_grid[name=target_grid]')[0];
-    //        var target_id_array = Ext.Array.pluck(target_grid.getStore().data.items, 'internalId');
-    //
-    //        for(var i = 0; i < target_id_array.length; i ++) {
-    //            if(record.get('id') === target_id_array[i] || Ext.isEmpty(record.get('addr'))) {
-    //                return false;
-    //            }
-    //        }
-    //        if(Ext.isEmpty(record.get('addr'))) {
-    //            return false;
-    //        }
-    //    },
-    //
-    //    selectionChange: function(selectionModel, selected, eOpts) {
-    //        var btn_delete = Ext.ComponentQuery.query('express_sheet_panel button[action=deleteSelection]')[0];
-    //        if(selected.length > 0) {
-    //            btn_delete.enable();
-    //        }else{
-    //            btn_delete.disable();
-    //        }
-    //    },
-    //
-    //    deleteSelection: function(button) {
-    //        var grid = button.up('grid');
-    //        var se = grid.getSelectionModel().getSelection();
-    //        grid.getStore().remove(se);
-    //    },
-    //
-    //    printExpressSheet: function(button) {
-    //        var win = button.up('window');
-    //        var form = win.down('form', false);
-    //        if(form.form.isValid()) {
-    //            button.disable();
-    //            Ext.Msg.alert('好了', '去拿单子吧', function() {
-    //                button.enable();
-    //            });
-    //            form.submit({
-    //                url: 'express_sheets/print_express_sheet'
-    //            });
-    //        }
-    //
-    ////        var grid = form.up('panel').down('[name=target_grid]', false);
-    ////        var target_customer_ids = Ext.Array.pluck(Ext.Array.pluck(grid.getStore().data.items, "data"), "id");
-    ////        var target_customer_ids_str = target_customer_ids.join("|");
-    ////
-    ////        var express_id = form.down('[name=express_id]', false).getValue();
-    ////        var our_company_id = form.down('[name=our_company_id]', false).getValue();
-    ////
-    ////        if(target_customer_ids.length === 0){
-    ////            Ext.example.msg("错误", "表格中还没有数据！");
-    ////        }else{
-    ////            if(form.form.isValid()) {
-    ////                button.disable();
-    ////                Ext.Msg.alert('好了', '去拿单子吧', function() {
-    ////                    button.enable();
-    ////                });
-    ////                Ext.Ajax.request({
-    ////                    url:'servlet/ExpressPrintServlet',
-    ////                    params: {
-    ////                        customer_ids: target_customer_ids_str,
-    ////                        express_id: express_id,
-    ////                        our_company_id: our_company_id
-    ////                    },
-    ////                    success: function(response) {
-    ////
-    ////                    },
-    ////                    failure: function() {
-    ////
-    ////                    }
-    ////                });
-    ////            }
-    ////        }
-    //    },
-    //
+    /**
+     * 如果已经打印过了，则不能直接关闭，要填完单号才能关闭
+     * @param win
+     * @return {Boolean}
+     */
+    checkPrintFlag: function(win) {
+        var print_flag_field = win.down('[name=print_flag]', false);
+        if(print_flag_field.getValue() != "false") {
+            Ext.example.msg("错误", "请点击“完成”来关闭此窗口！")
+            return false;
+        }
+    },
+
     enableExpressButton: function(combo) {
         var form = combo.up('form');
         var express_combo = form.down('[name=express_id]', false);
@@ -188,6 +120,8 @@ Ext.define('EIM.controller.ExpressSheets', {
                 Ext.example.msg('成功', msg['timestamp']);
                 //返回的pdf文件名存到hidden里备用
                 form.down('[name=timestamp]', false).setValue(msg['timestamp']);
+                //同时给hidden_flag赋值，表示“已经打印过了”
+                form.down('[name=print_flag]', false).setValue('true');
             },
             failure: function() {
                 Ext.Msg.alert('错误', '可能是网络问题，请找Terry处理');

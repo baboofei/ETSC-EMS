@@ -58,6 +58,34 @@ Ext.define('EIM.model.GridCustomerUnit', {
             type: 'string'
         },
         {
+            name: 'all_city_ids',
+            type: 'string'
+        },
+        {
+            name: 'all_city_names',
+            type: 'string'
+        },
+        {
+            name: 'all_is_primes',
+            type: 'string'
+        },
+        {
+            name: 'all_addr_names',
+            type: 'string'
+        },
+        {
+            name: 'all_postcodes',
+            type: 'string'
+        },
+        {
+            name: 'all_addrs',
+            type: 'string'
+        },
+        {
+            name: 'all_en_addrs',
+            type: 'string'
+        },
+        {
             name: 'comment',
             type: 'string'
         }
