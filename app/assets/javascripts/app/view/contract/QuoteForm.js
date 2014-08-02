@@ -16,7 +16,7 @@ Ext.define('EIM.view.contract.QuoteForm', {
                 fieldDefaults: EIM_field_defaults,
                 items: [
                     {
-                        xtype: 'combo',
+                        xtype: 'boxselect',
                         fieldLabel: '报价编号',
                         name: 'quote_id',
                         allowBlank: false,

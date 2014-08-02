@@ -126,6 +126,7 @@ Ext.define('EIM.controller.CustomerUnits', {
         var tab_panel = tab.up('tabpanel');
         var tabs = tab_panel.items.items;
         var valid_tab_count = 0;
+        var me = this;
         Ext.Array.each(tabs, function(item, index) {
             if(item.xtype === "addr_for_unit" && Ext.isEmpty(item.down('[grossName=addr_name]', false).getValue())) {
                 Ext.example.msg("错误", "请先把现有地址信息填写完整！");
@@ -141,7 +142,9 @@ Ext.define('EIM.controller.CustomerUnits', {
                 xtype: 'addr_for_unit',
                 addrIndex: tabs.length
             });
-            new_tab.down('checkbox', false).setValue(false);
+            var new_checkbox = new_tab.down('checkbox', false);
+            new_checkbox.setValue(false);
+            new_checkbox.on('change', me.selectPrime, this);
             tab_panel.setActiveTab(new_tab);
         }
     },

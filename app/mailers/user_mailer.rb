@@ -282,16 +282,16 @@ class UserMailer < ActionMailer::Base
     def new_customer_detail_email(customers, receiver_ids, sale)
         receiver_ids = receiver_ids - $obsoleted_user_ids
         @customers = customers
-
-        mail(:to => "terrych@etsc-tech.com",
+        mail(:to => receiver_ids.map{|p| User.find(p).etsc_email},
+        #mail(:to => "terrych@etsc-tech.com",
              :subject => "#{sale.name} 上月新客户明细，应发至（#{receiver_ids.map{|p| User.find(p).name}.join("、")}）"
         )
     end
     #同时发一次催非销售转走客户的
     def prompt_transfer_customer_email(customers, not_sale)
         @customers = customers
-        #mail(:to => not_sale.etsc_email,
-        mail(:to => "terrych@etsc-tech.com",
+        mail(:to => not_sale.etsc_email,
+        #mail(:to => "terrych@etsc-tech.com",
             :subject => "请及时转让客户"
         )
     end

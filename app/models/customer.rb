@@ -35,7 +35,7 @@ class Customer < ActiveRecord::Base
     scope :valid, where("customers.is_obsolete = 0")
 
     def self.in_unit(customer_unit_id)
-        where("customer_unit_id = ?", "#{customer_unit_id}")
+        where("customer_units.id = ?", "#{customer_unit_id}").includes(:customer_unit_addr => :customer_unit)
     end
 
     def self.in_salecase(salecase_id)
@@ -102,9 +102,9 @@ class Customer < ActiveRecord::Base
     def for_mini_grid_json
         attr = attributes
         #binding.pry if customer_unit.nil?
-        attr['customer_unit>name'] = customer_unit.name
-        attr['customer_unit>id'] = customer_unit.id
-        attr['email'] = email
+        attr['customer_unit>name'] = customer_unit_addr.customer_unit.name
+        attr['customer_unit>id'] = customer_unit_addr.customer_unit.id
+        #attr['email'] = email
         attr
     end
 

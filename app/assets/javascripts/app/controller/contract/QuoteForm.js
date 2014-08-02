@@ -38,10 +38,33 @@ Ext.define('EIM.controller.contract.QuoteForm', {
         var me = this;
 
         me.control({
+            'contract_quote_form boxselect': {
+                change: this.triggerNoneQuote
+            },
             'contract_quote_form button[action=next]': {
                 click: this.addContract
             }
         });
+    },
+
+    triggerNoneQuote: function(box, newValue, oldValue) {
+        var me = this;
+        var all_old_ids = (Ext.isEmpty(oldValue) ? "" : oldValue.split(", "));
+        var all_new_ids = (Ext.isEmpty(newValue) ? "" : newValue.split(", "));
+        if(all_new_ids.indexOf("0") != -1 && all_old_ids.indexOf("0") === -1) {
+            //选了“无报价”，则把别的都清空，只留下“无报价”
+            box.un('change', me.triggerNoneQuote, this);
+            box.setValue(0);
+            box.on('change', me.triggerNoneQuote, this);
+        } else if(all_new_ids.indexOf("0") != -1 && Ext.Array.difference(all_new_ids , all_old_ids) != ["0"]) {
+            //之前有“无报价”，新选了一项别的，则留下这个“别的”，清空“无报价”
+            box.un('change', me.triggerNoneQuote, this);
+            box.removeValue([0]);
+            box.on('change', me.triggerNoneQuote, this);
+        }
+        if(oldValue === "0" && Ext.isEmpty(newValue)) {
+            box.setValue(0);
+        }
     },
 
     addContract: function(button) {
@@ -50,16 +73,20 @@ Ext.define('EIM.controller.contract.QuoteForm', {
 
         var me = this;
         if(form.form.isValid()) {
-            var combo = form.down('combo', false);
-            var quote_id = combo.getValue();
-            var store = combo.getStore();
+            var boxselect = form.down('boxselect', false);
+            var quote_id = boxselect.getValue();
+            var store = boxselect.getStore();
             load_uniq_controller(me, 'contract.Form');
             win.close();
             var view = Ext.widget('contract_form').show();
-            if(quote_id != 0) {
-                var record = store.getById(quote_id);
+            console.log(quote_id);
+
+            if(quote_id === [0]) {
+                //无报价，啥也不传
+            } else {
+                var record = store.getById(quote_id[0]);
                 view.down('[name=summary]', false).setValue(record.get('summary'));
-                view.down('[name=quote_id]', false).setValue(quote_id);
+                view.down('[name=quote_id]', false).setValue(quote_id.join("|"));
 
                 //给combo做一个假的store以正确显示值
                 var customer_unit_field = view.down('expandable_customer_unit_combo combo', false);

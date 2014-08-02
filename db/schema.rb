@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140715012953) do
+ActiveRecord::Schema.define(:version => 20140715012343) do
 
   create_table "accessories", :force => true do |t|
     t.string   "url"
@@ -115,18 +115,6 @@ ActiveRecord::Schema.define(:version => 20140715012953) do
     t.integer  "salecase_id"
     t.datetime "created_at",          :null => false
     t.datetime "updated_at",          :null => false
-  end
-
-  create_table "business_unit_addrs", :force => true do |t|
-    t.integer  "unit_id"
-    t.string   "name"
-    t.string   "addr"
-    t.string   "en_addr"
-    t.string   "postcode"
-    t.integer  "city_id"
-    t.integer  "user_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
   end
 
   create_table "business_unit_aliases", :force => true do |t|
@@ -736,18 +724,6 @@ ActiveRecord::Schema.define(:version => 20140715012953) do
     t.datetime "updated_at",       :null => false
   end
 
-  create_table "pop_unit_addrs", :force => true do |t|
-    t.integer  "unit_id"
-    t.string   "name"
-    t.string   "addr"
-    t.string   "en_addr"
-    t.string   "postcode"
-    t.integer  "city_id"
-    t.integer  "user_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
   create_table "pop_unit_aliases", :force => true do |t|
     t.string   "unit_alias"
     t.integer  "pop_unit_id"
@@ -1194,18 +1170,6 @@ ActiveRecord::Schema.define(:version => 20140715012953) do
     t.datetime "updated_at", :null => false
   end
 
-  create_table "vendor_unit_addrs", :force => true do |t|
-    t.integer  "unit_id"
-    t.string   "name"
-    t.string   "addr"
-    t.string   "en_addr"
-    t.string   "postcode"
-    t.integer  "city_id"
-    t.integer  "user_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
   create_table "vendor_unit_aliases", :force => true do |t|
     t.string   "unit_alias"
     t.integer  "vendor_unit_id"
@@ -1309,18 +1273,6 @@ ActiveRecord::Schema.define(:version => 20140715012953) do
     t.string   "user_id"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
-  end
-
-  create_table "vip_unit_addrs", :force => true do |t|
-    t.integer  "unit_id"
-    t.string   "name"
-    t.string   "addr"
-    t.string   "en_addr"
-    t.string   "postcode"
-    t.integer  "city_id"
-    t.integer  "user_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
   end
 
   create_table "vip_unit_aliases", :force => true do |t|

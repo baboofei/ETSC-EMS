@@ -138,7 +138,7 @@ class CustomerUnit < ActiveRecord::Base
                 message = $etsc_create_ok
             end
         end
-        binding.pry
+        #binding.pry
         fields_to_be_updated = %w(city_id en_name site cu_sort comment)
         fields_to_be_updated.each do |field|
             customer_unit[field] = params[field]
@@ -148,33 +148,47 @@ class CustomerUnit < ActiveRecord::Base
         customer_unit.name = params['name|en_name|unit_aliases>unit_alias']
         customer_unit.save
 
-        #如果是修改，则先把旧的地址和别称删光
-        if params[:id] != ""
-            CustomerUnitAlias.delete_all("customer_unit_id = #{params[:id]}")
-            CustomerUnitAddr.delete_all("unit_id = #{params[:id]}")
-            customer_unit_id = params[:id].to_i
-        else
-            customer_unit_id = customer_unit.id
-        end
+        #地址不能删，因为地址和客户还有着关联
+        #但地址正好也不提供删除功能，所以直接加就好了
+        #CustomerUnitAddr.delete_all("unit_id = #{params[:id]}")
 
         #存地址
         params_keys = params.keys
         addr_list = params_keys.select{|p| p.include?("addr_name")}
         addr_count = addr_list.size
 
+        #binding.pry
+        #因为不允许前台删数据，所以：
+        #已经有m条记录
+        #传过来的参数里只可能有n(n>m)条记录
+        #所以传来的记录里，前m条直接update
+        #剩下的n-m条new
+        existed_addr_ids = CustomerUnit.find(params['id']).customer_unit_addrs.order("id").map(&:id)
+
         1.upto(addr_count) do |index|
-            addr = CustomerUnitAddr.new
+            if existed_addr_ids[index - 1].blank?
+                addr = CustomerUnitAddr.new
+            else
+                addr = CustomerUnitAddr.find(existed_addr_ids[index - 1])
+            end
             addr['name'] = params["addr_name_#{index}"]
             addr['is_prime'] = params["is_prime_#{index}"]
             addr['city_id'] = params["real_city_id_#{index}"].blank? ? params["city_id_#{index}"] : params["real_city_id_#{index}"]
             addr['postcode'] = params["postcode_#{index}"]
             addr['addr'] = params["addr_#{index}"]
             addr['en_addr'] = params["en_addr_#{index}"]
-            addr['unit_id'] = customer_unit_id
+            addr['unit_id'] = params["id"]
             addr['user_id'] = user_id
             addr.save
         end
 
+        #如果是修改，则先把旧的别称删光
+        if params[:id] != ""
+            CustomerUnitAlias.delete_all("customer_unit_id = #{params[:id]}")
+            customer_unit_id = params[:id].to_i
+        else
+            customer_unit_id = customer_unit.id
+        end
         #存别称
         #本名也作为别称的一条存起来
         alias_array = params['unit_aliases>unit_alias'].multi_split << params['name|en_name|unit_aliases>unit_alias']

@@ -252,22 +252,25 @@ class Contract < ActiveRecord::Base
                 contract.save
                 #如果是有报价的，则其下的合同项也从报价项带过来
                 if !params['quote_id'].blank?
-                    quote = Quote.find(params['quote_id'])
-                    quote_items = quote.quote_items
-                    quote_items.each_with_index do |quote_item, index|
-                        contract_item = ContractItem.new
-                        contract_item.product_id = quote_item.product_id
-                        contract_item.quantity = quote_item.quantity
-                        contract_item.contract_id = contract.id
-                        contract_item.send_status = 1
-                        contract_item.check_and_accept_status = 1
-                        contract_item.warranty_term_id = 2
-                        contract_item.inner_id = index
-                        contract_item.save
+                    quote_id_array = params['quote_id'].split("|")
+                    quote_id_array.each do |quote_id|
+                        quote = Quote.find(quote_id)
+                        quote_items = quote.quote_items
+                        quote_items.each_with_index do |quote_item, index|
+                            contract_item = ContractItem.new
+                            contract_item.product_id = quote_item.product_id
+                            contract_item.quantity = quote_item.quantity
+                            contract_item.contract_id = contract.id
+                            contract_item.send_status = 1
+                            contract_item.check_and_accept_status = 1
+                            contract_item.warranty_term_id = 2
+                            contract_item.inner_id = index
+                            contract_item.save
+                        end
                     end
                     #contract.currency_id = quote.currency_id
                     #contract.sum = quote.total
-                    contract.save
+                    #contract.save
                 end
                 #刚新增时定不下来应收款点，所以不管
 
