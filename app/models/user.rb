@@ -477,7 +477,17 @@ class User < ActiveRecord::Base
         sheet[1, 0] = 1
         sheet[1, 1] = '中文测试'
         book.write path
+    end
 
+    def self.import_xls
+        require 'spreadsheet'
+        file = Spreadsheet.open("#{Rails.public_path}/8.4入库清单.xls")
+
+        sheet = file.worksheet 0
+        #p sheet.class
+        sheet.each { |row|
+            p row[1]
+        }
     end
 
     private

@@ -40,6 +40,12 @@ Ext.define('EIM.controller.admin_inventory.ForStockForm', {
             'admin_inventory_for_stock_grid button[action=deleteSelection]': {
                 click: this.deleteSelection
             },
+            'admin_inventory_for_stock_grid button[action=importXls]': {
+                click: this.selectXlsFile
+            },
+            'admin_inventory_for_stock_grid button[action=batchEditVendor]': {
+                click: this.selectVendor
+            },
             'admin_inventory_for_stock_form button[action=save]': {
                 click: this.submit
             }
@@ -88,11 +94,14 @@ Ext.define('EIM.controller.admin_inventory.ForStockForm', {
         var me = this;
         var grid = me.getGrid();
         var btn_delete = grid.down('button[action=deleteSelection]', false);
+        var btn_batch_edit_vendor = grid.down('button[action=batchEditVendor]', false);
 
         if(selected.length > 0) {
             btn_delete.enable();
+            btn_batch_edit_vendor.enable();
         } else {
             btn_delete.disable();
+            btn_batch_edit_vendor.disable();
         }
     },
 
@@ -101,6 +110,18 @@ Ext.define('EIM.controller.admin_inventory.ForStockForm', {
         var grid = button.up('grid');
         var se = grid.getSelectionModel().getSelection();
         grid.getStore().remove(se);
+    },
+
+    selectXlsFile: function() {
+        var me = this;
+        load_uniq_controller(me, 'admin_inventory.ImportXlsForm');
+        var view = Ext.widget('admin_inventory_import_xls_form').show();
+    },
+
+    selectVendor: function() {
+        var me = this;
+        load_uniq_controller(me, 'admin_inventory.SelectVendorForm');
+        var view = Ext.widget('admin_inventory_select_vendor_form').show();
     },
 
     submit: function(button) {

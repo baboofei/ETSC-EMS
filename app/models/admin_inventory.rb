@@ -1592,6 +1592,41 @@ class AdminInventory < ActiveRecord::Base
         where("model like ?", "%#{query}%")
     end
 
+    def self.parse_xls_to_json(params, user_id)
+        user_name = User.find(user_id).name
+
+        name = "#{Rails.public_path}/import_admin_inventory.xls"
+        #directory = "public"
+        # create the file path
+        #path = File.join(directory, name)
+        # write the file
+        File.open("#{name}", "wb") { |f| f.write(params[:xls_file].read) }
+
+        require 'spreadsheet'
+        file = Spreadsheet.open("#{name}")
+        sheet = file.worksheet 0
+        grid_data = []
+        sheet.each_with_index do |row, index|
+            if index > 0
+                grid_data << {
+                    :name => row[0],
+                    :model => row[1],
+                    :description => row[2],
+                    :current_quantity => row[3],
+                    :count_unit => row[4],
+                    :buy_price => row[5].to_f,
+                    :currency_name => 'RMB',
+                    :currency_id => 11,
+                    :rmb => row[5].to_f,
+                    :buyer_user_id => user_id,
+                    :buyer_user_name => user_name,
+                    :comment => row[8]
+                }
+            end
+        end
+        return {:success => true, :message => '导入成功', :grid_data => grid_data}
+    end
+
     def for_name_combo_json
         attr = {}
         attr['name'] = attributes['name']

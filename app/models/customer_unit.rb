@@ -45,11 +45,11 @@ class CustomerUnit < ActiveRecord::Base
             end.to_s.gsub("=>", ":")
         else
             attr['addr'] = [{
-                "name" => customer_unit_addrs[0]['name'],
-                "postcode" => customer_unit_addrs[0]['postcode'],
-                "addr" => customer_unit_addrs[0]['addr'],
-                "en_addr" => customer_unit_addrs[0]['en_addr'],
-                "customer_unit_addr_id" => customer_unit_addrs[0]['id']
+                "name" => customer_unit_addrs[0]['name'].to_s,
+                "postcode" => customer_unit_addrs[0]['postcode'].to_s,
+                "addr" => customer_unit_addrs[0]['addr'].to_s,
+                "en_addr" => customer_unit_addrs[0]['en_addr'].to_s,
+                "customer_unit_addr_id" => customer_unit_addrs[0]['id'].to_s
             }].to_s.gsub("=>", ":")
         end
 

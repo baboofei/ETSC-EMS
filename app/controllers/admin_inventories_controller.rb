@@ -160,4 +160,14 @@ class AdminInventoriesController < ApplicationController
             }
         end
     end
+
+    def upload_xls
+        #binding.pry
+        user_id = session[:user_id]
+        result = AdminInventory.parse_xls_to_json(params, user_id)
+
+        #binding.pry
+        #render :json => { :pic_path => "#{Rails.root}" , :name => "q1213.xls" }, :content_type => 'text/html'
+        render :text => result.to_json
+    end
 end

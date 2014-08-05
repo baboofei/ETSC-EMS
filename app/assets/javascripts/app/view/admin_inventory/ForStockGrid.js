@@ -100,13 +100,27 @@ Ext.define('EIM.view.admin_inventory.ForStockGrid', {
             action: 'deleteSelection',
             disabled: true
         });
+        this.importXlsButton = Ext.create('Ext.Button', {
+            text: '从.xls文件导入',
+            iconCls: 'btn_xls',
+            action: 'importXls'
+        });
+        this.batchEditVendorButton = Ext.create('Ext.Button', {
+            text: '批量修改供应商',
+            action: 'batchEditVendor',
+            disabled: true
+        });
 
-        this.bbar = [this.addItemButton, this.deleteItemButton];
+        this.bbar = [this.addItemButton, this.deleteItemButton, '-', this.importXlsButton, this.batchEditVendorButton];
 
         this.callParent(arguments);
     },
 
     getSelectedItem: function() {
         return this.getSelectionModel().getSelection()[0];
+    },
+
+    getSelectedItems: function() {
+        return this.getSelectionModel().getSelection();
     }
 });

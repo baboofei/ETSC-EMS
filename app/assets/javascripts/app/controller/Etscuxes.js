@@ -309,9 +309,11 @@ Ext.define('EIM.controller.Etscuxes', {
                 addr_combo.getStore().loadData(addr_store);
                 addr_combo.expand();
                 addr_combo.setValue(addr_array[0]['addr']);
-                if(!Ext.isEmpty(addr_field.getValue())) addr_field.setValue(addr_array[0]['addr']);
-                if(!Ext.isEmpty(en_addr_field.getValue())) en_addr_field.setValue(addr_array[0]['en_addr']);
-                if(!Ext.isEmpty(postcode_field.getValue())) postcode_field.setValue(addr_array[0]['postcode']);
+//                console.log(addr_field.getValue());
+//                console.log(Ext.isEmpty(addr_field.getValue()));
+                if(addr_field.getValue().indexOf(addr_array[0]['addr']) === -1) addr_field.setValue(addr_array[0]['addr']);
+                if(en_addr_field.getValue().indexOf(addr_array[0]['en_addr']) === -1) en_addr_field.setValue(addr_array[0]['en_addr']);
+                if(postcode_field.getValue().indexOf(addr_array[0]['post']) === -1) postcode_field.setValue(addr_array[0]['postcode']);
                 customer_unit_addr_id_field.setValue(addr_array[0]['customer_unit_addr_id']);
             }
         }
