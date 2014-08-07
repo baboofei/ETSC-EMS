@@ -305,7 +305,7 @@ Ext.define('EIM.controller.AdminInventories', {
             //防双击
             button.disable();
 
-            var grid_data = Ext.encode(Ext.pluck(grid.getStore().data.items, "data"));
+            var grid_data = Ext.encode(Ext.Array.pluck(grid.getStore().data.items, "data"));
             Ext.Ajax.request({
                 url: 'admin_inventories/save_admin_inventory',
                 params: {

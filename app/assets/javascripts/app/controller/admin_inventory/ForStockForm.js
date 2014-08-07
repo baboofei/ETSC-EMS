@@ -132,6 +132,22 @@ Ext.define('EIM.controller.admin_inventory.ForStockForm', {
         var grid = me.getGrid();
         if(grid.getStore().count() === 0) {
             Ext.example.msg("错误", "表格中还没有数据！");
+            return false;
+        }
+        var vendor_unit_id_array = Ext.Array.pluck(Ext.Array.pluck(grid.getStore().data.items, "data"), "vendor_unit_id");
+        var vendor_unit_id_str = vendor_unit_id_array.join("|");
+        if(vendor_unit_id_str.indexOf("0|0") != -1 || vendor_unit_id_str === "0") {
+            Ext.example.msg("错误", "表格中还有供应商信息不完整！");
+            return false;
+        }
+        var vendor_id_array = Ext.Array.pluck(Ext.Array.pluck(grid.getStore().data.items, "data"), "vendor_id");
+        var vendor_id_str = vendor_id_array.join("|");
+        if(vendor_id_str.indexOf("0|0") != -1 || vendor_id_str === "0") {
+            Ext.example.msg("错误", "表格中还有供应商信息不完整！");
+            return false;
+        }
+        if(grid.getStore().count() === 0) {
+            Ext.example.msg("错误", "表格中还没有数据！");
         } else {
             //防双击
             button.disable();
