@@ -27,7 +27,8 @@ class VendorsController < ApplicationController
     def get_combo_vendors
         #binding.pry
         vendor_unit_id = params[:vendor_unit_id]
-        vendors = Vendor.in_unit(vendor_unit_id)
+        query = params[:query]
+        vendors = Vendor.in_unit(vendor_unit_id).query_by(query)
 
         #binding.pry
         respond_to do |format|

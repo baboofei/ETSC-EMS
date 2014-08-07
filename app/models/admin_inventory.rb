@@ -242,6 +242,7 @@ class AdminInventory < ActiveRecord::Base
                     admin_item.save
 
                     #写入操作日志
+                    #binding.pry
                     item_history_params = {
                         :act_at => Time.now,
                         :before_inventory_id => admin_item.id,
@@ -1618,7 +1619,7 @@ class AdminInventory < ActiveRecord::Base
                     :currency_name => 'RMB',
                     :currency_id => 11,
                     :rmb => row[5].to_f,
-                    :buyer_user_id => user_id,
+                    'buyer>id' => user_id,
                     :buyer_user_name => user_name,
                     :comment => row[8]
                 }

@@ -21,9 +21,20 @@ Ext.define('EIM.view.etscux.ExpandableVendorCombo', {
             valueField: 'id',
             emptyText: '请选择供方联系人',
             allowBlank: false,
-            editable: false,
-            forceSelection: true,
-            triggerAction: 'all'
+            hideTrigger: true,
+//            editable: false,
+            mode: 'remote',
+            minChars: 1,
+//            forceSelection: true,
+            triggerAction: 'query',
+            validator: function(){
+                if(this.getValue() === this.getRawValue()) {
+                    return "请实际选择一个联系人！";
+                } else {
+                    this.clearInvalid();
+                    return true;
+                }
+            }
         }, {
             xtype: 'button',
             fieldLabel: '',

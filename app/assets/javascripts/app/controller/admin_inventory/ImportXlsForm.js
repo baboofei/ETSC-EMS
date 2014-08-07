@@ -44,10 +44,9 @@ Ext.define('EIM.controller.admin_inventory.ImportXlsForm', {
                 submitEmptyText: false,
                 success: function(the_form, action) {
                     var response = action.response;
-                    var msg = Ext.decode(response.responseText);
+                    var msg = Ext.decode(Ext.String.htmlDecode(response.responseText));
                     win.close();
                     Ext.example.msg('成功', msg.message);
-                    console.log(msg.grid_data);
                     Ext.getStore('GridForStockAdminInventories').loadData(msg.grid_data);
                 }
             });

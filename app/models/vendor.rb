@@ -12,6 +12,10 @@ class Vendor < ActiveRecord::Base
         where("vendor_units.id = ?", "#{vendor_unit_id}").includes(:vendor_unit)
     end
 
+    def self.query_by(query)
+        where("vendors.name like ? or vendors.en_name like ?", "%#{query}%", "%#{query}%")
+    end
+
     #自定义提交。因为模型复杂，估计是不可能公用了
     def self.create_or_update_with(params, user_id)
         item = "客户"
