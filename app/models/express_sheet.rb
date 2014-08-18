@@ -17,7 +17,7 @@ class ExpressSheet < ActiveRecord::Base
         attr['express_unit_name'] = Dictionary.where("data_type = 'express' and value = ?", express_unit_id).first.display
         attr['sender>name'] = sender.name
         #attr['receiver_unit_id'] = unit_receivable_id
-        attr['^unit_receivable>(name|unit_aliases>unit_alias)'] = unit_receivable_type.constantize.find(unit_receivable_id)['name']
+        attr['^unit_receivable>(name|unit_aliases>unit_alias|en_name)'] = unit_receivable_type.constantize.find(unit_receivable_id)['name']
         #attr['receiver_id'] = person_receivable_id
         attr['^person_receivable>(name|en_name)'] = person_receivable_type.constantize.find(person_receivable_id)['name']
         attr['^vestable>(number)'] = vestable_type.constantize.find(vestable_id)['number'] unless vestable_type.blank?
@@ -62,9 +62,15 @@ class ExpressSheet < ActiveRecord::Base
                                  :margin => using[:margin].map { |p| p.mm }) do |pdf|
 
             receiver_array.each_with_index do |re, index|
-                receiver = params[:receiver_type].camelcase.constantize.find(re)
-                receiver_addr = receiver.addr.blank? ? receiver.send("#{params[:receiver_type]}_unit").addr : receiver.addr
-                long_addr = receiver.send("#{params[:receiver_type]}_unit").city.prvc.name + receiver.send("#{params[:receiver_type]}_unit").city.name + receiver_addr
+                if params[:receiver_type] == "customer"
+                    receiver = Customer.find(re)
+                    receiver_addr = receiver.addr.blank? ? receiver.customer_unit_addr.addr : receiver.addr
+                    long_addr = receiver.customer_unit_addr.city.prvc.name + receiver.customer_unit_addr.city.name + receiver_addr
+                else
+                    receiver = params[:receiver_type].camelcase.constantize.find(re)
+                    receiver_addr = receiver.addr.blank? ? receiver.send("#{params[:receiver_type]}_unit").addr : receiver.addr
+                    long_addr = receiver.send("#{params[:receiver_type]}_unit").city.prvc.name + receiver.send("#{params[:receiver_type]}_unit").city.name + receiver_addr
+                end
 
                 merged_addr = long_addr.gsub(/(.*?市)\1+/, '\1') + "#{receiver.postcode.blank? ? '' : "(#{receiver.postcode})"}"
                 receiver = {
@@ -172,8 +178,13 @@ class ExpressSheet < ActiveRecord::Base
             #receiver_addr = receiver.addr.blank? ? receiver.send("#{params[:receiver_type]}_unit").addr : receiver.addr
             #long_addr = receiver.send("#{params[:receiver_type]}_unit").city.prvc.name + receiver.send("#{params[:receiver_type]}_unit").city.name + receiver_addr
 
-            new_sheet['unit_receivable_id'] = receiver.send("#{params['receiver_type']}_unit_id")
-            new_sheet['unit_receivable_type'] = "#{params['receiver_type'].split("_")[0].camelcase}Unit"
+            if params['receiver_type'] == "customer"
+                new_sheet['unit_receivable_id'] = receiver.customer_unit_addr.unit_id
+                new_sheet['unit_receivable_type'] = "CustomerUnit"
+            else
+                new_sheet['unit_receivable_id'] = receiver.send("#{params['receiver_type']}_unit_id")
+                new_sheet['unit_receivable_type'] = "#{params['receiver_type'].split("_")[0].camelcase}Unit"
+            end
             new_sheet['person_receivable_id'] = single_record['receiver_id']
             new_sheet['person_receivable_type'] = params['receiver_type'].camelcase
             #new_sheet['vestable_id'] = params["salecase_id"]

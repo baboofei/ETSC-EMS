@@ -1640,3 +1640,4 @@ class AdminInventory < ActiveRecord::Base
         attr
     end
 end
+

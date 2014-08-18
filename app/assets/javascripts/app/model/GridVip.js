@@ -18,7 +18,7 @@ Ext.define('EIM.model.GridVip', {
             type: 'int'
         },
         {
-            name: 'vip_unit>(name|unit_aliases>unit_alias)',
+            name: 'vip_unit>(name|unit_aliases>unit_alias|en_name)',
 //            name: 'vip_unit>vip_unit_aliases>unit_alias',
             type: 'string'
         },

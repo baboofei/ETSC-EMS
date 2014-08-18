@@ -169,7 +169,7 @@ Ext.define('EIM.view.contract.Grid', {
             },
             {
                 header: '客户单位',
-                dataIndex: 'customer_unit>(name|unit_aliases>unit_alias)',
+                dataIndex: 'customer_unit>(name|unit_aliases>unit_alias|en_name)',
                 width: 160,
                 filter: {
                     type: 'string'
@@ -177,7 +177,7 @@ Ext.define('EIM.view.contract.Grid', {
             },
             {
                 header: '客户',
-                dataIndex: 'end_user>name',
+                dataIndex: 'end_user>(name|en_name)',
                 width: 50,
                 filter: {
                     type: 'string'
@@ -185,7 +185,7 @@ Ext.define('EIM.view.contract.Grid', {
             },
             {
                 header: '客户联系人',
-                dataIndex: 'buyer>name',
+                dataIndex: 'buyer>(name|en_name)',
                 width: 50,
                 filter: {
                     type: 'string'
@@ -193,7 +193,7 @@ Ext.define('EIM.view.contract.Grid', {
             },
             {
                 header: '商务相关联系人',
-                dataIndex: 'business_contact>name',
+                dataIndex: 'business_contact>(name|en_name)',
                 width: 50,
                 filter: {
                     type: 'string'

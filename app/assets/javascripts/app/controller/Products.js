@@ -58,8 +58,8 @@ Ext.define('EIM.controller.Products', {
     editProduct: function(button) {
         var me = this;
         var form = button.up('form');
-        var producer_vendor_unit_field = form.down('[name=producer>(name|short_name|short_code)] combo', false);
-        var seller_vendor_unit_field = form.down('[name=seller>(name|short_name|short_code)] combo', false);
+        var producer_vendor_unit_field = form.down('[name=producer>(name|short_name|short_code|en_name)] combo', false);
+        var seller_vendor_unit_field = form.down('[name=seller>(name|short_name|short_code|en_name)] combo', false);
         var params;
         switch (button.action) {
             case 'edit_product_info':
@@ -116,8 +116,8 @@ Ext.define('EIM.controller.Products', {
             price_form.getValues(),
             description_form.getValues()
         );
-        submit_params['producer_vendor_unit_id'] = panel.down('[name=producer>(name|short_name|short_code)] combo', false).getValue();
-        submit_params['seller_vendor_unit_id'] = panel.down('[name=seller>(name|short_name|short_code)] combo', false).getValue();
+        submit_params['producer_vendor_unit_id'] = panel.down('[name=producer>(name|short_name|short_code|en_name)] combo', false).getValue();
+        submit_params['seller_vendor_unit_id'] = panel.down('[name=seller>(name|short_name|short_code|en_name)] combo', false).getValue();
         if (info_form.form.isValid() && price_form.form.isValid() && description_form.form.isValid()) {
             //防双击
             button.disable();
@@ -150,7 +150,7 @@ Ext.define('EIM.controller.Products', {
         var btn_group = [btn_edit_info, btn_edit_price, btn_edit_description];
         if (selected.length > 0) {
             //先un掉一些trigger
-            var producer_vendor_unit_combo = Ext.ComponentQuery.query('product_detail [name=producer>(name|short_name|short_code)] combo')[0];
+            var producer_vendor_unit_combo = Ext.ComponentQuery.query('product_detail [name=producer>(name|short_name|short_code|en_name)] combo')[0];
             producer_vendor_unit_combo.un('change', me.clearSeller, this);
             producer_vendor_unit_combo.un('select', me.syncProducerSeller, this);
 
@@ -158,15 +158,15 @@ Ext.define('EIM.controller.Products', {
             product_price_field.loadRecord(record);
             product_description_field.loadRecord(record);
             //给combo做一个假的store以正确显示值
-            var producer_vendor_unit_field = detail_panel.down('[name=producer>(name|short_name|short_code)] combo', false);
+            var producer_vendor_unit_field = detail_panel.down('[name=producer>(name|short_name|short_code|en_name)] combo', false);
             producer_vendor_unit_field.getStore().loadData([{
                 id: record.get('producer>id'),
-                name: record.get('producer>(name|short_name|short_code)')
+                name: record.get('producer>(name|short_name|short_code|en_name)')
             }]);
             producer_vendor_unit_field.setValue(record.get('producer>id'));
-            var seller_vendor_unit_field = detail_panel.down('[name=seller>(name|short_name|short_code)] combo', false);
+            var seller_vendor_unit_field = detail_panel.down('[name=seller>(name|short_name|short_code|en_name)] combo', false);
             seller_vendor_unit_field.getStore().loadData([
-                [record.get('seller>id'), record.get('seller>(name|short_name|short_code)')]
+                [record.get('seller>id'), record.get('seller>(name|short_name|short_code|en_name)')]
             ]);
             seller_vendor_unit_field.setValue(record.get('seller>id'));
 
@@ -194,7 +194,7 @@ Ext.define('EIM.controller.Products', {
      */
     clearSeller: function(combo) {
         var form = combo.up('form');
-        var seller_vendor_unit_combo = form.down('[name=seller>(name|short_name|short_code)] combo', false);
+        var seller_vendor_unit_combo = form.down('[name=seller>(name|short_name|short_code|en_name)] combo', false);
         seller_vendor_unit_combo.setValue();
     },
     /**
@@ -205,7 +205,7 @@ Ext.define('EIM.controller.Products', {
      */
     syncProducerSeller: function(combo, records) {
         var form = combo.up('form');
-        var seller_vendor_unit_combo = form.down('[name=seller>(name|short_name|short_code)] combo', false);
+        var seller_vendor_unit_combo = form.down('[name=seller>(name|short_name|short_code|en_name)] combo', false);
         seller_vendor_unit_combo.setValue(records[0]);
     },
 

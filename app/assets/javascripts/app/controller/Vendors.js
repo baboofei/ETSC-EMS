@@ -107,8 +107,8 @@ Ext.define('EIM.controller.Vendors', {
             price_form.getValues(),
             description_form.getValues()
         );
-        submit_params['producer_vendor_unit_id'] = panel.down('[name=producer>(name|short_name|short_code)] combo', false).getValue();
-        submit_params['seller_vendor_unit_id'] = panel.down('[name=seller>(name|short_name|short_code)] combo', false).getValue();
+        submit_params['producer_vendor_unit_id'] = panel.down('[name=producer>(name|short_name|short_code|en_name)] combo', false).getValue();
+        submit_params['seller_vendor_unit_id'] = panel.down('[name=seller>(name|short_name|short_code|en_name)] combo', false).getValue();
         if (info_form.form.isValid() && price_form.form.isValid() && description_form.form.isValid()) {
             //防双击
             button.disable();

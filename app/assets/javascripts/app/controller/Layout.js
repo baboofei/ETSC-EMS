@@ -223,18 +223,18 @@ Ext.define('EIM.controller.Layout', {
                                                 sum_field.setValue(records[0].get('sum'));
                                                 //给combo做一个假的store以正确显示值
                                                 customer_unit_field.getStore().loadData([
-                                                    [records[0].get('customer_unit>id'), records[0].get('customer_unit>(name|unit_aliases>unit_alias)')]
+                                                    [records[0].get('customer_unit>id'), records[0].get('customer_unit>(name|unit_aliases>unit_alias|en_name)')]
                                                 ]);
                                                 customer_unit_field.setValue(records[0].get('customer_unit>id'));
 
                                                 buyer_customer_field.getStore().loadData([
-                                                    [records[0].get('buyer_customer_id'), records[0].get('buyer>name')]
+                                                    [records[0].get('buyer_customer_id'), records[0].get('buyer>(name|en_name)')]
                                                 ]);
                                                 buyer_customer_field.setValue(records[0].get('buyer_customer_id'));
                                                 buyer_customer_field.getStore().getProxy().setExtraParam('customer_unit_id', records[0].get('customer_unit>id'));
 
                                                 end_user_customer_field.getStore().loadData([
-                                                    [records[0].get('end_user_customer_id'), records[0].get('end_user>name')]
+                                                    [records[0].get('end_user_customer_id'), records[0].get('end_user>(name|en_name)')]
                                                 ]);
                                                 end_user_customer_field.setValue(records[0].get('end_user_customer_id'));
                                                 end_user_customer_field.getStore().getProxy().setExtraParam('customer_unit_id', records[0].get('customer_unit>id'));
@@ -254,7 +254,7 @@ Ext.define('EIM.controller.Layout', {
                                                     business_contact_field.setValue("");
                                                 } else {
                                                     business_contact_field.getStore().loadData([
-                                                        [records[0].get('business_contact_id'), records[0].get('business_contact>name')]
+                                                        [records[0].get('business_contact_id'), records[0].get('business_contact>(name|en_name)')]
                                                     ]);
                                                     business_contact_field.setValue(records[0].get('business_contact_id'));
                                                     business_contact_field.getStore().getProxy().setExtraParam('business_unit_id', records[0].get('business_unit_id'))

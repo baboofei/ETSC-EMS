@@ -16,10 +16,6 @@ class Array
         end
     end
 
-    def cross_multi_with(front_item, back_item, result)
-
-    end
-
     #不带参数，用self来递归
     def cross_multi
         case self.size
@@ -70,5 +66,21 @@ class Array
             result << [front_item] + [back_item]
         end
         return result
+    end
+
+    #一个长数组，形如：
+    #["vendor_unit", {"vendor_unit" => {"unit_aliases" => "a"}}, {"vendor_unit"=>"unit_aliases"}, "vendor_unit"]
+    #可能有String或者Hash。
+    #取出其中最“长”的
+    # @return [Object]
+    def get_longest_include_hash
+        hash_part = []
+        self.each do |item|
+            if item.class.name == "Hash"
+                hash_part << item
+            end
+        end
+
+        return self[0]
     end
 end

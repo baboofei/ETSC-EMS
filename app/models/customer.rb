@@ -34,6 +34,10 @@ class Customer < ActiveRecord::Base
 
     scope :valid, where("customers.is_obsolete = 0")
 
+    def customer_unit
+        customer_unit_addr.customer_unit
+    end
+
     def self.in_unit(customer_unit_id)
         where("customer_units.id = ?", "#{customer_unit_id}").includes(:customer_unit_addr => :customer_unit)
     end
@@ -58,7 +62,7 @@ class Customer < ActiveRecord::Base
         attr = attributes
         #binding.pry if customer_unit.nil?
         if customer_unit_addr
-            attr['customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias)'] = customer_unit_addr.customer_unit.name
+            attr['customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias|en_name)'] = customer_unit_addr.customer_unit.name
             #attr['customer_unit>customer_unit_aliases>unit_alias'] = customer_unit.name
             attr['customer_unit>id'] = customer_unit_addr.customer_unit.id
             #binding.pry if customer_unit.city.nil?
@@ -82,7 +86,7 @@ class Customer < ActiveRecord::Base
             attr['customer_unit>unit_aliases>unit_alias'] = customer_unit_aliases_name_array.join("、")
             attr['customer_unit_addr>customer_unit>cu_sort'] = customer_unit_addr.customer_unit.cu_sort
         else
-            attr['customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias)'] = $etsc_empty_data
+            attr['customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias|en_name)'] = $etsc_empty_data
             #attr['customer_unit>name'] = $etsc_empty_data
             attr['customer_unit>id'] = 0
             attr['customer_unit_addr>city>name'] = $etsc_empty_data

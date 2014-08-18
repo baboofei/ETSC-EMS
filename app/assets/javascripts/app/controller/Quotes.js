@@ -369,13 +369,13 @@ Ext.define('EIM.controller.Quotes', {
             //给combo做一个假的store以正确显示值
             var customer_unit_field = info_form.down('[name=customer_unit_id]', false);
             customer_unit_field.getStore().loadData([
-                [selected[0].get('customer_unit>id'), selected[0].get('customer_unit>(name|unit_aliases>unit_alias)')]
+                [selected[0].get('customer_unit>id'), selected[0].get('customer_unit>(name|unit_aliases>unit_alias|en_name)')]
             ]);
             customer_unit_field.setValue(selected[0].get('customer_unit>id'));
 
             var customer_field = info_form.down('[name=customer_id]', false);
             customer_field.getStore().loadData([
-                [selected[0].get('customer>id'), selected[0].get('customer>name')]
+                [selected[0].get('customer>id'), selected[0].get('customer>(name|en_name)')]
             ]);
             customer_field.setValue(selected[0].get('customer>id'));
             customer_field.getStore().getProxy().setExtraParam('customer_unit_id', selected[0].get('customer_unit>id'))

@@ -111,7 +111,7 @@ Ext.define('EIM.controller.Contracts', {
                     tool_tip1.setTarget(combo.getEl());
                     var selection = me.getGrid().getSelectedItem();
                     if (selection) {
-                        var name = selection.get('buyer>name');
+                        var name = selection.get('buyer>(name|en_name)');
                         var phone = selection.get('buyer>phone');
                         var mobile = selection.get('buyer>mobile');
                         tool_tip1.update("<table class='tip-cls'><tr><th>姓名：</th><td>" + name + "</td></tr><tr><th>固定电话：</th><td>" + phone + "</td></tr><tr><th>移动电话：</th><td>" + mobile + "</td></tr></table>");
@@ -123,7 +123,7 @@ Ext.define('EIM.controller.Contracts', {
                     tool_tip2.setTarget(combo.getEl());
                     var selection = me.getGrid().getSelectedItem();
                     if (selection) {
-                        var name = selection.get('end_user>name');
+                        var name = selection.get('end_user>(name|en_name)');
                         var phone = selection.get('end_user>phone');
                         var mobile = selection.get('end_user>mobile');
                         tool_tip2.update("<table class='tip-cls'><tr><th>姓名：</th><td>" + name + "</td></tr><tr><th>固定电话：</th><td>" + phone + "</td></tr><tr><th>移动电话：</th><td>" + mobile + "</td></tr></table>");
@@ -135,7 +135,7 @@ Ext.define('EIM.controller.Contracts', {
                     tool_tip3.setTarget(combo.getEl());
                     var selection = me.getGrid().getSelectedItem();
                     if (selection) {
-                        var name = selection.get('business_contact>name');
+                        var name = selection.get('business_contact>(name|en_name)');
                         var phone = selection.get('business_contact>phone');
                         var mobile = selection.get('business_contact>mobile');
                         tool_tip3.update("<table class='tip-cls'><tr><th>姓名：</th><td>" + name + "</td></tr><tr><th>固定电话：</th><td>" + phone + "</td></tr><tr><th>移动电话：</th><td>" + mobile + "</td></tr></table>");
@@ -634,18 +634,18 @@ Ext.define('EIM.controller.Contracts', {
 
             //给combo做一个假的store以正确显示值
             customer_unit_field.getStore().loadData([
-                [selected[0].get('customer_unit>id'), selected[0].get('customer_unit>(name|unit_aliases>unit_alias)')]
+                [selected[0].get('customer_unit>id'), selected[0].get('customer_unit>(name|unit_aliases>unit_alias|en_name)')]
             ]);
             customer_unit_field.setValue(selected[0].get('customer_unit>id'));
 
             buyer_customer_field.getStore().loadData([
-                [selected[0].get('buyer_customer_id'), selected[0].get('buyer>name')]
+                [selected[0].get('buyer_customer_id'), selected[0].get('buyer>(name|en_name)')]
             ]);
             buyer_customer_field.setValue(selected[0].get('buyer_customer_id'));
             buyer_customer_field.getStore().getProxy().setExtraParam('customer_unit_id', selected[0].get('customer_unit>id'));
 
             end_user_customer_field.getStore().loadData([
-                [selected[0].get('end_user_customer_id'), selected[0].get('end_user>name')]
+                [selected[0].get('end_user_customer_id'), selected[0].get('end_user>(name|en_name)')]
             ]);
             end_user_customer_field.setValue(selected[0].get('end_user_customer_id'));
             end_user_customer_field.getStore().getProxy().setExtraParam('customer_unit_id', selected[0].get('customer_unit>id'));
@@ -665,7 +665,7 @@ Ext.define('EIM.controller.Contracts', {
                 business_contact_field.setValue("");
             } else {
                 business_contact_field.getStore().loadData([
-                    [selected[0].get('business_contact_id'), selected[0].get('business_contact>name')]
+                    [selected[0].get('business_contact_id'), selected[0].get('business_contact>(name|en_name)')]
                 ]);
                 business_contact_field.setValue(selected[0].get('business_contact_id'));
                 business_contact_field.getStore().getProxy().setExtraParam('business_unit_id', selected[0].get('business_unit_id'))

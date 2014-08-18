@@ -13,7 +13,7 @@ Ext.define('EIM.model.GridPop', {
         name: 'pop_unit>id',
         type: 'int'
     }, {
-        name: 'pop_unit>(name|unit_aliases>unit_alias)',
+        name: 'pop_unit>(name|unit_aliases>unit_alias|en_name)',
         //            name: 'pop_unit>pop_unit_aliases>unit_alias',
         type: 'string'
     }, {

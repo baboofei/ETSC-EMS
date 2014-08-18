@@ -55,9 +55,9 @@ class Product < ActiveRecord::Base
 
     def for_grid_json(user_id)
         attr = attributes
-        attr['producer>(name|short_name|short_code)'] = producer.name unless producer.nil?
+        attr['producer>(name|short_name|short_code|en_name)'] = producer.name unless producer.nil?
         attr['producer>id'] = producer.id unless producer.nil?
-        attr['seller>(name|short_name|short_code)'] = seller.name unless seller.nil?
+        attr['seller>(name|short_name|short_code|en_name)'] = seller.name unless seller.nil?
         attr['seller>id'] = seller.id unless seller.nil?
         if currency.blank?
             attr['currency_name'] = $etsc_empty_data

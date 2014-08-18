@@ -126,9 +126,9 @@ class Quote < ActiveRecord::Base
         attr['business>name'] = business.name if business
         attr['currency_name'] = currency.name
         attr['customer_unit>id'] = customer_unit.id
-        attr['customer_unit>(name|unit_aliases>unit_alias)'] = customer_unit.name
+        attr['customer_unit>(name|unit_aliases>unit_alias|en_name)'] = customer_unit.name
         attr['customer>id'] = customer.id
-        attr['customer>name'] = customer.name
+        attr['customer>(name|en_name)'] = customer.name
         attr['editable'] = editable
         attr
     end

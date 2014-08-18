@@ -18,7 +18,7 @@ Ext.define('EIM.model.GridCustomer', {
             type: 'int'
         },
         {
-            name: 'customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias)',
+            name: 'customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias|en_name)',
             //            name: 'customer_unit>customer_unit_aliases>unit_alias',
             type: 'string'
         },

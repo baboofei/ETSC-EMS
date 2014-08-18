@@ -37,7 +37,7 @@ Ext.define('EIM.view.pop.Grid', {
             },
             {
                 header: '公共联系人单位',
-                dataIndex: 'pop_unit>(name|unit_aliases>unit_alias)',
+                dataIndex: 'pop_unit>(name|unit_aliases>unit_alias|en_name)',
 //                dataIndex: 'pop_unit>pop_unit_aliases>unit_alias',
                 width: 150,
                 sortable: false,

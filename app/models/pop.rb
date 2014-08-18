@@ -10,9 +10,9 @@ class Pop < ActiveRecord::Base
 
     def for_grid_json(user_id)
         attr = attributes
-        #binding.pry if customer_unit.nil?
+        #binding.pry if pop_unit.nil?
         if pop_unit
-            attr['pop_unit>(name|unit_aliases>unit_alias)'] = pop_unit.name
+            attr['pop_unit>(name|unit_aliases>unit_alias|en_name)'] = pop_unit.name
             #attr['pop_unit>pop_unit_aliases>unit_alias'] = pop_unit.name
             attr['pop_unit>id'] = pop_unit.id
             #binding.pry if pop_unit.city.nil?
@@ -35,11 +35,11 @@ class Pop < ActiveRecord::Base
             end
             attr['pop_unit>unit_aliases>unit_alias'] = pop_unit_aliases_name_array.join("、")
         else
-            attr['customer_unit>(name|unit_aliases>unit_alias)'] = $etsc_empty_data
-            #attr['customer_unit>name'] = $etsc_empty_data
-            attr['customer_unit>id'] = 0
-            attr['customer_unit>city>name'] = $etsc_empty_data
-            attr['customer_unit>city>id'] = 0
+            attr['pop_unit>unit_aliases>unit_alias'] = $etsc_empty_data
+            #attr['pop_unit>name'] = $etsc_empty_data
+            attr['pop_unit>id'] = 0
+            attr['pop_unit>city>name'] = $etsc_empty_data
+            attr['pop_unit>city>id'] = 0
         end
         attr[:user_name] = user.name
         attr[:user_id] = user.id

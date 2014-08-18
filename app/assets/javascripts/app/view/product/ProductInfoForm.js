@@ -26,11 +26,11 @@ Ext.define('EIM.view.product.ProductInfoForm', {
         },
         {
             xtype: 'expandable_vendor_unit_combo',
-            name: 'producer>(name|short_name|short_code)'
+            name: 'producer>(name|short_name|short_code|en_name)'
         },
         {
             xtype: 'expandable_vendor_unit_combo',
-            name: 'seller>(name|short_name|short_code)',
+            name: 'seller>(name|short_name|short_code|en_name)',
             fieldLabel: '销售厂家'
         },
         {

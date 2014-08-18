@@ -64,7 +64,7 @@ Ext.define('EIM.view.express_sheet.Grid', {
             },
             {
                 header: '收件人单位',
-                dataIndex: '^unit_receivable>(name|unit_aliases>unit_alias)',
+                dataIndex: '^unit_receivable>(name|unit_aliases>unit_alias|en_name)',
                 width: 150,
                 sortable: false,
                 filter: {

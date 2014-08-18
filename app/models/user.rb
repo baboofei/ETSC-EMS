@@ -159,11 +159,11 @@ class User < ActiveRecord::Base
             member_ids = [id]
             #return [id]
         end
-        #group_ids = User.find(self.id).group_ids
-        #unless group_ids.blank?
-        #    group_str = "(#{group_ids.map{|p| "?"}.join(",")})"
-        #    member_ids << User.where("groups.id in #{group_str}", *group_ids).includes(:groups).map(&:id)
-        #end
+        group_ids = User.find(self.id).group_ids
+        unless group_ids.blank?
+            group_str = "(#{group_ids.map{|p| "?"}.join(",")})"
+            member_ids << User.where("groups.id in #{group_str}", *group_ids).includes(:groups).map(&:id)
+        end
         return member_ids.flatten.uniq
     end
 
@@ -213,7 +213,7 @@ class User < ActiveRecord::Base
         end
         group_ids = User.find(self.id).group_ids
         unless group_ids.blank?
-            group_str = "(#{group_ids.map{|p| "?"}.join(",")})"
+            group_str = "(#{group_ids.map{"?"}.join(",")})"
             member_ids << User.where("groups.id in #{group_str}", *group_ids).includes(:groups).map(&:id)
         end
         return member_ids.flatten.uniq

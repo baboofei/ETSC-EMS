@@ -714,7 +714,6 @@ class UserMailer < ActionMailer::Base
         )
     end
 
-
     def function_instruction_email(user)
         #users = User.at_job
         #users = User.where("id = 2 or id = 5")

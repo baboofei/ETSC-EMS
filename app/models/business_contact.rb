@@ -77,7 +77,7 @@ class BusinessContact < ActiveRecord::Base
         end
         attr[:user_name] = user.name
         attr[:user_id] = user.id
-        attr['editable'] = User.find(user.id).get_group_mate_ids.include? user_id
+        attr['editable'] = true#User.find(user.id).get_group_mate_ids.include? user_id
         attr
     end
 

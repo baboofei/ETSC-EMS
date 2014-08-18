@@ -150,20 +150,24 @@ Ext.define('EIM.controller.ExpressSheets', {
         var win = button.up('window');
         var form = win.down('form', false);
         var grid = form.down('grid', false);
-
+        var form = win.down('form', false);
         if (Ext.isEmpty(form.down('[name=timestamp]', false).getValue())) {
             Ext.example.msg('错误', '你还没打印呢！');
             return false;
         }
-        if (Ext.Array.unique(Ext.Array.map(Ext.getStore("TempGridExpressPeople").data.items, function(item) {
+        var all_number = Ext.Array.map(Ext.getStore("TempGridExpressPeople").data.items, function(item) {
             return item.get("tracking_number");
-        }))[0] === "") {
+        });
+        if (all_number.join("|") === "" //一项且未填
+            || (all_number.join("|").match(/\|$/) != null || all_number.join("|").match(/^\|/) != null) //头或尾未填
+            || all_number.join("|").indexOf("||") != -1 //中间未填
+            ) {
             Ext.example.msg('错误', '请填写每个收件人的快递单号！');
             return false;
         }
 
-        if (form.form.isValid()) {
-            var grid_data = Ext.encode(Ext.pluck(grid.getStore().data.items, "data"));;
+        if(form.form.isValid()) {
+            var grid_data = Ext.encode(Ext.pluck(grid.getStore().data.items, "data"));
             form.submit({
                 url: 'express_sheets/add_from_grid',
                 params: {
@@ -173,9 +177,11 @@ Ext.define('EIM.controller.ExpressSheets', {
                 success: function(the_form, action) {
                     var response = action.response;
                     var msg = Ext.decode(response.responseText);
+                    var print_flag_field = win.down('[name=print_flag]', false);
+                    print_flag_field.setValue('false');//加了这个就可以通过beforeclose的判断了
                     win.close();
                     Ext.example.msg('成功', msg.message);
-//                    Ext.getStore('Contracts').load();
+                    //                    Ext.getStore('Contracts').load();
                 },
                 failure: function() {
                     Ext.Msg.alert('错误', '可能是网络问题，请找Terry处理');
@@ -189,7 +195,7 @@ Ext.define('EIM.controller.ExpressSheets', {
         if (record.get('editable')) {
             var view = Ext.widget('express_sheet_cost_form').show();
             //        view.down('form', false).loadRecord(record);
-            view.down('combo').setValue(11);
+            view.down('combo', false).setValue(11);
         }
     },
 

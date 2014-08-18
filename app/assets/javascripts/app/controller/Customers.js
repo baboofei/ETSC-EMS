@@ -172,7 +172,7 @@ Ext.define('EIM.controller.Customers', {
         //给combo做一个假的store以正确显示值
         var customer_unit_field = view.down('[name=customer_unit_id]', false);
         customer_unit_field.getStore().loadData([
-            [record.get('customer_unit>id'), record.get('customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias)')]
+            [record.get('customer_unit>id'), record.get('customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias|en_name)')]
         ]);
         customer_unit_field.setValue(record.get('customer_unit>id'));
 

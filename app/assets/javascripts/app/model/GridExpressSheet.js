@@ -25,7 +25,7 @@ Ext.define('EIM.model.GridExpressSheet', {
         //            type: 'int'
         //        },
         {
-            name: '^unit_receivable>(name|unit_aliases>unit_alias)',
+            name: '^unit_receivable>(name|unit_aliases>unit_alias|en_name)',
             //            name: 'unit_receivable>(vendor_unit#customer_unit#pop_unit#business_unit)>(name|unit_aliases>unit_alias)',
             type: 'string'
         },

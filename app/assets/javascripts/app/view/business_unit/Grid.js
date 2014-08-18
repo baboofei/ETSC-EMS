@@ -97,29 +97,12 @@ Ext.define('EIM.view.business_unit.Grid', {
                     type: 'string'
                 }
             },
-//            {
-//                header: '单位性质',
-//                dataIndex: 'sort_id',
-//                width: 100,
-//                sortable: true,
-//                filter: {
-//                    type: 'list',
-//                    phpMode: true,
-//                    options: []
-//                },
-//                renderer: function(value) {
-//                    for(var i = 0; i < sortArray.length; i++) {
-//                        if(sortArray[i]["id"] === value) {
-//                            return sortArray[i]["name"];
-//                        }
-//                    }
-//                }
-//            },
             {
                 header: '别称',
                 dataIndex: 'unit_aliases>unit_alias',
                 width: 150,
                 sortable: true,
+                hidden: true,
                 filter: {
                     type: 'string'
                 }

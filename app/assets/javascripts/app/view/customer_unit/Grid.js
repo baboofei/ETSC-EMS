@@ -140,6 +140,7 @@ Ext.define('EIM.view.customer_unit.Grid', {
                 dataIndex: 'unit_aliases>unit_alias',
                 width: 150,
                 sortable: true,
+                hidden: true,
                 filter: {
                     type: 'string'
                 }

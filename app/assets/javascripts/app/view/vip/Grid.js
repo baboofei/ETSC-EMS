@@ -37,7 +37,7 @@ Ext.define('EIM.view.vip.Grid', {
             },
             {
                 header: 'VIP联系人单位',
-                dataIndex: 'vip_unit>(name|unit_aliases>unit_alias)',
+                dataIndex: 'vip_unit>(name|unit_aliases>unit_alias|en_name)',
 //                dataIndex: 'vip_unit>vip_unit_aliases>unit_alias',
                 width: 150,
                 sortable: false,

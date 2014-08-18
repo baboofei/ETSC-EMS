@@ -149,7 +149,7 @@ Ext.define('EIM.view.quote.Grid', {
             },
             {
                 header: '客户单位',
-                dataIndex: 'customer_unit>(name|unit_aliases>unit_alias)',
+                dataIndex: 'customer_unit>(name|unit_aliases>unit_alias|en_name)',
                 width: 150,
                 sortable: true,
                 filter: {
@@ -158,7 +158,7 @@ Ext.define('EIM.view.quote.Grid', {
             },
             {
                 header: '客户',
-                dataIndex: 'customer>name',
+                dataIndex: 'customer>(name|en_name)',
                 width: 50,
                 sortable: true,
                 filter: {

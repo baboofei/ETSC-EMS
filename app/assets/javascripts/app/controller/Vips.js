@@ -162,7 +162,7 @@ Ext.define('EIM.controller.Vips', {
         view.down('form', false).loadRecord(record);
         //给combo做一个假的store以正确显示值
         var vip_unit_field = view.down('[name=vip_unit_id]', false);
-        vip_unit_field.getStore().loadData([[record.get('vip_unit>id'), record.get('vip_unit>(name|unit_aliases>unit_alias)')]]);
+        vip_unit_field.getStore().loadData([[record.get('vip_unit>id'), record.get('vip_unit>(name|unit_aliases>unit_alias|en_name)')]]);
         vip_unit_field.setValue(record.get('vip_unit>id'));
 
         if(!record.get('editable')) {

@@ -37,7 +37,7 @@ Ext.define('EIM.view.customer.Grid', {
             },
             {
                 header: '客户单位',
-                dataIndex: 'customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias)',
+                dataIndex: 'customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias|en_name)',
 //                dataIndex: 'customer_unit>customer_unit_aliases>unit_alias',
                 width: 150,
                 sortable: false,

@@ -212,7 +212,7 @@ Ext.define('EIM.controller.customer.CheckDupForm', {
         if(selected.length === 1) {
             form.loadRecord(selected[0]);
             form.down('[name=customer_unit_id]', false).setValue(selected[0].get('customer_unit>id'));
-            form.down('[name=customer_unit_name]', false).setValue(selected[0].get('customer_unit>(name|unit_aliases>unit_alias)'));
+            form.down('[name=customer_unit_name]', false).setValue(selected[0].get('customer_unit>(name|unit_aliases>unit_alias|en_name)'));
             override_button.enable();
         } else {
             form.form.reset();

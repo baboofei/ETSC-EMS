@@ -161,7 +161,7 @@ Ext.define('EIM.controller.Pops', {
         //给combo做一个假的store以正确显示值
         var pop_unit_field = view.down('[name=pop_unit_id]', false);
         pop_unit_field.getStore().loadData([
-            [record.get('pop_unit>id'), record.get('pop_unit>(name|unit_aliases>unit_alias)')]
+            [record.get('pop_unit>id'), record.get('pop_unit>(name|unit_aliases>unit_alias|en_name)')]
         ]);
         pop_unit_field.setValue(record.get('pop_unit>id'));
 

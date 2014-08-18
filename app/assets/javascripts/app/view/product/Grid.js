@@ -34,7 +34,7 @@ Ext.define('EIM.view.product.Grid', {
             },
             {
                 header: '生产厂商',
-                dataIndex: 'producer>(name|short_name|short_code)',
+                dataIndex: 'producer>(name|short_name|short_code|en_name)',
                 width: 150,
                 sortable: true,
                 filter: {
@@ -43,7 +43,7 @@ Ext.define('EIM.view.product.Grid', {
             },
             {
                 header: '销售厂商',
-                dataIndex: 'seller>(name|short_name|short_code)',
+                dataIndex: 'seller>(name|short_name|short_code|en_name)',
                 width: 150,
                 sortable: true,
                 filter: {
