@@ -3,7 +3,7 @@
 #所以决定前者用start_at和end_at，后者用from_time和to_time
 #TODO 有些还没按这规则来
 class UserMailer < ActionMailer::Base
-    $obsoleted_user_ids = [47, 69] #离职的员工先这么写着吧，牵扯太多
+    $obsoleted_user_ids = [43, 47, 69] #离职的员工先这么写着吧，牵扯太多
     include ActionView::Helpers::SanitizeHelper
     #default :from => "hexawing@gmail.com",         #gmail邮箱，可用
     #default :from => "etsc@qq.com"         #公司QQ邮箱，可用

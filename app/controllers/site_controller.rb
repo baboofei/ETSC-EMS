@@ -17,35 +17,35 @@ class SiteController < ApplicationController
         end
     end
 
-    def index
-        @recent_serials = Serial.recent_20
-        all_recommend_serials = Serial.with_recommend_images.uniq #有图的才出……
-        @recommend_serials = all_recommend_serials.shuffle![0..5] #打乱后取前6个
-        @solutions = Solution.find(:all).shuffle![0..5]
-
-        @recent_news = Event.order("created_at DESC").limit(6)
-
-        @vendor_units = []
-        recommend_array = %w(COH PIC PRM LUM ILX NEL THA LUN PLM MPD VES TKN QDL)
-        recommend_array.each {
-            |x|
-            @vendor_units << VendorUnit.where("short_code = ?", x)[0]
-        }
-                                                                  #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
-                                                                  #    @vendor_units << VendorUnit.where("short_code = ?", 'PIC')[0]
-                                                                  #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
-                                                                  #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
-                                                                  #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
-                                                                  #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
-                                                                  #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
-                                                                  #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
-                                                                  #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
-                                                                  #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
-                                                                  #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
-                                                                  #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
-        @vendor_units += VendorUnit.where("is_partner = ? and is_producer = ?", 1, 1).order("name")
-        render :layout => "site"
-    end
+    #def index
+    #    @recent_serials = Serial.recent_20
+    #    all_recommend_serials = Serial.with_recommend_images.uniq #有图的才出……
+    #    @recommend_serials = all_recommend_serials.shuffle![0..5] #打乱后取前6个
+    #    @solutions = Solution.find(:all).shuffle![0..5]
+    #
+    #    @recent_news = Event.order("created_at DESC").limit(6)
+    #
+    #    @vendor_units = []
+    #    recommend_array = %w(COH PIC PRM LUM ILX NEL THA LUN PLM MPD VES TKN QDL)
+    #    recommend_array.each {
+    #        |x|
+    #        @vendor_units << VendorUnit.where("short_code = ?", x)[0]
+    #    }
+    #                                                              #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+    #                                                              #    @vendor_units << VendorUnit.where("short_code = ?", 'PIC')[0]
+    #                                                              #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+    #                                                              #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+    #                                                              #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+    #                                                              #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+    #                                                              #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+    #                                                              #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+    #                                                              #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+    #                                                              #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+    #                                                              #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+    #                                                              #    @vendor_units << VendorUnit.where("short_code = ?", 'COH')[0]
+    #    @vendor_units += VendorUnit.where("is_partner = ? and is_producer = ?", 1, 1).order("name")
+    #    render :layout => "site"
+    #end
 
     def download_file
         file = "#{Rails.root}/public/files/product/handbook/"+params[:id].to_s+"."+params[:format].to_s
@@ -425,5 +425,13 @@ class SiteController < ApplicationController
 
     def show_product_new
 
+    end
+
+    def test
+        render :layout => "test"
+    end
+
+    def index
+        render :layout => "site"
     end
 end

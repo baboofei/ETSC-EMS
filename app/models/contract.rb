@@ -257,15 +257,17 @@ class Contract < ActiveRecord::Base
                         quote = Quote.find(quote_id)
                         quote_items = quote.quote_items
                         quote_items.each_with_index do |quote_item, index|
-                            contract_item = ContractItem.new
-                            contract_item.product_id = quote_item.product_id
-                            contract_item.quantity = quote_item.quantity
-                            contract_item.contract_id = contract.id
-                            contract_item.send_status = 1
-                            contract_item.check_and_accept_status = 1
-                            contract_item.warranty_term_id = 2
-                            contract_item.inner_id = index
-                            contract_item.save
+                            if quote_item.product
+                                contract_item = ContractItem.new
+                                contract_item.product_id = quote_item.product_id
+                                contract_item.quantity = quote_item.quantity
+                                contract_item.contract_id = contract.id
+                                contract_item.send_status = 1
+                                contract_item.check_and_accept_status = 1
+                                contract_item.warranty_term_id = 2
+                                contract_item.inner_id = index
+                                contract_item.save
+                            end
                         end
                     end
                     #contract.currency_id = quote.currency_id
@@ -548,7 +550,7 @@ class Contract < ActiveRecord::Base
         item = "合同信息"
         message = $etsc_update_ok
         fields_to_be_updated = %w(customer_number summary requirement_id contract_type exchange_rate rmb does_need_install
-            does_need_lc lc_number pay_mode_id comment sum_currency_id sum_amount
+            does_need_lc lc_number pay_mode_id comment sum_currency_id sum_amount group_id
         )
         #binding.pry
         fields_to_be_updated.each do |field|
@@ -592,6 +594,8 @@ class Contract < ActiveRecord::Base
                 when "pay_mode_id"
                     modify_detail_array << "付款方式从#{contract[field].blank? ? "无" : PayMode.find(contract[field]).name}修改为#{params[field].blank? ? "无" : PayMode.find(params[field]).name}" if contract[field].to_s != params[field]
                     mail_modify_detail_array << "付款方式从#{contract[field].blank? ? "无" : PayMode.find(contract[field]).name}修改为#{params[field].blank? ? "无" : PayMode.find(params[field]).name}" if contract[field].to_s != params[field]
+                when "group_id"
+                    modify_detail_array << "项目组从#{(contract[field].blank? || contract[field].to_i == 0) ? "无" : Group.find(contract[field]).name}修改为#{(params[field].blank? || params[field].to_i == 0) ? "无" : Group.find(params[field]).name}"
                 when "comment"
                     modify_detail_array << "备注从#{contract[field].blank? ? "无" : contract[field]}修改为#{params[field].blank? ? "无" : params[field]}" if contract[field] != params[field]
                 else

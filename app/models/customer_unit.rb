@@ -79,8 +79,14 @@ class CustomerUnit < ActiveRecord::Base
     #end
 
     def for_grid_json
+        #binding.pry
         attr = attributes
         #binding.pry if city.nil?
+        #这里有一个奇怪的关于过滤的不知道算不算bug的东东：
+        #如果不要以下两句的话，带上过滤则会有错误。比如本来是三个地址的，过滤完后只显示一个，双击编辑时也只会显示一个，所以加上这两句修正一下
+        real_customer_unit = self.customer_unit_addrs[0].customer_unit
+        customer_unit_addrs = real_customer_unit.customer_unit_addrs
+
         attr['name|en_name|unit_aliases>unit_alias'] = name
         attr['customer_unit_addrs>city>name'] = customer_unit_addrs.map{|p| p.city.name}.uniq.join("、")
         attr['customer_unit_addrs>addr'] = customer_unit_addrs.map{|p| p.addr}.uniq.join("、")
@@ -139,7 +145,7 @@ class CustomerUnit < ActiveRecord::Base
             end
         end
         #binding.pry
-        fields_to_be_updated = %w(city_id en_name site cu_sort comment)
+        fields_to_be_updated = %w(en_name site cu_sort comment)
         fields_to_be_updated.each do |field|
             customer_unit[field] = params[field]
         end
@@ -158,31 +164,80 @@ class CustomerUnit < ActiveRecord::Base
         addr_count = addr_list.size
 
         #binding.pry
-        #因为不允许前台删数据，所以：
-        #已经有m条记录
-        #传过来的参数里只可能有n(n>m)条记录
-        #所以传来的记录里，前m条直接update
-        #剩下的n-m条new
-        existed_addr_ids = CustomerUnit.find(params['id']).customer_unit_addrs.order("id").map(&:id)
-
-        1.upto(addr_count) do |index|
-            if existed_addr_ids[index - 1].blank?
+        #先来判断“有效地址”数
+        max_tag_number = addr_list.map{|p| p[10..-1].to_i}.max
+        if max_tag_number == 1
+            #如果总长等于1，则认为其“有效”，用传来的参数直接进行处理
+            if params[:id] == ""
+                #新增
                 addr = CustomerUnitAddr.new
             else
-                addr = CustomerUnitAddr.find(existed_addr_ids[index - 1])
+                #修改
+                addr = CustomerUnitAddr.where("unit_id = ?", customer_unit.id).first
             end
-            addr['name'] = params["addr_name_#{index}"]
-            addr['is_prime'] = params["is_prime_#{index}"]
-            addr['city_id'] = params["real_city_id_#{index}"].blank? ? params["city_id_#{index}"] : params["real_city_id_#{index}"]
-            addr['postcode'] = params["postcode_#{index}"]
-            addr['addr'] = params["addr_#{index}"]
-            addr['en_addr'] = params["en_addr_#{index}"]
-            addr['unit_id'] = params["id"]
+            addr['name'] = params["addr_name_1"]
+            addr['is_prime'] = params["is_prime_1"]
+            if addr_count == 1
+                addr['city_id'] = params["city_id_1"]
+            else
+                addr['city_id'] = params["real_city_id_1"].blank? ? params["city_id_1"] : params["real_city_id_1"]
+            end
+
+            addr['postcode'] = params["postcode_1"]
+            addr['addr'] = params["addr_1"]
+            addr['en_addr'] = params["en_addr_1"]
+            addr['unit_id'] = customer_unit.id
             addr['user_id'] = user_id
             addr.save
+        else
+            #如果总长大于1，则循环，看是否有描述为空，有则无视此项，不为空的才处理
+            if params[:id] == ""
+                #新增
+                1.upto(max_tag_number) do |index|
+                    if params["addr_name_#{index}"].blank?
+                    else
+                        addr = CustomerUnitAddr.new
+                        addr['name'] = params["addr_name_#{index}"]
+                        addr['is_prime'] = params["is_prime_#{index}"]
+                        addr['city_id'] = params["real_city_id_#{index}"].blank? ? params["city_id_#{index}"] : params["real_city_id_#{index}"]
+                        addr['postcode'] = params["postcode_#{index}"]
+                        addr['addr'] = params["addr_#{index}"]
+                        addr['en_addr'] = params["en_addr_#{index}"]
+                        addr['unit_id'] = customer_unit.id
+                        addr['user_id'] = user_id
+                        addr.save
+                    end
+                end
+            else
+                #修改
+                to_delete_addr_array = []
+                1.upto(max_tag_number) do |index|
+                    if params["addr_name_#{index}"].blank?
+                        #对应的某项变成没有描述，则说明此项不要了，删之
+                        addr = CustomerUnitAddr.where("unit_id = ?", customer_unit.id)[index - 1]
+                        to_delete_addr_array << addr#有可能取到空
+                    else
+                        addr = CustomerUnitAddr.where("unit_id = ?", customer_unit.id)[index - 1]
+                        addr = CustomerUnitAddr.new if addr.blank?
+                        addr['name'] = params["addr_name_#{index}"]
+                        addr['is_prime'] = params["is_prime_#{index}"]
+                        addr['city_id'] = params["real_city_id_#{index}"].blank? ? params["city_id_#{index}"] : params["real_city_id_#{index}"]
+                        addr['postcode'] = params["postcode_#{index}"]
+                        addr['addr'] = params["addr_#{index}"]
+                        addr['en_addr'] = params["en_addr_#{index}"]
+                        addr['unit_id'] = customer_unit.id
+                        addr['user_id'] = user_id
+                        addr.save
+                    end
+                end
+
+                #集中删
+                to_delete_addr_array.each do |addr|
+                    addr.destroy
+                end
+            end
         end
 
-        #如果是修改，则先把旧的别称删光
         if params[:id] != ""
             CustomerUnitAlias.delete_all("customer_unit_id = #{params[:id]}")
             customer_unit_id = params[:id].to_i

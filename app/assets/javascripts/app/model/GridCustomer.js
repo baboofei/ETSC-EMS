@@ -14,6 +14,10 @@ Ext.define('EIM.model.GridCustomer', {
             type: 'string'
         },
         {
+            name: 'customer_unit_addr>name',
+            type: 'string'
+        },
+        {
             name: 'customer_unit>id',
             type: 'int'
         },
@@ -45,6 +49,10 @@ Ext.define('EIM.model.GridCustomer', {
         {
             name: 'customer_unit_addr>city>prvc>area>name',
             type: 'string'
+        },
+        {
+            name: 'customer_unit_addr_id',
+            type: 'int'
         },
         {
             name: 'phone',

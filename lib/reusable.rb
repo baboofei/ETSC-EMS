@@ -430,11 +430,11 @@ module Reusable
                                     end
                                 end
                                 #binding.pry
-                                p search_table_array
-                                p search_model_array
-                                p search_field_array
-                                p collect_id_array
-                                p include_table_hash_array
+                                #p search_table_array
+                                #p search_model_array
+                                #p search_field_array
+                                #p collect_id_array
+                                #p include_table_hash_array
                                 #binding.pry
                                 #考虑到效率问题，还是要看是来自几个表，单张表就全or，多张表就还是得取出id来相加。只不过不用像之前那样取表结构
                                 if search_table_array.uniq.size > 1

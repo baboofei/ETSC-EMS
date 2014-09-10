@@ -110,8 +110,8 @@ class ExpressSheet < ActiveRecord::Base
         end
         #p printer_name
 
-        #system("lpoptions -d #{printer_name}")
-        #system("lp #{Rails.root}/public/express_sheets/#{timestamp}.pdf")
+        system("lpoptions -d #{printer_name}")
+        system("lp #{Rails.root}/public/express_sheets/#{timestamp}.pdf")
 
         return timestamp
     end

@@ -63,7 +63,7 @@ class Customer < ActiveRecord::Base
         #binding.pry if customer_unit.nil?
         if customer_unit_addr
             attr['customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias|en_name)'] = customer_unit_addr.customer_unit.name
-            #attr['customer_unit>customer_unit_aliases>unit_alias'] = customer_unit.name
+            attr['customer_unit_addr>name'] = customer_unit_addr.name
             attr['customer_unit>id'] = customer_unit_addr.customer_unit.id
             #binding.pry if customer_unit.city.nil?
             attr['customer_unit_addr>city>name'] = customer_unit_addr.city.name
@@ -141,7 +141,7 @@ class Customer < ActiveRecord::Base
             customer.user_id = user_id
             message = $etsc_create_ok
         end
-
+        #binding.pry
         fields_to_be_updated = %w(customer_unit_addr_id name en_name email mobile phone fax im department position addr
             postcode en_addr lead_id comment group_id
         )
@@ -292,7 +292,7 @@ class Customer < ActiveRecord::Base
                 customers += Customer.where("customer_unit_aliases.unit_alias like ? and customers.name like ?",
                                             "%#{inquire.customer_unit_name}%",
                                             "#{inquire.name[0]}%"
-                ).includes(:customer_unit => :unit_aliases)
+                ).includes(:customer_unit_addr => {:customer_unit => :unit_aliases})
             elsif inquire.name.blank? && !inquire.en_name.blank?
                 #只填了英文名，则列出此单位所有英文名里包含此姓或此名的人
                 if inquire.en_name.split(" ").size > 1
@@ -300,12 +300,12 @@ class Customer < ActiveRecord::Base
                                                 "%#{inquire.customer_unit_name}%",
                         "#{inquire.en_name.split(" ")[0]}%",
                         "#{inquire.en_name.split(" ")[1]}%"
-                    ).includes(:customer_unit => :unit_aliases)
+                    ).includes(:customer_unit_addr => {:customer_unit => :unit_aliases})
                 else
                     customers += Customer.where("customer_unit_aliases.unit_alias like ? and customers.en_name like ?",
                                                 "%#{inquire.customer_unit_name}%",
                                                 "#{inquire.en_name}%"
-                    ).includes(:customer_unit => :unit_aliases)
+                    ).includes(:customer_unit_addr => {:customer_unit => :unit_aliases})
                 end
             elsif !inquire.name.blank? && !inquire.en_name.blank?
                 #中英文名都填了，则上面两种都列出
@@ -315,17 +315,17 @@ class Customer < ActiveRecord::Base
                                                 "#{inquire.name[0]}%",
                                                 "#{inquire.en_name.split(" ")[0]}%",
                                                 "#{inquire.en_name.split(" ")[1]}%"
-                    ).includes(:customer_unit => :unit_aliases)
+                    ).includes(:customer_unit_addr => {:customer_unit => :unit_aliases})
                 else
                     customers += Customer.where("customer_unit_aliases.unit_alias like ? and customers.name like ? and customers.en_name like ?",
                                                 "%#{inquire.customer_unit_name}%",
                                                 "#{inquire.name[0]}%",
                                                 "#{inquire.en_name}%"
-                    ).includes(:customer_unit => :unit_aliases)
+                    ).includes(:customer_unit_addr => {:customer_unit => :unit_aliases})
                 end
             else
                 #都没填，列出该单位所有人
-                customers += Customer.where("customer_unit_aliases.unit_alias like ?", "%#{inquire.customer_unit_name}%").includes(:customer_unit => :unit_aliases)
+                customers += Customer.where("customer_unit_aliases.unit_alias like ?", "%#{inquire.customer_unit_name}%").includes(:customer_unit_addr => {:customer_unit => :unit_aliases})
             end
         else
             #如果没填单位

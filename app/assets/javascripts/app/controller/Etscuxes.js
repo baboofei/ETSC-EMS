@@ -284,15 +284,16 @@ Ext.define('EIM.controller.Etscuxes', {
         var customer_unit_addr_id_field = form.down('[name=customer_unit_addr_id]', false);
         var addr_combo = form.down('[name=addr_combo]', false);
 //        console.log(addr_field);
+//        console.log(Ext.isEmpty(addr_field.getValue()));
         if(addr_field) {
             //如果地址是JSON格式，则解析一下放到addr_combo里供选
 //            console.log(records[0].get('addr'));
             var addr_array = Ext.JSON.decode(records[0].get('addr'));
-
+            console.log(addr_array);
             if(addr_array.length === 1) {
-                addr_field.setValue(addr_array[0]['addr']);
-                en_addr_field.setValue(addr_array[0]['en_addr']);
-                postcode_field.setValue(addr_array[0]['postcode']);
+                if(Ext.isEmpty(addr_field.getValue())) addr_field.setValue(addr_array[0]['addr']);
+                if(Ext.isEmpty(en_addr_field.getValue()))  en_addr_field.setValue(addr_array[0]['en_addr']);
+                if(Ext.isEmpty(postcode_field.getValue())) postcode_field.setValue(addr_array[0]['postcode']);
                 customer_unit_addr_id_field.setValue(addr_array[0]['customer_unit_addr_id']);
             } else {
                 var addr_store = [];
@@ -311,9 +312,9 @@ Ext.define('EIM.controller.Etscuxes', {
                 addr_combo.setValue(addr_array[0]['addr']);
 //                console.log(addr_field.getValue());
 //                console.log(Ext.isEmpty(addr_field.getValue()));
-                if(addr_field.getValue().indexOf(addr_array[0]['addr']) === -1) addr_field.setValue(addr_array[0]['addr']);
-                if(en_addr_field.getValue().indexOf(addr_array[0]['en_addr']) === -1) en_addr_field.setValue(addr_array[0]['en_addr']);
-                if(postcode_field.getValue().indexOf(addr_array[0]['post']) === -1) postcode_field.setValue(addr_array[0]['postcode']);
+                if(addr_field.getValue().indexOf(addr_array[0]['addr']) === -1 && Ext.isEmpty(addr_field.getValue())) addr_field.setValue(addr_array[0]['addr']);
+                if(en_addr_field.getValue().indexOf(addr_array[0]['en_addr']) === -1 && Ext.isEmpty(en_addr_field.getValue())) en_addr_field.setValue(addr_array[0]['en_addr']);
+                if(postcode_field.getValue().indexOf(addr_array[0]['postcode']) === -1 && Ext.isEmpty(postcode_field.getValue())) postcode_field.setValue(addr_array[0]['postcode']);
                 customer_unit_addr_id_field.setValue(addr_array[0]['customer_unit_addr_id']);
             }
         }

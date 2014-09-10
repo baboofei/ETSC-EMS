@@ -86,6 +86,7 @@ EIMV5::Application.routes.draw do
   match '/product.html' => 'site#show_product_new'
   #TODO 想一个比较合适的staff名字
   match 'login' => 'index#index'
+  match 'test' => 'site#test'
 
   resources :users
   root :to => 'site#index'

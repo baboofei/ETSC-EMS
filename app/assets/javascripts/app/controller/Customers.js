@@ -161,8 +161,9 @@ Ext.define('EIM.controller.Customers', {
     editCustomer: function(view, record) {
         //            var record = this.getSourceGrid().getSelectedCustomer();
         var view = Ext.widget('customer_form').show();
-        Ext.getStore("dict.Applications").load();
         view.down('form', false).loadRecord(record);
+
+        Ext.getStore("dict.Applications").load();
         //boxselect里的值单独赋
         var app_ids = record.data["prod_applications>id"];
         var app_array = Ext.Array.map(app_ids.split("|"), function(value) {
@@ -175,6 +176,9 @@ Ext.define('EIM.controller.Customers', {
             [record.get('customer_unit>id'), record.get('customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias|en_name)')]
         ]);
         customer_unit_field.setValue(record.get('customer_unit>id'));
+
+        //显示地址名称
+        view.down('[name=addr_combo]', false).setValue(record.get('customer_unit_addr>name'));
 
         var group_field = view.down('[name=group_id]', false);
         group_field.getStore().loadData([
@@ -263,9 +267,9 @@ Ext.define('EIM.controller.Customers', {
         var addr_field = form.down('[name=addr]', false);
         var en_addr_field = form.down('[name=en_addr]', false);
         var postcode_field = form.down('[name=postcode]', false);
-        if(!Ext.isEmpty(addr_field.getValue())) addr_field.setValue(addr.get('addr'));
-        if(!Ext.isEmpty(en_addr_field.getValue())) en_addr_field.setValue(addr.get('en_addr'));
-        if(!Ext.isEmpty(postcode_field.getValue())) postcode_field.setValue(addr.get('postcode'));
+        addr_field.setValue(addr.get('addr'));
+        en_addr_field.setValue(addr.get('en_addr'));
+        postcode_field.setValue(addr.get('postcode'));
         form.down('[name=customer_unit_addr_id]', false).setValue(addr.get('customer_unit_addr_id'));
 //        console.log(addr);
 //        console.log(addr.get('customer_unit_addr_id'));

@@ -18,15 +18,21 @@ to work as expected, they need to be ported to the correct
 location and included with correspondent include tab
 -->
 <body>
-<div class="ETSC-head">
+
+
+<div class="fixed">
   <div class="row" data-equalizer>
-    <div class="large-12 medium-12 small-12 columns">
+    <div class="large-6 medium-6 small-6 columns">
       <span class="show-for-medium-up"><img src="<%= asset_path("site/logo.jpg") %>" alt="ETSC" /></span>
       <span class="show-for-small-only"><img src="<%= asset_path("site/logo-pic.jpg") %>" alt="ETSC" /></span>
     </div>
-    <div class="large-12 medium-12 small-12 columns text-right">
+    <div class="large-6 medium-6 small-6 columns text-right">
       <a href="#"><img src="<%= asset_path("silk_icon/flag_cn.png") %>" width="20px" alt="中文"><span class="show-for-medium-up head-small-txt"> 中文</span></a>
       <a href="#"><img src="<%= asset_path("silk_icon/flag_uk.png") %>" width="20px" alt="English"><span class="show-for-medium-up head-small-txt"> English</span></a>
+    </div>
+    <div class="large-6 medium-6 small-6 columns text-right">
+      <span class="show-for-small-up head-big-txt">TEL: 027-87807177</span>
+      <!--<span class="show-for-small-only head-small-txt">TEL: 027-87807177</span>-->
     </div>
   </div>
   <nav class="top-bar" data-topbar role="navigation">
@@ -98,31 +104,84 @@ location and included with correspondent include tab
       </ul>
       <ul class="show-for-small-up">
         <li>
-          <a href="#"><img style="CURSOR: pointer" onclick="javascript:window.open('http://wpa.qq.com/msgrd?v=3&uin=499269653&site=qq&menu=yes'+document.location, '_blank', 'height=544, width=644,toolbar=no,scrollbars=no,menubar=no,status=no');" border="0" SRC="http://im.bizapp.qq.com:8000/zx_qq.gif">&nbsp;</a>
+          <a href="#"><img style="CURSOR: pointer" onclick="javascript:window.open('http://bizapp.qq.com/webc.htm?new=0&sid=499269653&eid=&o=www.etsc-tech.com&q=7&ref='+document.location, '_blank', 'height=544, width=644,toolbar=no,scrollbars=no,menubar=no,status=no');" border="0" SRC="http://im.bizapp.qq.com:8000/zx_qq.gif">&nbsp;</a>
         </li>
       </ul>
     </section>
   </nav>
   <div class="row">
-      <div class="row collapse ETSC-search-collapse">
-        <div class="small-20 columns">
+    <div>
+      <div class="row collapse">
+        <div class="small-10 columns">
           <input type="text" placeholder="想搜什么产品">
         </div>
-        <div class="small-4 columns">
+        <div class="small-2 columns">
           <a href="#" class="alert button postfix">搜</a>
         </div>
       </div>
+    </div>
   </div>
 </div>
-<%= yield %>
+<%= yield :layout %>
+<div class="off-canvas-wrap" data-offcanvas>
+  <div class="inner-wrap">
+    <nav class="tab-bar">
+      <section class="left-small"><a class="left-off-canvas-toggle menu-icon" href="#"><span></span></a></section>
+      <section class="middle tab-bar-section"><h1 class="title">Foundation</h1></section>
+      <section class="right-small"><a class="right-off-canvas-toggle menu-icon" href="#"><span></span></a></section>
+    </nav>
+    <aside class="left-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>Foundation</label></li>
+        <li><a href="#">The Psychohistorians</a></li>
+        <li><a href="#">...</a></li>
+      </ul>
+    </aside>
+    <aside class="right-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>Users</label></li>
+        <li><a href="#">Hari Seldon</a></li>
+        <li><a href="#">...</a></li>
+      </ul>
+    </aside>
+    <section class="main-section">
+      <p>2324</p>
+
+      <p>2324</p>
+
+      <p>2324</p>
+
+      <p>2324</p><p>2324</p>
+    </section>
+    <a class="exit-off-canvas"></a></div>
+</div>
+
+<ul class="example-orbit-content" data-orbit id="featured1">
+  <li data-orbit-slide="headline-1">
+    <div><h2>二级标题</h2>
+
+      <h3>小标题</h3></div>
+  </li>
+  <li data-orbit-slide="headline-2">
+    <div><h2>Headline 2</h2>
+
+      <h3>Subheadline</h3></div>
+  </li>
+  <li data-orbit-slide="headline-3">
+    <div><h2>Headline 3</h2>
+
+      <h3>Subheadline</h3></div>
+  </li>
+</ul>
+
 <div class="row">
-  <div class="large-24 columns">
+  <div class="large-12 columns">
     <h1>Welcome to Foundation</h1>
   </div>
 </div>
 
 <div class="row">
-  <div class="large-24 columns">
+  <div class="large-12 columns">
     <div class="panel">
       <h3>We&rsquo;re stoked you want to try Foundation! </h3>
 
@@ -132,15 +191,15 @@ location and included with correspondent include tab
       <p>Once you've exhausted the fun in this document, you should check out:</p>
 
       <div class="row">
-        <div class="large-8 medium-8 columns">
+        <div class="large-4 medium-4 columns">
           <p><a href="http://foundation.zurb.com/docs">Foundation Documentation</a><br/>Everything you need to know
             about using the framework.</p>
         </div>
-        <div class="large-8 medium-8 columns">
+        <div class="large-4 medium-4 columns">
           <p><a href="http://github.com/zurb/foundation">Foundation on Github</a><br/>Latest code, issue reports,
             feature requests and more.</p>
         </div>
-        <div class="large-8 medium-8 columns">
+        <div class="large-4 medium-4 columns">
           <p><a href="http://twitter.com/foundationzurb">@foundationzurb</a><br/>Ping us on Twitter if you have
             questions. If you build something with this we'd love to see it (and send you a totally boss sticker).</p>
         </div>
@@ -150,12 +209,12 @@ location and included with correspondent include tab
 </div>
 
 <div class="row">
-  <div class="large-16 medium-16 columns">
+  <div class="large-8 medium-8 columns">
     <h5>Here&rsquo;s your basic grid:</h5>
     <!-- Grid Example -->
 
     <div class="row">
-      <div class="large-24 columns">
+      <div class="large-12 columns">
         <div class="callout panel">
           <p><strong>This is a twelve column section in a row.</strong> Each of these includes a div.panel element so
             you can see where the columns are - it's not required at all for the grid.</p>
@@ -163,29 +222,29 @@ location and included with correspondent include tab
       </div>
     </div>
     <div class="row">
-      <div class="large-12 medium-12 columns">
+      <div class="large-6 medium-6 columns">
         <div class="callout panel">
           <p>Six columns</p>
         </div>
       </div>
-      <div class="large-12 medium-12 columns">
+      <div class="large-6 medium-6 columns">
         <div class="callout panel">
           <p>Six columns</p>
         </div>
       </div>
     </div>
     <div class="row">
-      <div class="large-8 medium-8 small-8 columns">
+      <div class="large-4 medium-4 small-4 columns">
         <div class="callout panel">
           <p>Four columns</p>
         </div>
       </div>
-      <div class="large-8 medium-8 small-8 columns">
+      <div class="large-4 medium-4 small-4 columns">
         <div class="callout panel">
           <p>Four columns</p>
         </div>
       </div>
-      <div class="large-8 medium-8 small-8 columns">
+      <div class="large-4 medium-4 small-4 columns">
         <div class="callout panel">
           <p>Four columns</p>
         </div>
@@ -198,35 +257,35 @@ location and included with correspondent include tab
 
     <form>
       <div class="row">
-        <div class="large-24 columns">
+        <div class="large-12 columns">
           <label>Input Label</label>
-          <input type="text" placeholder="large-24.columns"/>
+          <input type="text" placeholder="large-12.columns"/>
         </div>
       </div>
       <div class="row">
-        <div class="large-8 medium-8 columns">
+        <div class="large-4 medium-4 columns">
           <label>Input Label</label>
           <input type="text" placeholder="large-4.columns"/>
         </div>
-        <div class="large-8 medium-8 columns">
+        <div class="large-4 medium-4 columns">
           <label>Input Label</label>
           <input type="text" placeholder="large-4.columns"/>
         </div>
-        <div class="large-8 medium-8 columns">
+        <div class="large-4 medium-4 columns">
           <div class="row collapse">
             <label>Input Label</label>
 
-            <div class="small-18 columns">
+            <div class="small-9 columns">
               <input type="text" placeholder="small-9.columns"/>
             </div>
-            <div class="small-6 columns">
+            <div class="small-3 columns">
               <span class="postfix">.com</span>
             </div>
           </div>
         </div>
       </div>
       <div class="row">
-        <div class="large-24 columns">
+        <div class="large-12 columns">
           <label>Select Box</label>
           <select>
             <option value="husker">Husker</option>
@@ -237,27 +296,27 @@ location and included with correspondent include tab
         </div>
       </div>
       <div class="row">
-        <div class="large-12 medium-12 columns">
+        <div class="large-6 medium-6 columns">
           <label>Choose Your Favorite</label>
           <input type="radio" name="pokemon" value="Red" id="pokemonRed"><label for="pokemonRed">Radio 1</label>
           <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label for="pokemonBlue">Radio 2</label>
         </div>
-        <div class="large-12 medium-12 columns">
+        <div class="large-6 medium-6 columns">
           <label>Check these out</label>
           <input id="checkbox1" type="checkbox"><label for="checkbox1">Checkbox 1</label>
           <input id="checkbox2" type="checkbox"><label for="checkbox2">Checkbox 2</label>
         </div>
       </div>
       <div class="row">
-        <div class="large-24 columns">
+        <div class="large-12 columns">
           <label>Textarea Label</label>
-          <textarea placeholder="small-24.columns"></textarea>
+          <textarea placeholder="small-12.columns"></textarea>
         </div>
       </div>
     </form>
   </div>
 
-  <div class="large-8 medium-8 columns">
+  <div class="large-4 medium-4 columns">
     <h5>Try one of these buttons:</h5>
 
     <p><a href="#" class="small button">Simple Button</a><br/>
@@ -279,11 +338,28 @@ location and included with correspondent include tab
 
 <%= javascript_include_tag 'jquery/jquery-2.1.1.min' %>
 <%= javascript_include_tag 'foundation' %>
-<%= javascript_include_tag 'foundation/foundation.orbit' %>
 
 <!--<script src="js/foundation.min.js"></script>-->
 <script>
     $(document).foundation();
+
+    $("#featured1").on("ready.fndtn.orbit", function(event) {
+        console.log("ready");
+    });
+    $("#featured1").on("orbit:before-slide-change", function(event) {
+        console.info("before slide change");
+    });
+    $("#featured1").on("orbit:after-slide-change", function(event, orbit) {
+        console.info("after slide change");
+        console.info("slide " + orbit.slide_number + " of " + orbit.total_slides);
+    });
+    $("#featured1").on("orbit:timer-started", function(event, orbit) {
+        console.info("timer started");
+    });
+    $("#featured1").on("orbit:timer-stopped", function(event, orbit) {
+        console.info("timer stopped");
+    });
+
 </script>
 </body>
 </html>

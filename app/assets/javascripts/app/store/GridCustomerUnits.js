@@ -6,6 +6,7 @@ Ext.define('EIM.store.GridCustomerUnits', {
     model: 'EIM.model.GridCustomerUnit',
 
     autoLoad: true,
+    remoteSort: true,
 
     proxy: {
         url: 'customer_units/get_grid_customer_units/list.json',
