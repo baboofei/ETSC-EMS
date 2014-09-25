@@ -84,10 +84,43 @@ Ext.define('EIM.view.customer.CheckDupSubForm', {
             {
                 items: [
                     {
+                        xtype: 'combo',
+                        name: 'addr_combo',
+                        fieldLabel: '通信地址',
+                        flex: 2,
+                        store: Ext.create('Ext.data.Store', {
+                            fields: [
+                                {name: 'name', type: 'string'},
+                                {name: 'postcode', type: 'string'},
+                                {name: 'addr', type: 'string'},
+                                {name: 'en_addr', type: 'string'},
+                                {name: 'customer_unit_addr_id', type: 'string'}
+                            ]
+                        }),
+                        queryMode: 'local',
+                        displayField: 'name',
+                        editable: false,
+                        valueField: 'addr',
+                        mergeType: 'override'
+                    },
+                    {
+                        xtype: 'hidden',
+                        name: 'customer_unit_addr_id',
+                        hidden: true,
+                        mergeType: 'override'
+                    },
+                    {
+                        xtype: 'textfield',
                         name: 'addr',
-                        mergeType: 'override',
-                        fieldLabel: '地址'
+                        fieldLabel: '',
+                        flex: 3,
+                        mergeType: 'override'
                     }
+//                    {
+//                        name: 'addr',
+//                        mergeType: 'override',
+//                        fieldLabel: '地址'
+//                    }
                 ]
             },
             {

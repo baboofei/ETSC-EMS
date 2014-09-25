@@ -30,6 +30,19 @@ Ext.define('EIM.view.express_sheet.SinglePersonForm', {
                         allowBlank: false
                     },
                     {
+                        xtype: 'radiogroup',
+                        fieldLabel: '发送邮件给',
+                        name: 'send_mail_to',
+                        margin: 0,
+                        columns: 2,
+                        vertical: true,
+                        items: [
+                            { boxLabel: '仅寄件人', name: 'send_mail_target', inputValue: '1' },
+                            { boxLabel: '收件人&寄件人', name: 'send_mail_target', inputValue: '2'}
+                        ],
+                        allowBlank: false
+                    },
+                    {
                         xtype: 'datefield',
                         name: 'remind_at',
                         fieldLabel: '提醒时间',

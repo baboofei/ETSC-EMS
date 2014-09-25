@@ -107,7 +107,7 @@ Ext.define('EIM.controller.Salelogs', {
                                 }
                                 return false;
                             }
-                            //“寄目录”标签的提交
+                            //“寄目录/文件”标签的提交
                         case "mailed_content_grid":
                             {
                                 if (Ext.getStore("MailedContents").getCount() === 0) {

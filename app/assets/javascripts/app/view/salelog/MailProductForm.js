@@ -5,7 +5,6 @@ Ext.define('EIM.view.salelog.MailProductForm', {
     title: '新增/修改寄出产品',
     layout: 'anchor',
     width: 400,
-    height: 208,
     modal: true,
     autoShow: true,
 
@@ -110,6 +109,20 @@ Ext.define('EIM.view.salelog.MailProductForm', {
                         fieldLabel: '快递单号',
                         name: 'tracking_number',
                         allowBlank: false
+                    },
+                    {
+                        xtype: 'radiogroup',
+                        fieldLabel: '发送邮件给',
+                        name: 'send_mail_to',
+                        margin: 0,
+                        columns: 2,
+                        vertical: true,
+                        items: [
+                            { boxLabel: '仅寄件人', name: 'send_mail_target', inputValue: '1' },
+                            { boxLabel: '收件人&寄件人', name: 'send_mail_target', inputValue: '2'}
+                        ],
+                        allowBlank: false,
+                        disabled: true
                     },
                     {
                         xtype: 'datefield',

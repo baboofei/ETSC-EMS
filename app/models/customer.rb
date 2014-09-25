@@ -141,7 +141,7 @@ class Customer < ActiveRecord::Base
             customer.user_id = user_id
             message = $etsc_create_ok
         end
-        #binding.pry
+        binding.pry
         fields_to_be_updated = %w(customer_unit_addr_id name en_name email mobile phone fax im department position addr
             postcode en_addr lead_id comment group_id
         )
@@ -285,6 +285,7 @@ class Customer < ActiveRecord::Base
         model = params['source_controller'].singularize.constantize
         #然后看id对应的数据
         inquire = model.find(params[:id])
+        #binding.pry
         if !inquire.customer_unit_name.blank?
             #如果填了单位
             if !inquire.name.blank? && inquire.en_name.blank?

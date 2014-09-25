@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+</head>
+<body>
+<p>Dear <%= @receiver_name %>,</p>
+
+<p><%= @sender_name %> sent a parcel to you, <%= @express_name %> tracking number is <%= @tracking_number %>. Please
+  track.</p>
+
+<p>If any question, please contact <a href="mailto:<%= @sender_email %>"><%= @sender_email %></a>.</p>
+
+<p>Thanks for cooperation.</p>
+
+<p></p>
+
+<p></p>
+
+<p><%= @sender_company_name %></p>
+
+<p><%= Date.today.strftime("%Y-%m-%d") %></p>
+</body>
+</html>

@@ -48,7 +48,7 @@ class ServiceLog < ActiveRecord::Base
                         'grid_data' => data_array,
                         'project_option' => 'tsd'
                     }
-                    AdminInventory.create_or_update_with(admin_inventory_params, user_id)
+                    AdminInventory.create_or_update_with(admin_inventory_params, user_id, false)
                 end
             when "change_detached_parts"
                 process_type = 5
@@ -383,7 +383,7 @@ class ServiceLog < ActiveRecord::Base
                         'grid_data' => service_log_cache['change_parts'],
                         'project_option' => 'tsd'
                     }
-                    AdminInventory.create_or_update_with(admin_inventory_params, user_id)
+                    AdminInventory.create_or_update_with(admin_inventory_params, user_id, false)
                 elsif service_log_cache['add_equipment']
                     add_equipment_params = JSON.parse(service_log_cache['add_equipment'])
                     ReceivedEquipment.create_with(add_equipment_params)
@@ -471,7 +471,7 @@ class ServiceLog < ActiveRecord::Base
                         'grid_data' => service_log_cache['change_parts'],
                         'project_option' => 'tsd'
                     }
-                    AdminInventory.create_or_update_with(admin_inventory_params, user_id)
+                    AdminInventory.create_or_update_with(admin_inventory_params, user_id, false)
                 elsif service_log_cache['add_equipment']
                     add_equipment_params = JSON.parse(service_log_cache['add_equipment'])
                     ReceivedEquipment.create_with(add_equipment_params)
@@ -571,7 +571,7 @@ class ServiceLog < ActiveRecord::Base
                         'grid_data' => service_log_cache['change_parts'],
                         'project_option' => 'tsd'
                     }
-                    AdminInventory.create_or_update_with(admin_inventory_params, user_id)
+                    AdminInventory.create_or_update_with(admin_inventory_params, user_id, false)
                 elsif service_log_cache['add_equipment']
                     add_equipment_params = JSON.parse(service_log_cache['add_equipment'])
                     ReceivedEquipment.create_with(add_equipment_params)

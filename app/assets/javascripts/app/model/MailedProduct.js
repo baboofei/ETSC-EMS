@@ -40,6 +40,10 @@ Ext.define('EIM.model.MailedProduct', {
         {
             name: 'timestamp',
             type: 'string'
+        },
+        {
+            name: 'send_mail_target',
+            type: 'string'
         }
     ]
 });

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140715012343) do
+ActiveRecord::Schema.define(:version => 20140925033709) do
 
   create_table "accessories", :force => true do |t|
     t.string   "url"
@@ -266,10 +266,10 @@ ActiveRecord::Schema.define(:version => 20140715012343) do
     t.integer  "group_id"
     t.datetime "signed_at"
     t.datetime "invoiced_at"
-    t.integer  "contractable_id"
-    t.string   "contractable_type"
     t.datetime "created_at",                                          :null => false
     t.datetime "updated_at",                                          :null => false
+    t.integer  "contractable_id"
+    t.string   "contractable_type"
   end
 
   create_table "contracts_old_fields", :force => true do |t|
@@ -346,11 +346,7 @@ ActiveRecord::Schema.define(:version => 20140715012343) do
 
   create_table "customer_units", :force => true do |t|
     t.string   "name"
-    t.integer  "city_id"
-    t.string   "addr"
-    t.string   "postcode"
     t.string   "en_name"
-    t.string   "en_addr"
     t.integer  "cu_sort"
     t.integer  "user_id"
     t.string   "site"
@@ -386,11 +382,11 @@ ActiveRecord::Schema.define(:version => 20140715012343) do
     t.string   "department"
     t.string   "position"
     t.string   "comment"
-    t.string   "addr"
-    t.string   "postcode"
     t.integer  "user_id"
     t.integer  "lead_id"
+    t.string   "postcode"
     t.string   "en_addr"
+    t.string   "addr"
     t.integer  "group_id"
     t.string   "is_obsolete",           :default => "0", :null => false
     t.datetime "created_at",                             :null => false
@@ -451,11 +447,19 @@ ActiveRecord::Schema.define(:version => 20140715012343) do
   create_table "dictionaries", :force => true do |t|
     t.string   "data_type"
     t.string   "display"
+    t.string   "display_en"
     t.string   "value"
     t.boolean  "available",  :default => true, :null => false
     t.datetime "created_at",                   :null => false
     t.datetime "updated_at",                   :null => false
   end
+
+  create_table "doubtable_customer_units", :force => true do |t|
+    t.string  "description",      :limit => 500
+    t.integer "customer_unit_id"
+  end
+
+  add_index "doubtable_customer_units", ["id"], :name => "id"
 
   create_table "editable_roles_stores", :id => false, :force => true do |t|
     t.integer  "editable_role_id"
@@ -546,13 +550,13 @@ ActiveRecord::Schema.define(:version => 20140715012343) do
     t.integer  "currency_id"
     t.date     "send_at"
     t.string   "pdf_url"
+    t.string   "comment"
     t.integer  "unit_receivable_id"
     t.string   "unit_receivable_type"
     t.integer  "person_receivable_id"
     t.string   "person_receivable_type"
     t.integer  "vestable_id"
     t.string   "vestable_type"
-    t.string   "comment"
     t.datetime "created_at",                                            :null => false
     t.datetime "updated_at",                                            :null => false
   end
@@ -621,6 +625,14 @@ ActiveRecord::Schema.define(:version => 20140715012343) do
     t.integer  "vendor_unit_id"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
+  end
+
+  create_table "links", :force => true do |t|
+    t.string   "image_url"
+    t.string   "description"
+    t.string   "link_to"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
 
   create_table "m_inquires", :force => true do |t|
@@ -909,7 +921,6 @@ ActiveRecord::Schema.define(:version => 20140715012343) do
     t.text     "comment"
     t.string   "state"
     t.integer  "quote_type"
-    t.integer  "group_id"
     t.text     "pdf"
     t.text     "summary"
     t.decimal  "rmb",              :precision => 12, :scale => 2
@@ -918,6 +929,7 @@ ActiveRecord::Schema.define(:version => 20140715012343) do
     t.decimal  "max_custom_tax",   :precision => 5,  :scale => 2
     t.boolean  "does_count_ctvat"
     t.decimal  "x_discount",       :precision => 5,  :scale => 2
+    t.integer  "group_id"
     t.integer  "quotable_id"
     t.string   "quotable_type"
     t.datetime "created_at",                                      :null => false
@@ -1051,10 +1063,18 @@ ActiveRecord::Schema.define(:version => 20140715012343) do
     t.datetime "updated_at",        :null => false
   end
 
-  create_table "serials", :force => true do |t|
+  create_table "serials_solutions", :force => true do |t|
+    t.integer  "solution_id"
+    t.integer  "serial_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
+  create_table "series", :force => true do |t|
     t.string   "brief"
     t.string   "name"
-    t.integer  "type_id"
+    t.integer  "sort_by_function_id"
+    t.integer  "sort_by_application_id"
     t.text     "description"
     t.text     "application_in_site"
     t.text     "parameter_in_site"
@@ -1062,15 +1082,15 @@ ActiveRecord::Schema.define(:version => 20140715012343) do
     t.boolean  "is_recommend"
     t.boolean  "is_display"
     t.integer  "user_id"
-    t.datetime "created_at",          :null => false
-    t.datetime "updated_at",          :null => false
+    t.datetime "created_at",             :null => false
+    t.datetime "updated_at",             :null => false
   end
 
-  create_table "serials_solutions", :force => true do |t|
-    t.integer  "solution_id"
-    t.integer  "serial_id"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+  create_table "series_relationships", :id => false, :force => true do |t|
+    t.integer  "main_series_id"
+    t.integer  "related_series_id"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
   end
 
   create_table "service_logs", :force => true do |t|
@@ -1094,6 +1114,20 @@ ActiveRecord::Schema.define(:version => 20140715012343) do
     t.integer  "category"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "sort_by_applications", :force => true do |t|
+    t.string   "name"
+    t.integer  "parent_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "sort_by_functions", :force => true do |t|
+    t.string   "name"
+    t.integer  "parent_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "stores", :force => true do |t|

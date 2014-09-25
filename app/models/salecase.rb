@@ -52,7 +52,7 @@ class Salecase < ActiveRecord::Base
         attr['customer_units>(name|en_name|unit_aliases>unit_alias)'] = customer_units.map(&:name).join("、")
         attr['group_name'] = group.blank? ? "" : "#{group.name}(#{group.description})"
         attr['has_signed_contract'] = end_at.blank? ? "" : end_at.strftime("%Y-%m-%d")
-        attr['updated_at'] = salelogs.sort_by{|p| p.contact_at}[-1].contact_at#.strftime("%Y-%m-%d")
+        attr['updated_at'] = salelogs.sort_by{|p| p.contact_at}[-1].contact_at if salelogs != []#.strftime("%Y-%m-%d")
         attr['editable'] = User.find(user.id).get_group_mate_ids.include? user_id
         attr
     end

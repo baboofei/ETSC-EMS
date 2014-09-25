@@ -140,7 +140,32 @@ class ContractItem < ActiveRecord::Base
                     when "check_and_accept_status"
                         modify_detail_array << "验收状态从#{old_contract_item[field].blank? ? "无" : Dictionary.where("data_type = ? and value = ?", field, old_contract_item[field]).first.display}修改为#{contract_item[field].blank? ? "无" : Dictionary.where("data_type = ? and value = ?", field, contract_item[field]).first.display}" if old_contract_item[field].to_s != contract_item[field].to_s
                     when "expected_leave_factory_at"
-                        modify_detail_array << "预计发货时间从#{old_contract_item[field].blank? ? "无" : old_contract_item[field].strftime("%Y-%m-%d")}修改为#{contract_item[field].blank? ? "无" : contract_item[field].strftime("%Y-%m-%d")}" if old_contract_item[field].to_s != contract_item[field].to_s
+                        if old_contract_item[field].to_s != contract_item[field].to_s
+                            modify_detail_array << "预计发货时间从#{old_contract_item[field].blank? ? "无" : old_contract_item[field].strftime("%Y-%m-%d")}修改为#{contract_item[field].blank? ? "无" : contract_item[field].strftime("%Y-%m-%d")}"
+                            contract = contract_item.contract
+                            if is_local
+                                #在本机上调试时只发给Terry
+                                target_ids = [5]
+                            else
+                                target_ids = []
+                                target_ids << contract.dealer.id
+                                target_ids << contract.dealer.get_direct_manager_id
+                                target_ids << Role.find(18).user_ids
+                                target_ids = target_ids.flatten.uniq
+                            end
+
+                            target_ids.each do |target_id|
+                                #消息通知
+                                sn = (Time.now.to_f*1000).ceil
+                                message_params = {
+                                    :content => "合同#{contract.number.to_eim_message_link(sn)}中货品的预计发货时间已经改变为#{contract_item[field].blank? ? "无" : contract_item[field].strftime("%Y-%m-%d")}。",
+                                    :receiver_user_id => target_id,
+                                    :send_at => Time.now,
+                                    :sn => sn
+                                }
+                                PersonalMessage.create_or_update_with(message_params, user_id)
+                            end
+                        end
                     when "appointed_leave_factory_at"
                         modify_detail_array << "合约发货时间从#{old_contract_item[field].blank? ? "无" : old_contract_item[field].strftime("%Y-%m-%d")}修改为#{contract_item[field].blank? ? "无" : contract_item[field].strftime("%Y-%m-%d")}" if old_contract_item[field].to_s != contract_item[field].to_s
                     when "actually_leave_factory_at"
@@ -411,7 +436,7 @@ class ContractItem < ActiveRecord::Base
         return {:success => true, :message => "合同项修改成功"}
     end
 
-    def self.batch_edit_date_with(params, user_id)
+    def self.batch_edit_date_with(params, user_id, is_local)
         #binding.pry
         contract_item_id_array = params['select_ids'].split('|')
         contract_item_id_array.each do |contract_item_id|
@@ -450,6 +475,38 @@ class ContractItem < ActiveRecord::Base
             contract_history.natural_language = "修改了合同项((#{contract_item.product.model})，改动如下：#{natural_language}。"
             contract_history.save
         end
+
+        #虽然是批量改但只发一次消息
+        field = params['item']
+        #binding.pry
+        contract_item = ContractItem.find(params['select_ids'].split('|')[0])
+        contract = contract_item.contract
+        case field
+            when "expected_leave_factory_at"
+                if is_local
+                    #在本机上调试时只发给Terry
+                    target_ids = [5]
+                else
+                    target_ids = []
+                    target_ids << contract.dealer.id
+                    target_ids << contract.dealer.get_direct_manager_id
+                    target_ids << Role.find(18).user_ids
+                    target_ids = target_ids.flatten.uniq
+                end
+
+                target_ids.each do |target_id|
+                    #消息通知
+                    sn = (Time.now.to_f*1000).ceil
+                    message_params = {
+                        :content => "合同#{contract.number.to_eim_message_link(sn)}中货品的预计发货时间已经改变为#{contract_item[field].blank? ? "无" : contract_item[field].strftime("%Y-%m-%d")}。",
+                        :receiver_user_id => target_id,
+                        :send_at => Time.now,
+                        :sn => sn
+                    }
+                    PersonalMessage.create_or_update_with(message_params, user_id)
+                end
+        end
+
         if params['item'] == "appointed_leave_factory_at" || params['item'] == "leave_etsc_at" || params['item'] == "check_and_accept_at"
                 params[:contract_item_ids] = params['select_ids']
                 validate_to_gen_receivables(params, user_id)

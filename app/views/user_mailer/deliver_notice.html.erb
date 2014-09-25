@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+</head>
+<body>
+<p>尊敬的<%= @receiver_name %>，</p>
+
+<p>　　今<%= @sender_name %>通过<%= @express_name %>快递给您寄送了<%= @quantity %><%= @model %>，快递单号为<%= @tracking_number %>
+  ，请注意查收。谢谢！</p>
+
+<p></p>
+
+<p></p>
+
+<p style="text-align: right;"><%= @sender_company_name %>　　　　　　<br/><%= Date.today.strftime("%Y年%m月%d日") %>　　　　</p>
+</body>
+</html>

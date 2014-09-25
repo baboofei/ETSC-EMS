@@ -54,18 +54,7 @@ Ext.define('EIM.controller.customer.CheckDupForm', {
                 selectionchange: this.selectionChange
             },
             'customer_confirm_customer_unit_form button[action=save]': {
-                click: function(button) {
-                    var win = button.up('window');
-                    var combo = win.down('combo', false);
-                    var target_form = Ext.ComponentQuery.query('customer_check_dup_sub_form[name=out]')[0];
-                    if(!Ext.isEmpty(combo.getValue())) {
-                        target_form.down('[name=customer_unit_id]', false).setValue(combo.getValue());
-                        target_form.down('[name=customer_unit_name]', false).setValue(combo.getRawValue());
-                        win.close();
-                    } else {
-                        combo.markInvalid('请选择客户单位！');
-                    }
-                }
+                click: this.setAddressCombo
             },
             'customer_confirm_customer_application_form button[action=save]': {
                 click: function(button) {
@@ -104,9 +93,21 @@ Ext.define('EIM.controller.customer.CheckDupForm', {
                     Ext.ComponentQuery.query('customer_check_dup_form')[0].down('button[action=create]').enable();
                 }
             },
+            'customer_check_dup_form combo[name=addr_combo]': {
+                select: function(combo, records) {
+                    var addr = records[0];
+                    var form = combo.up('form');
+                    var addr_field = form.down('[name=addr]', false);
+                    var en_addr_field = form.down('[name=en_addr]', false);
+                    var postcode_field = form.down('[name=postcode]', false);
+                    addr_field.setValue(addr.get('addr'));
+                    en_addr_field.setValue(addr.get('en_addr'));
+                    postcode_field.setValue(addr.get('postcode'));
+                    form.down('[name=customer_unit_addr_id]', false).setValue(addr.get('customer_unit_addr_id'));
+                }
+            },
             'customer_check_dup_form button[action=override]': {
                 click: this.popSalecaseForm
-//                click: this.overrideCustomer
             },
             'customer_check_dup_form button[action=create]': {
                 click: this.popApplicationForm
@@ -173,10 +174,15 @@ Ext.define('EIM.controller.customer.CheckDupForm', {
                 callback: function(records) {
                     if(records.length > 0) {
                         //给combo做一个假的store以正确显示值
-                        combo.getStore().loadData([
-                            [records[0].get('id'), records[0].get('name')]
-                        ]);
-                        combo.setValue(records[0].get('id'));
+                        //带数据好麻烦，还是expand出来自己选比较好
+//                        combo.getStore().loadData([
+//                            [records[0].get('id'), records[0].get('name')]
+//                        ]);
+//                        combo.setValue(records[0].get('id'));
+//                        combo.clearValue();
+//                        console.log(customer_unit_in_name);
+                        combo.setValue(records[0].get('name'));
+                        combo.expand();
                     }
                 }
             })
@@ -212,11 +218,64 @@ Ext.define('EIM.controller.customer.CheckDupForm', {
         if(selected.length === 1) {
             form.loadRecord(selected[0]);
             form.down('[name=customer_unit_id]', false).setValue(selected[0].get('customer_unit>id'));
-            form.down('[name=customer_unit_name]', false).setValue(selected[0].get('customer_unit>(name|unit_aliases>unit_alias|en_name)'));
+            form.down('[name=customer_unit_name]', false).setValue(selected[0].get('customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias|en_name)'));
             override_button.enable();
         } else {
             form.form.reset();
             override_button.disable();
+        }
+    },
+
+    setAddressCombo: function(button) {
+        var win = button.up('window');
+        var combo = win.down('combo', false);
+        var target_form = Ext.ComponentQuery.query('customer_check_dup_sub_form[name=out]')[0];
+        if(!Ext.isEmpty(combo.getValue())) {
+            target_form.down('[name=customer_unit_id]', false).setValue(combo.getValue());
+            target_form.down('[name=customer_unit_name]', false).setValue(combo.getRawValue());
+
+            //根据当前所选单位的信息，生成下面窗口上的可选择地址combo
+            var customer_unit_id = combo.getValue();
+            var addr_field = target_form.down('[name=addr]', false);
+            var en_addr_field = target_form.down('[name=en_addr]', false);
+            var postcode_field = target_form.down('[name=postcode]', false);
+            var customer_unit_addr_id_field = target_form.down('[name=customer_unit_addr_id]', false);
+            var addr_combo = target_form.down('[name=addr_combo]');
+
+            if(combo.getValue() === combo.getRawValue()) {
+                combo.markInvalid('请<span style="color:#ff0000;">选择</span>一个客户单位！');
+                return false;
+            }
+            var addr_array = Ext.JSON.decode(combo.getStore().getById(customer_unit_id).get('addr'));
+
+
+            if(addr_array.length === 1) {
+                if(Ext.isEmpty(addr_field.getValue())) addr_field.setValue(addr_array[0]['addr']);
+                if(Ext.isEmpty(en_addr_field.getValue()))  en_addr_field.setValue(addr_array[0]['en_addr']);
+                if(Ext.isEmpty(postcode_field.getValue())) postcode_field.setValue(addr_array[0]['postcode']);
+                customer_unit_addr_id_field.setValue(addr_array[0]['customer_unit_addr_id']);
+            } else {
+                var addr_store = [];
+                Ext.Array.each(addr_array, function(item) {
+                    addr_store.push({
+                        name: item['name'],
+                        addr: item['addr'],
+                        postcode: item['postcode'],
+                        en_addr: item['en_addr'],
+                        customer_unit_addr_id: item['customer_unit_addr_id']
+                    });
+                });
+                addr_combo.getStore().loadData(addr_store);
+                addr_combo.expand();
+                addr_combo.setValue(addr_array[0]['addr']);
+                if(addr_field.getValue().indexOf(addr_array[0]['addr']) === -1 && Ext.isEmpty(addr_field.getValue())) addr_field.setValue(addr_array[0]['addr']);
+                if(en_addr_field.getValue().indexOf(addr_array[0]['en_addr']) === -1 && Ext.isEmpty(en_addr_field.getValue())) en_addr_field.setValue(addr_array[0]['en_addr']);
+                if(postcode_field.getValue().indexOf(addr_array[0]['postcode']) === -1 && Ext.isEmpty(postcode_field.getValue())) postcode_field.setValue(addr_array[0]['postcode']);
+                customer_unit_addr_id_field.setValue(addr_array[0]['customer_unit_addr_id']);
+            }
+            win.close();
+        } else {
+            combo.markInvalid('请选择客户单位！');
         }
     },
 

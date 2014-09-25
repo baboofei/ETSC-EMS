@@ -20,7 +20,7 @@ Ext.define('EIM.view.customer.PossibleGrid', {
             },
             {
                 header: '客户单位',
-                dataIndex: 'customer_unit>(name|unit_aliases>unit_alias|en_name)',
+                dataIndex: 'customer_unit_addr>customer_unit>(name|unit_aliases>unit_alias|en_name)',
                 width: 150,
                 sortable: false
             },

@@ -42,7 +42,8 @@ class ContractItemsController < ApplicationController
     end
 
     def batch_edit_contract_item_date
-        result = ContractItem.batch_edit_date_with(params, session[:user_id])
+        is_local = judge_ip
+        result = ContractItem.batch_edit_date_with(params, session[:user_id], is_local)
         render :json => {:success => result[:success], :message => result[:message]}
     end
 

@@ -36,6 +36,11 @@
                 "xy": [155, 29]
             }
         },
+        "item": {
+            "description": {
+                "xy": [10, 5]
+            }
+        },
         "receiver":{
             "company": {
                 "xy": [14, 44],
@@ -92,6 +97,11 @@
             },
             "day": {
                 "xy": [57, 22]
+            }
+        },
+        "item": {
+            "description": {
+                "xy": [30, 31]
             }
         },
         "receiver": {
@@ -152,6 +162,11 @@
                 "xy": [193, 19]
             }
         },
+        "item": {
+            "description": {
+                "xy": [132, 107]
+            }
+        },
         "receiver": {
             "company": {
                 "xy": [33, 81],
@@ -169,6 +184,69 @@
             },
             "cell": {
                 "xy": [43, 69]
+            }
+        }
+    },
+
+    "6": {
+        "cn_name": "圆通",
+        "printer_name": "EpsonForZhongtong",
+        "page_size": [230, 127],
+        "margin": [0, 0, 0, 0],
+        "monthly_payment_ac": "",
+        "sender": {
+            "company": {
+                "xy": [30, 94],
+                "w": 70
+            },
+            "name": {
+                "xy": [32, 102]
+            },
+            "addr": {
+                "xy": [30, 85],
+                "w": 70
+            },
+            "phone": {
+                "xy": [80, 68]
+            },
+            "cell": {
+                "xy": [42, 68]
+            },
+            "monthly_payment_ac": {
+                "xy": [132, 34]
+            },
+            "sign": {
+                "xy": [35, 29]
+            },
+            "month": {
+                "xy": [32, 20]
+            },
+            "day": {
+                "xy": [42, 20]
+            }
+        },
+        "item": {
+            "description": {
+                "xy": [33, 55]
+            }
+        },
+        "receiver": {
+            "company": {
+                "xy": [128, 90],
+                "w": 70
+            },
+            "name": {
+                "xy": [127, 97]
+            },
+            "addr": {
+                "xy": [125, 82],
+                "w": 70
+            },
+            "phone": {
+                "xy": [180, 65]
+            },
+            "cell": {
+                "xy": [141, 65]
             }
         }
     }

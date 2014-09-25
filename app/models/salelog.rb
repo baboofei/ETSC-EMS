@@ -118,32 +118,64 @@ class Salelog < ActiveRecord::Base
                 #然后往寄出样品|日志的关联表里加上数据
                 #TODO 这里将来如果有样品表的话，应该就是“样品|日志的关联表”，可能此表还得有额外的属性，比如个案号
 
+                #发邮件
+                grid_data_hash_array = JSON.parse(params[:grid_data])
+                grid_data_hash_array.each do |grid_data_hash|
+                    UserMailer.deliver_notice(grid_data_hash, user_id).deliver
+                end
+
                 ExpressSheet.add_from_salelog(:sample, params, user_id)
             when "mailed_content_grid"
                 self.add_mailing_salelog(:content, params, user_id)
 
-                #然后往寄出目录|日志的关联表里加上数据
+                #然后往寄出目录/文件|日志的关联表里加上数据
                 #TODO 这一项要管理吗？
 
-                ExpressSheet.add_from_salelog(:content, params, user_id)
+                #发邮件
+                grid_data_hash_array = JSON.parse(params[:grid_data])
+                grid_data_hash_array.each do |grid_data_hash|
+                    UserMailer.deliver_notice(grid_data_hash, user_id).deliver
+                end
 
+                ExpressSheet.add_from_salelog(:content, params, user_id)
             when "mailed_processing_piece_to_vendor_grid"
                 self.add_mailing_salelog(:process_to_vendor, params, user_id)
 
                 #然后往寄出加工件|日志的关联表里加上数据
                 #TODO 这个也不好管理吧
+
+                #发邮件
+                grid_data_hash_array = JSON.parse(params[:grid_data])
+                grid_data_hash_array.each do |grid_data_hash|
+                    UserMailer.deliver_notice(grid_data_hash, user_id).deliver
+                end
+
                 ExpressSheet.add_from_salelog(:processing_piece_to_vendor, params, user_id)
             when "mailed_processing_piece_to_customer_grid"
                 self.add_mailing_salelog(:process_to_customer, params, user_id)
 
                 #然后往寄出加工件|日志的关联表里加上数据
                 #TODO 这个也不好管理吧……
+
+                #发邮件
+                grid_data_hash_array = JSON.parse(params[:grid_data])
+                grid_data_hash_array.each do |grid_data_hash|
+                    UserMailer.deliver_notice(grid_data_hash, user_id).deliver
+                end
+
                 ExpressSheet.add_from_salelog(:processing_piece_to_customer, params, user_id)
             when "mailed_product_grid"
                 self.add_mailing_salelog(:product, params, user_id)
 
                 #然后往寄出产品|日志的关联表里加上数据
                 #TODO 这里将来如果有样品表的话，应该就是“样品|日志的关联表”，可能此表还得有额外的属性，比如个案号
+
+                #发邮件
+                grid_data_hash_array = JSON.parse(params[:grid_data])
+                grid_data_hash_array.each do |grid_data_hash|
+                    UserMailer.deliver_notice(grid_data_hash, user_id).deliver
+                end
+
                 ExpressSheet.add_from_salelog(:product, params, user_id)
             when "quote"
                 #新增一个报价
@@ -282,7 +314,7 @@ class Salelog < ActiveRecord::Base
         #binding.pry
         natural_array = []
         grid_data_hash_array.each do |grid_data_hash|
-            express = Dictionary.where("data_type = ? and value = ?", "express", grid_data_hash['express_id']).first.display
+            express = Dictionary.where("data_type = 'express' and value = ?", grid_data_hash['express_id']).first.display
             quantity = grid_data_hash['quantity'].blank? ? "" : "#{grid_data_hash['quantity']}件"
             target = (action == :process_to_vendor ? "往工厂" : "给#{grid_data_hash['customer_name']}")
             natural_array << "通过#{express}#{target}寄了#{quantity}#{grid_data_hash['model']}，快递单号为#{grid_data_hash['tracking_number']}"

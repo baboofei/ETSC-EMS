@@ -251,7 +251,7 @@ class Contract < ActiveRecord::Base
                 #binding.pry
                 contract.save
                 #如果是有报价的，则其下的合同项也从报价项带过来
-                if !params['quote_id'].blank?
+                unless (params['quote_id'].blank? || params['quote_id'].to_i == 0)
                     quote_id_array = params['quote_id'].split("|")
                     quote_id_array.each do |quote_id|
                         quote = Quote.find(quote_id)

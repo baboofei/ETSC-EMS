@@ -337,43 +337,43 @@ Ext.define('EIM.controller.Pops', {
      * 确定打印快递单
      * @param button
      */
-    printExpressSheet: function(button) {
-        var me = this;
-        var win = button.up('window');
-        var form = win.down('form', false);
-        //        console.log();
-        var grid = me.getTargetGrid();
-        var target_pop_ids = Ext.Array.pluck(Ext.Array.pluck(grid.getStore().data.items, "data"), "id");
-        var target_pop_ids_str = target_pop_ids.join("|");
-
-        var express_id = form.down('[name=express_id]', false).getValue();
-        var our_company_id = form.down('[name=our_company_id]', false).getValue();
-
-        if (target_pop_ids.length === 0) {
-            Ext.example.msg("错误", "表格中还没有数据！");
-        } else {
-            if (form.form.isValid()) {
-                button.disable();
-                Ext.Msg.alert('好了', '去拿单子吧', function() {
-                    win.close();
-                });
-                Ext.Ajax.request({
-                    url: 'servlet/ExpressPrintServlet',
-                    params: {
-                        pop_ids: target_pop_ids_str,
-                        express_id: express_id,
-                        our_company_id: our_company_id
-                    },
-                    success: function(response) {
-
-                    },
-                    failure: function() {
-
-                    }
-                });
-            }
-        }
-    },
+//    printExpressSheet: function(button) {
+//        var me = this;
+//        var win = button.up('window');
+//        var form = win.down('form', false);
+//        //        console.log();
+//        var grid = me.getTargetGrid();
+//        var target_pop_ids = Ext.Array.pluck(Ext.Array.pluck(grid.getStore().data.items, "data"), "id");
+//        var target_pop_ids_str = target_pop_ids.join("|");
+//
+//        var express_id = form.down('[name=express_id]', false).getValue();
+//        var our_company_id = form.down('[name=our_company_id]', false).getValue();
+//
+//        if (target_pop_ids.length === 0) {
+//            Ext.example.msg("错误", "表格中还没有数据！");
+//        } else {
+//            if (form.form.isValid()) {
+//                button.disable();
+//                Ext.Msg.alert('好了', '去拿单子吧', function() {
+//                    win.close();
+//                });
+//                Ext.Ajax.request({
+//                    url: 'servlet/ExpressPrintServlet',
+//                    params: {
+//                        pop_ids: target_pop_ids_str,
+//                        express_id: express_id,
+//                        our_company_id: our_company_id
+//                    },
+//                    success: function(response) {
+//
+//                    },
+//                    failure: function() {
+//
+//                    }
+//                });
+//            }
+//        }
+//    },
 
     /**
      * 销售日志模块中“添加联系人”操作时的提交

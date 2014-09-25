@@ -51,10 +51,13 @@ Ext.define('EIM.controller.ExpressSheets', {
                 select: this.enableExpressButton
             },
             'express_sheet_complex_form combo[name=our_company_id]': {
-                select: this.enableExpressButton
+                select: this.enableExpressButtonAndRadio
             },
             'express_sheet_complex_form button[action=grid_print]': {
                 click: this.gridPrintExpressSheet
+            },
+            'express_sheet_complex_form radiogroup': {
+                change: this.changeAllMailTarget
             },
             'express_sheet_complex_form grid': {
                 itemdblclick: this.editTempExpressPerson
@@ -97,6 +100,14 @@ Ext.define('EIM.controller.ExpressSheets', {
         }
     },
 
+    enableExpressButtonAndRadio: function(combo) {
+        var me = this;
+        var form = combo.up('form');
+        var radio = form.down('radiogroup', false);
+        radio.setDisabled(combo.getValue() != 1);
+        me.enableExpressButton(combo);
+    },
+
     gridPrintExpressSheet: function(button) {
         var form = button.up('form');
         var values = form.getValues();
@@ -113,7 +124,8 @@ Ext.define('EIM.controller.ExpressSheets', {
                 }).join("|"),
                 receiver_type: values['receiver_type'],
                 express_id: values['express_id'],
-                our_company_id: values['our_company_id']
+                our_company_id: values['our_company_id'],
+                item_description: values['description']
             },
             success: function(response) {
                 var msg = Ext.decode(response.responseText);
@@ -129,9 +141,22 @@ Ext.define('EIM.controller.ExpressSheets', {
         });
     },
 
+    changeAllMailTarget: function(group, newValue) {
+        var store = Ext.getStore("TempGridExpressPeople");
+        var count = store.count();
+        for(var i = 0; i < count; i++) {
+            store.getAt(i).set('send_mail_target', Number(newValue['send_mail_target']));
+        }
+    },
+
     editTempExpressPerson: function(view, record) {
         var view = Ext.widget('express_sheet_single_person_form').show();
+
         view.down('form', false).loadRecord(record);
+        if(Ext.ComponentQuery.query("express_sheet_complex_form [name=our_company_id]")[0].getValue() != 1) {
+            view.down('radiogroup').setValue({send_mail_target: "1"});
+            view.down('radiogroup').disable();
+        }
     },
 
     updateTempExpressPerson: function(button) {
@@ -150,7 +175,6 @@ Ext.define('EIM.controller.ExpressSheets', {
         var win = button.up('window');
         var form = win.down('form', false);
         var grid = form.down('grid', false);
-        var form = win.down('form', false);
         if (Ext.isEmpty(form.down('[name=timestamp]', false).getValue())) {
             Ext.example.msg('错误', '你还没打印呢！');
             return false;
@@ -165,6 +189,15 @@ Ext.define('EIM.controller.ExpressSheets', {
             Ext.example.msg('错误', '请填写每个收件人的快递单号！');
             return false;
         }
+        var all_target = Ext.Array.map(Ext.getStore("TempGridExpressPeople").data.items, function(item) {
+            return item.get("send_mail_target");
+        });
+        if(form.down('[name=our_company_id]', false).getValue() === 1 && Ext.Array.unique(all_target).length > 1) {
+            Ext.example.msg('错误', '“发送邮件给…”一栏的填写不一致！');
+            return false;
+        }
+//        console.log(all_target);
+        //TODO 这里还要校验是不是选对了发邮件和发件公司，因为有可能会后来改
 
         if(form.form.isValid()) {
             var grid_data = Ext.encode(Ext.pluck(grid.getStore().data.items, "data"));

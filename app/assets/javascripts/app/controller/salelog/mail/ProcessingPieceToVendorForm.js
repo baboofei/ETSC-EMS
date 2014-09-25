@@ -38,7 +38,7 @@ Ext.define('EIM.controller.salelog.mail.ProcessingPieceToVendorForm', {
                 select: this.enableExpressButton
             },
             'mail_processing_piece_to_vendor_form combo[name=our_company_id]': {
-                select: this.enableExpressButton
+                select: this.enableExpressButtonAndRadio
             },
             'mail_processing_piece_to_vendor_form print_express_sheet_button': {
                 click: this.printExpressSheet
@@ -71,6 +71,19 @@ Ext.define('EIM.controller.salelog.mail.ProcessingPieceToVendorForm', {
         }
     },
 
+    enableExpressButtonAndRadio: function(combo) {
+        var me = this;
+        var form = combo.up('form');
+        var radio = form.down('radiogroup', false);
+        if(combo.getValue() != 1) {
+            radio.setValue({send_mail_target: '1'});
+        } else {
+            radio.reset();
+        }
+        radio.setDisabled(combo.getValue() != 1);
+        me.enableExpressButton(combo);
+    },
+
     printExpressSheet: function(button) {
         var form = button.up('form');
         var values = form.getValues();
@@ -84,7 +97,8 @@ Ext.define('EIM.controller.salelog.mail.ProcessingPieceToVendorForm', {
                 receiver_ids: values['vendor_id'],
                 receiver_type: 'vendor',
                 express_id: values['express_id'],
-                our_company_id: values['our_company_id']
+                our_company_id: values['our_company_id'],
+                item_description: values['model']
             },
             success: function(response) {
                 var msg = Ext.decode(response.responseText);
@@ -104,6 +118,7 @@ Ext.define('EIM.controller.salelog.mail.ProcessingPieceToVendorForm', {
         var values = form.getValues();
         values['vendor_unit_name'] = form.down('[name=vendor_unit_id]', false).getRawValue();
         values['vendor_name'] = form.down('[name=vendor_id]', false).getRawValue();
+        values['send_mail_target'] = form.down('[name=send_mail_to]', false).getValue()['send_mail_target'];
 
         var store = Ext.getStore("MailedProcessingPieceToVendors");
         if(form.form.isValid()){

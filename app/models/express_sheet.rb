@@ -22,7 +22,7 @@ class ExpressSheet < ActiveRecord::Base
         attr['^person_receivable>(name|en_name)'] = person_receivable_type.constantize.find(person_receivable_id)['name']
         attr['^vestable>(number)'] = vestable_type.constantize.find(vestable_id)['number'] unless vestable_type.blank?
         attr['currency_name'] = currency.name if currency
-        attr['editable'] = User.where("roles.id = 9").includes(:roles).map(&:id).include?(user_id)
+        attr['editable'] = true#User.where("roles.id = 9").includes(:roles).map(&:id).include?(user_id)
         attr
     end
 
@@ -52,6 +52,9 @@ class ExpressSheet < ActiveRecord::Base
             :monthly_payment_ac => page_config[express_sym][:monthly_payment_ac],
             :month => "%02d" % Time.now.month,
             :day => "%02d" % Time.now.day
+        }
+        item = {
+            :description => params[:item_description]
         }
         using = page_config[express_sym]
 
@@ -92,6 +95,9 @@ class ExpressSheet < ActiveRecord::Base
                 pdf.text_box(sender[:name], :at => using[:sender][:sign][:xy].map { |p| p.mm }, :size => 10)
                 pdf.text_box(sender[:month], :at => using[:sender][:month][:xy].map { |p| p.mm })
                 pdf.text_box(sender[:day], :at => using[:sender][:day][:xy].map { |p| p.mm })
+
+                pdf.text_box(item[:description], :at => using[:item][:description][:xy].map { |p| p.mm })
+
                 pdf.text_box(receiver[:company].to_s, :at => using[:receiver][:company][:xy].map { |p| p.mm }, :width => using[:receiver][:company][:w].mm)
                 pdf.text_box(receiver[:name], :at => using[:receiver][:name][:xy].map { |p| p.mm })
                 pdf.text_box(receiver[:addr], :at => using[:receiver][:addr][:xy].map { |p| p.mm }, :width => using[:receiver][:addr][:w].mm)
@@ -110,8 +116,8 @@ class ExpressSheet < ActiveRecord::Base
         end
         #p printer_name
 
-        system("lpoptions -d #{printer_name}")
-        system("lp #{Rails.root}/public/express_sheets/#{timestamp}.pdf")
+        #system("lpoptions -d #{printer_name}")
+        #system("lp #{Rails.root}/public/express_sheets/#{timestamp}.pdf")
 
         return timestamp
     end
@@ -130,7 +136,7 @@ class ExpressSheet < ActiveRecord::Base
                 new_sheet['description'] = "#{quantity}#{single_record['model']}"
                 new_sheet['send_at'] = "#{timestamp[0..3]}-#{timestamp[4..5]}-#{timestamp[6..7]} #{timestamp[8..9]}:#{timestamp[10..11]}:#{timestamp[12..13]}".to_datetime
                 new_sheet['pdf_url'] = "#{Rails.root}/public/express_sheets/#{single_record['timestamp']}.pdf"
-                new_sheet['unit_receivable_id'] = Customer.find(single_record['customer_id']).customer_unit_id
+                new_sheet['unit_receivable_id'] = Customer.find(single_record['customer_id']).customer_unit.id
                 new_sheet['unit_receivable_type'] = "CustomerUnit"
                 new_sheet['person_receivable_id'] = single_record['customer_id']
                 new_sheet['person_receivable_type'] = "Customer"
@@ -165,6 +171,7 @@ class ExpressSheet < ActiveRecord::Base
 
     def self.add_from_grid(params, user_id)
         JSON.parse(params["grid_data"]).each do |single_record|
+            #写快递单表
             timestamp = params['timestamp'].split("_")[0]
 
             new_sheet = ExpressSheet.new
@@ -191,6 +198,13 @@ class ExpressSheet < ActiveRecord::Base
             #new_sheet['vestable_type'] = "Salecase"
             #new_sheet['comment'] = params["comment"]
             new_sheet.save
+
+            #发邮件
+            #binding.pry
+            grid_data_hash_array = JSON.parse(params[:grid_data])
+            grid_data_hash_array.each do |grid_data_hash|
+                UserMailer.deliver_notice(grid_data_hash, user_id).deliver
+            end
         end
     end
 

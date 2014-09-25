@@ -431,7 +431,13 @@ class SiteController < ApplicationController
         render :layout => "test"
     end
 
+    ##############################################################
     def index
+        @links = Link.where("1=1")
         render :layout => "site"
+    end
+
+    def about_us
+
     end
 end

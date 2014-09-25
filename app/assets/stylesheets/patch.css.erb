@@ -32,14 +32,14 @@
     height: 36px;
     line-height: 36px;
     padding-left: 18px;
-    font-size: .8em;
+    font-size: .8rem;
 }
 /** 多层UL 及 单层 UL **/
 .ETSC-tree-ul *,
 .ETSC-flat-ul *{
     list-style-type: none;
-    font-size: .8em;
-    line-height: 2em;
+    font-size: .8rem;
+    line-height: 2rem;
     font-weight: bold;
 }
 .ETSC-tree-ul a{
@@ -52,11 +52,11 @@
 }
 /** TAB签 **/
 .ETSC-main-panel .tabs {
-    padding-left: 1em;
+    padding-left: 1rem;
 }
 .ETSC-main-panel .tabs a {
-    font-size: .8em;
-    padding: .5em 1.5em;
+    font-size: .8rem;
+    padding: .5rem 1.5rem;
     background-color: #CCC;
 }
 .ETSC-main-panel .tabs .active a {
@@ -66,7 +66,7 @@
 
 /** 解决方案 **/
 .ETSC-solution *{
-    font-size: .8em;
+    font-size: .8rem;
     color: #666;
 }
 .ETSC-solution h4 {
@@ -79,14 +79,76 @@
 
 /** 合作伙伴LOGO **/
 .ETSC-main-panel ul li ul .th {
-    text-align: center;padding: 8px 0;
+    text-align: center;
+    padding: 8px 0;
     background-color: #f2f2f2;
 }
-.ETSC-main-panel .th a {
+.ETSC-main-panel .th a,
+.ETSC-recommend-panel .th a {
     border: 4px solid #FFFFFF;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
-    display: inline-block;max-width: 100%;
+    display: inline-block;
+    max-width: 100%;
 }
-/*.ETSC-main-panel li.th {*/
-    /*background-color: #f2f2f2;*/
-/*}*/
+.ETSC-recommend-panel .th a {
+    border: 0 solid #FFFFFF;
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2);
+    max-width: 100%;
+}
+
+/* 推荐产品滚动 */
+.ETSC-recommend-panel ul li {
+    text-align: center;
+}
+.ETSC-recommend-panel ul li ul .th {
+    padding: 4px 10px;
+    background-color: #FFF;
+}
+.ETSC-recommend-panel h3 {
+    background: none repeat scroll 0 0 #575B5E;
+    color: #FFFFFF;
+    font-weight: bold;
+    height: 36px;
+    line-height: 36px;
+    padding-left: 18px;
+    margin: 0;
+    font-size: .8rem;
+}
+
+/* 友情链接 */
+.ETSC-link-panel h3 {
+    /*height: 36px;*/
+    /*line-height: 36px;*/
+    padding-left: 10px;
+    font-size: .9rem;
+}
+.ETSC-link-panel div {
+    font-family: Arial,Helvetica,sans-serif;
+    color: #333333;
+    background-color: #FFFFFF;
+    border: 1px solid #D9D9D9;
+    border-radius: 2px;
+    box-shadow: rgba(0, 0, 0, 0.07) 1px 1px 1px 0px;
+    padding: 0;
+}
+.ETSC-link-panel ul {
+    margin-left: 0px;
+    margin-bottom: 0px;
+    text-align: center;
+}
+.ETSC-link-panel .th {
+    /*border: 0;*/
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2);
+}
+
+/* 尾巴 */
+.ETSC-footer {
+    background: none repeat scroll 0 0 #575B5E;
+    padding: 15px 0;
+}
+.ETSC-footer p {
+    font-size: 0.8rem;
+    color: #FFF;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}

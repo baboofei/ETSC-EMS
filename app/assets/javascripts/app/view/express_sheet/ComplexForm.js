@@ -6,7 +6,6 @@ Ext.define('EIM.view.express_sheet.ComplexForm', {
     iconCls: 'btn_print',
     layout: 'fit',
     width: 600,
-    height: 262,
     modal: true,
     autoShow: false,
 
@@ -108,6 +107,18 @@ Ext.define('EIM.view.express_sheet.ComplexForm', {
                         ]
                     },
                     {
+                        xtype: 'radiogroup',
+                        fieldLabel: '发送邮件给',
+                        name: 'all_send_mail_to',
+                        columns: 2,
+                        vertical: true,
+                        items: [
+                            { boxLabel: '仅寄件人', name: 'send_mail_target', inputValue: '1' },
+                            { boxLabel: '收件人（所有）&寄件人', name: 'send_mail_target', inputValue: '2'}
+                        ],
+                        disabled: true
+                    },
+                    {
                         xtype: 'displayfield',
                         fieldLabel: '拿回单子后请填写↓',
                         labelWidth: 150,
@@ -130,6 +141,14 @@ Ext.define('EIM.view.express_sheet.ComplexForm', {
                                 dataIndex: 'tracking_number',
                                 minWidth: 120,
                                 flex: 1
+                            },
+                            {
+                                header: '发送邮件给…',
+                                dataIndex: 'send_mail_target',
+                                width: 110,
+                                renderer: function(value) {
+                                    return ((value === "1" || Ext.isEmpty(value)) ? "仅寄件人" : "收件人&寄件人");
+                                }
                             },
                             {
                                 header: '提醒时间',

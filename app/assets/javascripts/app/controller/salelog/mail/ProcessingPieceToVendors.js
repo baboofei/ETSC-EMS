@@ -60,7 +60,6 @@ Ext.define('EIM.controller.salelog.mail.ProcessingPieceToVendors', {
         btn_save.hide();
         btn_update.show();
         btn_print.enable();
-        console.log(record);
 //        hidden.setValue(record.get('customer_id'));
         view.down('form').loadRecord(record);
         //给combo做一个假的store以正确显示值
@@ -69,6 +68,7 @@ Ext.define('EIM.controller.salelog.mail.ProcessingPieceToVendors', {
             [record.get('vendor_unit_id'), record.get('vendor_unit_name')]
         ]);
         vendor_unit_field.setValue(record.get('vendor_unit_id'));
+        if(record.get('our_company_id') === 1) view.down('radiogroup', false).enable();
     },
     selectionChange: function(selectionModel, selected) {
         var edit_btn = this.getGrid().down("[iconCls=btn_edit]");

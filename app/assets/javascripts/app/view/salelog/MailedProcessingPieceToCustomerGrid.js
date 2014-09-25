@@ -51,6 +51,14 @@ Ext.define('EIM.view.salelog.MailedProcessingPieceToCustomerGrid', {
                 width: 80
             },
             {
+                header: '发送邮件给',
+                dataIndex: 'send_mail_target',
+                width: 80,
+                renderer: function(value) {
+                    return (value === "1" ? "仅寄件人" : "收件人&寄件人");
+                }
+            },
+            {
                 header: '提醒时间',
                 dataIndex: 'remind_at',
                 width: 150,

@@ -1,22 +1,22 @@
-Ext.define('EIM.view.salelog.MailContentForm', {
+Ext.define('EIM.view.contract.MailToCustomerForm', {
     extend: 'Ext.window.Window',
-    alias: 'widget.mail_content_form',
+    alias: 'widget.contract_mail_to_customer_form',
 
-    title: '新增/修改寄出目录/文件',
-    layout: 'anchor',
-    width: 400,
-//    height: 180,
+    title: '打印快递单',
+    iconCls: 'btn_print',
+    layout: 'fit',
+    width: 600,
     modal: true,
-    autoShow: true,
+    autoShow: false,
 
     initComponent: function() {
         this.items = [
             {
                 xtype: 'form',
                 bodyPadding: 4,
-                layout: 'anchor',
-                border: 0,
+                layout: 'form',
                 fieldDefaults: EIM_field_defaults,
+                trackResetOnLoad: true,
                 items: [
                     {
                         xtype: 'hidden',
@@ -120,19 +120,17 @@ Ext.define('EIM.view.salelog.MailContentForm', {
         ];
 
         this.buttons = [
+            //            {
+            //                text: '打印',
+            //                action: 'printExpressSheet'
+            //            },
+            //            {
+            //                text: '邮件发送PDF',
+            //                action: 'mailExpressSheet'
+            //            },
             {
-                text: '确定',
-                action: 'save'
-            },
-            {
-                text: '确定',
-                action: 'update',
-                hidden: true
-            },
-            {
-                text: '取消',
-                scope: this,
-                handler: this.close
+                text: '完成',
+                action: 'complete_print'
             }
         ];
 

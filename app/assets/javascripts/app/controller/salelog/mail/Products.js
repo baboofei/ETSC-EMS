@@ -62,6 +62,7 @@ Ext.define('EIM.controller.salelog.mail.Products', {
         btn_print.enable();
 //        hidden.setValue(record.get('customer_id'));
         view.down('form').loadRecord(record);
+        if(record.get('our_company_id') === 1) view.down('radiogroup', false).enable();
     },
     selectionChange: function(selectionModel, selected) {
         var edit_btn = this.getGrid().down("[iconCls=btn_edit]");

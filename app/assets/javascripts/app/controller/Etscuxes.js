@@ -289,7 +289,7 @@ Ext.define('EIM.controller.Etscuxes', {
             //如果地址是JSON格式，则解析一下放到addr_combo里供选
 //            console.log(records[0].get('addr'));
             var addr_array = Ext.JSON.decode(records[0].get('addr'));
-            console.log(addr_array);
+//            console.log(addr_array);
             if(addr_array.length === 1) {
                 if(Ext.isEmpty(addr_field.getValue())) addr_field.setValue(addr_array[0]['addr']);
                 if(Ext.isEmpty(en_addr_field.getValue()))  en_addr_field.setValue(addr_array[0]['en_addr']);
@@ -346,13 +346,16 @@ Ext.define('EIM.controller.Etscuxes', {
         form.show('', function() {
             var expand_customer_unit = button.up('form').down('expandable_customer_unit_combo', false);
             if(expand_customer_unit) {
-                var combo = expand_customer_unit.down('combo')
+                var combo = expand_customer_unit.down('combo');
                 if(combo.getValue() === combo.getRawValue()) {
                     //如果两个值相等，说明是个假值(还没有这个单位)，则弹出的表单里不预填写
                 }else{
                     //否则把单位的值传过去
+                    //不能直接传值，不然好多相关信息带不过去。
+                    //最简单的办法是弹出来让选择一下
                     var target_combo = form.down('expandable_customer_unit_combo').down('combo');
-                    target_combo.setValue(combo.getValue());
+                    target_combo.setRawValue(combo.getRawValue());
+                    target_combo.expand();
                 }
             }
             form.down('[name=source_element_id]').setValue(button.id);

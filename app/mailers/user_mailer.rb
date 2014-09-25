@@ -4,12 +4,16 @@
 #TODO 有些还没按这规则来
 class UserMailer < ActionMailer::Base
     $obsoleted_user_ids = [43, 47, 69] #离职的员工先这么写着吧，牵扯太多
+
+    $inner_sender = %q("ETSC信息管理系统"<admin@etsc-tech.com>)
+    $outer_sender = %q("东隆科技ETSC"<admin@etsc-tech.com>)
+
     include ActionView::Helpers::SanitizeHelper
     #default :from => "hexawing@gmail.com",         #gmail邮箱，可用
     #default :from => "etsc@qq.com"         #公司QQ邮箱，可用
     #default :from => "1163726690@qq.com"         #商务QQ邮箱，可用
     #default :from => "hexawing@qq.com"         #私人QQ邮箱，可用
-    default :from => %q("ETSC信息管理系统"<admin@etsc-tech.com>)   #263企业邮箱，可用
+    default :from => $inner_sender   #263企业邮箱，可用
     #default :from => "hexawing@163.com"        #163私人邮箱，可用
 
     def welcome_email(user, sex, department, position)
@@ -728,6 +732,42 @@ class UserMailer < ActionMailer::Base
         #@functions =  Function.where("users.id = 1").includes(:roles => :users)
     end
 
+    def deliver_notice(grid_data_hash, user_id)
+        @receiver_name = grid_data_hash['customer_name'].blank? ? grid_data_hash['vendor_name'] : grid_data_hash['customer_name']
+        @sender_name = User.find(user_id)['name']
+        @express_name = Dictionary.where("data_type = 'express' and value = ?", grid_data_hash['express_id']).first.display
+        @quantity = grid_data_hash['quantity'].blank? ? "" : "#{grid_data_hash['quantity']}件"
+        @model = grid_data_hash['model']
+        @tracking_number = grid_data_hash['tracking_number']
+
+        if grid_data_hash['send_mail_target'] == "1"
+            mail(:to => "terrych@etsc-tech.com",
+                :subject => "来自ETSC的提醒邮件"
+            )
+        elsif grid_data_hash['send_mail_target'] == "2"
+            mail(:to => "terrych@etsc-tech.com",
+                 :from => $outer_sender,
+                 :subject => "来自ETSC的提醒邮件"
+            )
+        end
+    end
+    def deliver_notice_en(grid_data_hash, user_id)
+        @receiver_name = grid_data_hash['customer_name'].blank? ? grid_data_hash['vendor_name'] : grid_data_hash['customer_name']#TODO 取英文名，这个还有问题
+        @sender_name = User.find(user_id)['en_name']
+        @express_name = Dictionary.where("data_type = 'express' and value = ?", grid_data_hash['express_id']).first.display_en
+        @tracking_number = grid_data_hash['tracking_number']
+
+        if grid_data_hash['send_mail_target'] == "1"
+            mail(:to => "terrych@etsc-tech.com",
+                 :subject => "来自ETSC的提醒邮件"
+            )
+        elsif grid_data_hash['send_mail_target'] == "2"
+            mail(:to => "terrych@etsc-tech.com",
+                 :from => $outer_sender,
+                 :subject => "来自ETSC的提醒邮件"
+            )
+        end
+    end
 
     private
     # 决定数据放到大数组的哪一行
