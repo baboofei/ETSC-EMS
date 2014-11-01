@@ -602,10 +602,33 @@ class User < ActiveRecord::Base
         #    end
         #}
 
-        receivers = Customer.where(true).reject{|p| p.email.blank?}.map{|p| p.email.split(",")[0]}.shuffle[0..500]
-        receivers << User.at_job.map(&:etsc_email)
-        receivers.each do |receiver|
-            UserMailer.promotion_test_email(receiver).deliver
+        receivers = Customer.where("
+        customers.user_id = 13 and
+        ((customers.email is not null and customers.email <> '') or customers.im <> '') and
+        (customers.created_at > '2013-01-01' or salelogs.created_at > '2013-01-01')
+        ").includes(:salecases => :salelogs)
+
+        receiver_email_array = receivers.map do |p|
+            if p.im.blank?
+                p.email.split(",")[0].strip
+            else
+                "#{p.im.match(/\d+/)[0]}@qq.com"
+            end
+        end
+
+        #receiver_email_array.each do |p|
+        #    p p + "___" + p.match(/^(?:[-_a-zA-Z0-9\.])*@(?:[a-zA-Z0-9]*[-_]?[-_a-zA-Z0-9]+[\.])+[a-zA-Z]+(?:[\.][a-zA-Z]+)?$/i).to_s
+        #end
+
+        grouped_array = []
+        expected_size = 5#一组5人
+        expected_length = receiver_email_array.size / expected_size
+        0.upto(expected_length) do |i|
+            grouped_array << [receiver_email_array[(i * expected_size)..(i * expected_size + (expected_size - 1))]]
+        end
+
+        grouped_array.each do |group_receivers|
+            UserMailer.promotion_test_email(group_receivers.flatten).deliver
             sleep 10
         end
     end
@@ -658,3 +681,4 @@ class User < ActiveRecord::Base
     end
 
 end
+

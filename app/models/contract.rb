@@ -15,11 +15,18 @@ class Contract < ActiveRecord::Base
     belongs_to :signer, :class_name => 'User', :foreign_key => 'signer_user_id'
 
     belongs_to :customer_unit
-    belongs_to :end_user, :class_name => 'Customer', :foreign_key => 'end_user_customer_id'
-    belongs_to :buyer, :class_name => 'Customer', :foreign_key => 'buyer_customer_id'
+    #belongs_to :end_user, :class_name => 'Customer', :foreign_key => 'end_user_customer_id'
+    #belongs_to :buyer, :class_name => 'Customer', :foreign_key => 'buyer_customer_id'
+    #现在合同和客户改成多对多了，因为可能真不止两个联系人--20140918
+    has_many :contracts_customers, :class_name => "ContractsCustomer", :foreign_key => 'contract_id'
+    has_many :customers, :through => :contracts_customers, :source => :customer
 
     belongs_to :business_unit
-    belongs_to :business_contact
+    #现在合同和进出口公司联系人改成多对多了，因为可能真不止两个联系人--20140918
+    has_many :business_contacts_contracts, :class_name => "BusinessContactsContract", :foreign_key => 'contract_id'
+    has_many :business_contacts, :through => :business_contacts_contracts, :source => :business_contact
+
+    #belongs_to :business_contact
 
     belongs_to :our_company
     belongs_to :pay_mode
@@ -135,16 +142,18 @@ class Contract < ActiveRecord::Base
         attr['dealer>name'] = dealer.name
         attr['customer_unit>(name|unit_aliases>unit_alias|en_name)'] = customer_unit.name
         attr['customer_unit>id'] = customer_unit.id
-        attr['end_user>(name|en_name)'] = end_user.name
-        attr['end_user>phone'] = end_user.phone
-        attr['end_user>mobile'] = end_user.mobile
-        attr['buyer>(name|en_name)'] = buyer.name
-        attr['buyer>phone'] = buyer.phone
-        attr['buyer>mobile'] = buyer.mobile
+
+        attr['customers>(name|en_name)'] = customers.map(&:name).join("、")
+        #attr['end_user>(name|en_name)'] = end_user.name
+        #attr['end_user>phone'] = end_user.phone
+        #attr['end_user>mobile'] = end_user.mobile
+        #attr['buyer>(name|en_name)'] = buyer.name
+        #attr['buyer>phone'] = buyer.phone
+        #attr['buyer>mobile'] = buyer.mobile
         attr['business_unit>name'] = business_unit.blank? ? '无' : business_unit.name
-        attr['business_contact>(name|en_name)'] = business_contact.blank? ? '无' : business_contact.name
-        attr['business_contact>phone'] = business_contact.blank? ? '无' : business_contact.phone
-        attr['business_contact>mobile'] = business_contact.blank? ? '无' : business_contact.mobile
+        attr['business_contacts>(name|en_name)'] = business_contacts.size == 0 ? '无' : business_contacts.map(&:name).join("、")
+        #attr['business_contact>phone'] = business_contact.blank? ? '无' : business_contact.phone
+        #attr['business_contact>mobile'] = business_contact.blank? ? '无' : business_contact.mobile
         attr['quote>number'] = quote.blank? ? '' : quote.number
         attr['pay_mode>name'] = pay_mode.blank? ? '' : pay_mode.name
         #attr['purchaser_order>number'] = purchase_order.name

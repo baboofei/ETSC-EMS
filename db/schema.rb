@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140925033709) do
+ActiveRecord::Schema.define(:version => 20141020024359) do
 
   create_table "accessories", :force => true do |t|
     t.string   "url"
@@ -108,6 +108,13 @@ ActiveRecord::Schema.define(:version => 20140925033709) do
     t.integer  "user_id"
     t.datetime "created_at",       :null => false
     t.datetime "updated_at",       :null => false
+  end
+
+  create_table "business_contacts_contracts", :id => false, :force => true do |t|
+    t.integer  "business_contact_id"
+    t.integer  "contract_id"
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
   end
 
   create_table "business_contacts_salecases", :id => false, :force => true do |t|
@@ -270,6 +277,13 @@ ActiveRecord::Schema.define(:version => 20140925033709) do
     t.datetime "updated_at",                                          :null => false
     t.integer  "contractable_id"
     t.string   "contractable_type"
+  end
+
+  create_table "contracts_customers", :id => false, :force => true do |t|
+    t.integer  "contract_id"
+    t.integer  "customer_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
 
   create_table "contracts_old_fields", :force => true do |t|
@@ -1073,7 +1087,7 @@ ActiveRecord::Schema.define(:version => 20140925033709) do
   create_table "series", :force => true do |t|
     t.string   "brief"
     t.string   "name"
-    t.integer  "sort_by_function_id"
+    t.integer  "sort_by_category_id"
     t.integer  "sort_by_application_id"
     t.text     "description"
     t.text     "application_in_site"
@@ -1123,7 +1137,7 @@ ActiveRecord::Schema.define(:version => 20140925033709) do
     t.datetime "updated_at", :null => false
   end
 
-  create_table "sort_by_functions", :force => true do |t|
+  create_table "sort_by_categories", :force => true do |t|
     t.string   "name"
     t.integer  "parent_id"
     t.datetime "created_at", :null => false

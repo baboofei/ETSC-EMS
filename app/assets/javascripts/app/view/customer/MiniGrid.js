@@ -5,7 +5,7 @@ Ext.define('EIM.view.customer.MiniGrid', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.customer_mini_grid',
 
-    requires: 'Ext.ux.grid.FiltersFeature',
+//    requires: 'Ext.ux.grid.FiltersFeature',
 
     iconCls: 'ttl_grid',
 
@@ -16,46 +16,31 @@ Ext.define('EIM.view.customer.MiniGrid', {
                 header: '客户单位',
                 flex: 1,
                 sortable: false,
-                dataIndex: 'customer_unit>name',
-                filter: {
-                    type: 'string'
-                }
+                dataIndex: 'customer_unit>name'
             },
             {
                 header: '姓名',
                 width: 50,
                 sortable: false,
-                dataIndex: 'name',
-                filter: {
-                    type: 'string'
-                }
+                dataIndex: 'name'
             },
             {
                 header: '移动电话',
                 width: 100,
                 sortable: false,
-                dataIndex: 'mobile',
-                filter: {
-                    type: 'string'
-                }
+                dataIndex: 'mobile'
             },
             {
                 header: '固定电话',
                 width: 100,
                 sortable: false,
-                dataIndex: 'phone',
-                filter: {
-                    type: 'string'
-                }
+                dataIndex: 'phone'
             },
             {
                 header: '电子邮件',
                 width: 100,
                 sortable: false,
                 dataIndex: 'email',
-                filter: {
-                    type: 'string'
-                },
                 renderer: function(value, metaData, record) {
                     var array = value.split(',');
                     var email = [];
@@ -71,10 +56,7 @@ Ext.define('EIM.view.customer.MiniGrid', {
                 header: '传真',
                 width: 100,
                 sortable: false,
-                dataIndex: 'fax',
-                filter: {
-                    type: 'string'
-                }
+                dataIndex: 'fax'
             }
         ];
 
@@ -104,7 +86,12 @@ Ext.define('EIM.view.customer.MiniGrid', {
             }
         ];
 
-        this.bbar = [this.addCustomerFromButton, this.deleteCustomerFromButton, '-', this.pagingToolbar];
+        this.bbar = [
+            this.addCustomerFromButton,
+            this.deleteCustomerFromButton,
+            '-',
+            this.pagingToolbar
+        ];
 
         this.callParent(arguments);
     },

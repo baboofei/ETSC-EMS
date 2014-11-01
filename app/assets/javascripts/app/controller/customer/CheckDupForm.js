@@ -279,48 +279,6 @@ Ext.define('EIM.controller.customer.CheckDupForm', {
         }
     },
 
-    overrideCustomer: function(button) {
-        button.disable();
-        var win = button.up('window');
-        var grid = win.down('grid', false);
-        var selection = grid.getSelectedItem();
-
-        var inquire_type_field = win.down('[name=inquire_type]', false);
-        var inquire_id_field = win.down('[name=inquire_id]', false);
-        var params = win.down('[name=out]', false).getValues();
-        params['id'] = selection.get('id');
-        params['application_names'] = "";
-        params['inquire_type'] = inquire_type_field.getValue();
-        params['inquire_id'] = inquire_id_field.getValue();
-
-        Ext.Ajax.request({
-            url: 'customers/save_customer',
-            params: params,
-            success: function(response) {
-                var msg = Ext.decode(response.responseText);
-                Ext.example.msg('成功', msg.message);
-                win.close();
-//                //再在回调里，把客户和对应的lead关联起来
-//                Ext.Ajax.request({
-//                    url: '#',
-//                    params: {
-//                        id: abc
-//                    },
-//                    success: function(response) {
-//                        var msg = Ext.decode(response.responseText);
-//                        Ext.example.msg('成功', msg.message);
-//                    },
-//                    failure: function() {
-//                        Ext.Msg.alert('错误','可能是网络问题，请找Terry处理');
-//                    }
-//                });
-            },
-            failure: function() {
-                Ext.Msg.alert('错误','可能是网络问题，请找Terry处理');
-            }
-        });
-    },
-
     popApplicationForm: function(button) {
         var me = this;
 

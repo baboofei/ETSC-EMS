@@ -22,6 +22,12 @@ Ext.define('EIM.view.admin_inventory.InStockQueryGrid', {
                 sortable: false
             },
             {
+                header: '描述',
+                dataIndex: 'description',
+                width: 200,
+                sortable: false
+            },
+            {
                 header: '数量',
                 dataIndex: 'current_quantity',
                 width: 50,

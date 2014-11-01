@@ -1,4 +1,4 @@
-Ext.define('EIM.model.ContractItem', {
+Ext.define('EIM.model.GridContractMiniCustomer', {
     extend: 'Ext.data.Model',
     fields: [
         {

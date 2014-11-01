@@ -177,23 +177,23 @@ Ext.define('EIM.view.contract.Grid', {
             },
             {
                 header: '客户',
-                dataIndex: 'end_user>(name|en_name)',
+                dataIndex: 'customers>(name|en_name)',
                 width: 50,
                 filter: {
                     type: 'string'
                 }
             },
-            {
-                header: '客户联系人',
-                dataIndex: 'buyer>(name|en_name)',
-                width: 50,
-                filter: {
-                    type: 'string'
-                }
-            },
+//            {
+//                header: '客户联系人',
+//                dataIndex: 'buyer>(name|en_name)',
+//                width: 50,
+//                filter: {
+//                    type: 'string'
+//                }
+//            },
             {
                 header: '商务相关联系人',
-                dataIndex: 'business_contact>(name|en_name)',
+                dataIndex: 'business_contacts>(name|en_name)',
                 width: 50,
                 filter: {
                     type: 'string'

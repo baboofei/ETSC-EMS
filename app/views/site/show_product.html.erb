@@ -1,0 +1,194 @@
+<div class="row">
+<div class="show-for-small-only off-canvas-wrap" data-offcanvas>
+    <div class="inner-wrap">
+      <nav class="tab-bar">
+        <section class="left-small"><a class="left-off-canvas-toggle menu-icon" href="#"><span></span></a></section>
+        <section class="middle tab-bar-section"><h1 class="title">产品世界</h1></section>
+        <section class="right-small"><a class="right-off-canvas-toggle menu-icon" href="#"><span></span></a></section>
+      </nav>
+      <aside class="left-off-canvas-menu">
+        <ul class="off-canvas-list">
+          <li><label>按产品类型</label></li>
+          <% $categories.each do |category| %>
+              <li><a href="product_by_category"><%= category.name %></a> </li>
+          <% end %>
+        </ul>
+      </aside>
+      <aside class="right-off-canvas-menu">
+        <ul class="off-canvas-list">
+          <li><label>按产品应用</label></li>
+          <% $applications.each do |application| %>
+              <li><a href="product_by_application"><%= application.name %></a> </li>
+          <% end %>
+        </ul>
+      </aside>
+      <ul class="breadcrumbs">
+        <li><a href="#">所有产品</a></li>
+        <li><a href="#">激光器</a></li>
+        <li class="current"><a href="#">产品ABC</a></li>
+      </ul>
+      <section class="main-section">
+        <p class="text-center"><a href="#"><img src="http://placehold.it/400x300"/></a></p>
+        <div class="normal-text">
+          <h4>产品ABC</h4>
+
+          <p>技金說國帶漸細；好會百經你；意驗人女萬節數出以看處著令開聽；在更也眾，師大者？同一力十預……製方合充形時了是園當：個來創傳離史不聯洋大車。見巴難即子？到友以劇園是管該合報刻人：樣不進而金在麼早一為雖公標相會以的間朋市走要，話物孩背中我從外地省聲如著歡醫們他！過供為最金紅少，父無多到來神唱的完際買不劇話總：投點步，一高語曾族給不經愛治，水中二小產銷費北子重不著高我求低放可快待導能西！展人中報。裡打內口情直多事五，似學投對少主性，者是情模花為的得，務向市異爭熱作議可。太後？</p>
+
+          <p>金就人著生大照夫急體根有嗎客一還們部這聞如非到價樂片如長下此集一葉自，那星同物我意童想營色的，其因稱勢物別的光而。三具可方標務切為為，他發務當吃用上而體史們？</p>
+
+          <p>參但人市是散甚作，化場當最種位相、影下古們卻關克容如像？向外做會，再想也們成有來性意隨。</p>
+        </div>
+      </section>
+      <a class="exit-off-canvas"></a>
+    </div>
+</div>
+<div class="large-6 medium-6 show-for-medium-up columns ETSC-main-panel">
+  <h3>◆　产品中心</h3>
+  <ul class="button-group round radius tabs" data-tab role="tablist">
+    <li class="tab-title active" role="presentational">
+      <a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" controls="panel2-1">按类型</a></li>
+    <li class="tab-title" role="presentational">
+      <a href="#panel2-2" role="tab" tabindex="0" aria-selected="false" controls="panel2-2">按应用</a></li>
+  </ul>
+  <div class="tabs-content">
+    <section role="tabpanel" aria-hidden="false" class="content active" id="panel2-1">
+      <ul class="ETSC-tree-ul">
+        <% $categories.each do |category| %>
+            <li><a href="product_by_category?category_id=<%= category.id %>"><%= category.name %></a></li>
+        <% end %>
+      </ul>
+    </section>
+    <section role="tabpanel" aria-hidden="true" class="content" id="panel2-2">
+      <ul class="ETSC-tree-ul">
+        <% $applications.each do |application| %>
+            <li><a href="product_by_application?application_id=<%= application.id %>"><%= application.name %></a> </li>
+        <% end %>
+      </ul>
+    </section>
+  </div>
+</div>
+<div class="large-18 medium-18 show-for-medium-up columns normal-text">
+  <div class="large-24 medium-24 show-for-medium-up columns normal-text">
+    <div class="row ETSC-product-list">
+      <div class="large-8 medium-8 small-8 column clear-indent">
+        <a href="#"><img src="http://placehold.it/400x300"/></a>
+      </div>
+      <div class="large-16 medium-16 small-16 column">
+        <h4>产品ABC</h4>
+
+        <p>技金說國帶漸細；好會百經你；意驗人女萬節數出以看處著令開聽；在更也眾，師大者？同一力十預……製方合充形時了是園當：個來創傳離史不聯洋大車。見巴難即子？到友以劇園是管該合報刻人：樣不進而金在麼早一為雖公標相會以的間朋市走要，話物孩背中我從外地省聲如著歡醫們他！過供為最金紅少，父無多到來神唱的完際買不劇話總：投點步，一高語曾族給不經愛治，水中二小產銷費北子重不著高我求低放可快待導能西！展人中報。裡打內口情直多事五，似學投對少主性，者是情模花為的得，務向市異爭熱作議可。太後？</p>
+
+        <p>金就人著生大照夫急體根有嗎客一還們部這聞如非到價樂片如長下此集一葉自，那星同物我意童想營色的，其因稱勢物別的光而。三具可方標務切為為，他發務當吃用上而體史們？</p>
+
+        <p>參但人市是散甚作，化場當最種位相、影下古們卻關克容如像？向外做會，再想也們成有來性意隨。</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="magellan-container" style="background-color:#fff !important;" data-magellan-expedition="fixed" data-options="destination_threshold:65;throttle_delay:0;">
+        <dl class="sub-nav">
+          <dd data-magellan-arrival="feature"><a href="#feature">产品特点</a></dd>
+          <dd data-magellan-arrival="application"><a href="#application">主要应用</a></dd>
+          <dd data-magellan-arrival="parameter"><a href="#parameter">参数</a></dd>
+          <dd data-magellan-arrival="picture"><a href="#picture">其它图片</a></dd>
+          <dd data-magellan-arrival="relationship"><a href="#relationship">相关产品</a></dd>
+          <dd data-magellan-arrival="same_series"><a href="#same_series">同系列产品</a></dd>
+          <dd data-magellan-arrival="download"><a href="#download">相关下载</a></dd>
+        </dl>
+      </div>
+
+      <p><a name="feature"></a></p>
+
+      <h3 data-magellan-destination="feature">产品特点</h3>
+
+      <p>業以空，軍新型參白設國發多的地帶電修快今，得論心每活天影子新離的史中人我像現反應賣微另在象價：是天果另；回好樣吸，取洲節師真三今從青資洲灣到；參作下電突發也外的飛我客想；可晚極。分及下式？不小會味清？學林目，性招然型主好得更。</p>
+
+      <p>比火照不登懷……人說她是知同教通反成場到境總市洲功是是動幾魚還當等中千對告兒臺以南了水林進……區特空的海山的文知上人保官打點語精。低面味總，李論系葉在和了，在先經灣上場，竟無去洋我就行已形是用能力住以用而做……根一學的存始或事子，教屋給久見廣物對記老臺個望雨量下轉國服金失、定法直照是重行完入況有書回車樣。</p>
+
+      <p>在為成不史的理腦方事離時友名這微、遠式吃解去的看風、強可回止種。</p>
+
+      <p>多他成位西處成飛有上是唱營轉一老！能特點送還：會說更別、成然夜，公慢和是子老裡他氣頭命？</p>
+
+      <p>集要口人四現英談技事選女且來樣展息作史接！</p>
+
+
+      <hr>
+      <p><a name="application"></a></p>
+
+      <h3 data-magellan-destination="application">主要应用</h3>
+
+      <p>那將嗎她苦為記排以解形的以，的不商件。</p>
+
+      <p>元濟一腦，斯如可於反那球斷供該中也管色易不票復外思們驚你香。</p>
+
+      <p>可裡雜說雜但差港他長：葉出上當麼星時而母力傳人高，會另半我在什有今有你轉這、蘭我外力有積農裡，他起費經的。</p>
+
+      <p>一目拿養件起那們把府吸……壓且對寫苦點國！</p>
+
+      <hr>
+      <p><a name="parameter"></a></p>
+
+      <h3 data-magellan-destination="parameter">参数</h3>
+
+      <p>的同知金以該軍這生？太視的改能一；的功日上，文和產，果的去政醫便省賣知臉運藝所經形？不見要是，遊作不風眼世小明。這她麼體樣就生才品容大沒本手館來，配常裝：業論說，白身強用先紅但？德他期年，在學什就想親到在社面，起下稱；臺二的，去再傳間久刻面反型好別她，同的前命本流他可且灣神手說山時常投文害價話界子心中心量冷念不小進家到態速共當話營熱習的多家進紙見幾那己響積人市的自告人愛……母個。</p>
+
+      <p>重文情作，沒同問代南聯皮著流出正查備？廣期良現離成賽一離自讀害上方：走火院響該頭力找民民千在富容！</p>
+      <hr>
+      <p><a name="picture"></a></p>
+
+      <h3 data-magellan-destination="picture">其它图片</h3>
+
+      <p>到而紀自少可政們送又先客球！著就因人她成多法表錯出以所聲臺我政愛積過在是我主可角，子民眾……道過己。在接友東因眼去美巴許一來望不的油更期社交深通具書量你，廣司合：後有她臺每故這表術好他馬的引北我說心對寫原克美求動究起是樂我熱計院然女色她灣法部外得想起給的，我不候紅。始所感，起節民利地，響體的興下難！</p>
+
+      <p>政得平著；北民清進而一治在著試是歷始別個依白是影，不市無，改放兩作講上病知士代的推不得多，我代公過體表是因的法在之行，實了頭他，到受呢後大遊。</p>
+
+      <p>陸天考此日歡提檢大以明家未怕日打。</p>
+
+      <p>高深時，術長而半行的！經身著其刻天機和得些，初及以部道在，和教團天戲布圖味進料讀防奇王畫就推看推……之因大市的不包究。山上基雙……的源日能以之第、動山。</p>
+
+      <p>於聞是合開安，取這時把學們兩打消造沒雜能金唱學那麼的業大卻道期同，超天認……觀空此熱，都想愛死離一神進工？怎銀經臺子代新一，緊有國的遊以甚處過主國臺制目是做在生語山有東樣不十止學及作以，地民們標選長是同麼色路性熱賽調信，他運國代回不電們不：幾金相技民會過，安選向，年力府，象員有們、品清爭至推角他證學不。小作此足太二筆合生實十；歌公完灣，中出種當書孩知火來想般定職古男是來市存花形麼千；相那化照度知為人維健事兒不司弟河生美華……面求做！男父著！財賽我續風裡陽下界社禮而種構許很到於處本、根皮保點石看景的人草有星於八時亞斯生了政，何演科、實設器。容極時看克很他我道校公。</p>
+      <hr>
+      <p><a name="relationship"></a></p>
+
+      <h3 data-magellan-destination="relationship">相关产品</h3>
+
+      <p>到而紀自少可政們送又先客球！著就因人她成多法表錯出以所聲臺我政愛積過在是我主可角，子民眾……道過己。在接友東因眼去美巴許一來望不的油更期社交深通具書量你，廣司合：後有她臺每故這表術好他馬的引北我說心對寫原克美求動究起是樂我熱計院然女色她灣法部外得想起給的，我不候紅。始所感，起節民利地，響體的興下難！</p>
+
+      <p>政得平著；北民清進而一治在著試是歷始別個依白是影，不市無，改放兩作講上病知士代的推不得多，我代公過體表是因的法在之行，實了頭他，到受呢後大遊。</p>
+
+      <p>陸天考此日歡提檢大以明家未怕日打。</p>
+
+      <p>高深時，術長而半行的！經身著其刻天機和得些，初及以部道在，和教團天戲布圖味進料讀防奇王畫就推看推……之因大市的不包究。山上基雙……的源日能以之第、動山。</p>
+
+      <p>於聞是合開安，取這時把學們兩打消造沒雜能金唱學那麼的業大卻道期同，超天認……觀空此熱，都想愛死離一神進工？怎銀經臺子代新一，緊有國的遊以甚處過主國臺制目是做在生語山有東樣不十止學及作以，地民們標選長是同麼色路性熱賽調信，他運國代回不電們不：幾金相技民會過，安選向，年力府，象員有們、品清爭至推角他證學不。小作此足太二筆合生實十；歌公完灣，中出種當書孩知火來想般定職古男是來市存花形麼千；相那化照度知為人維健事兒不司弟河生美華……面求做！男父著！財賽我續風裡陽下界社禮而種構許很到於處本、根皮保點石看景的人草有星於八時亞斯生了政，何演科、實設器。容極時看克很他我道校公。</p>
+      <hr>
+      <p><a name="same_series"></a></p>
+
+      <h3 data-magellan-destination="same_series">同系列产品</h3>
+
+      <p>到而紀自少可政們送又先客球！著就因人她成多法表錯出以所聲臺我政愛積過在是我主可角，子民眾……道過己。在接友東因眼去美巴許一來望不的油更期社交深通具書量你，廣司合：後有她臺每故這表術好他馬的引北我說心對寫原克美求動究起是樂我熱計院然女色她灣法部外得想起給的，我不候紅。始所感，起節民利地，響體的興下難！</p>
+
+      <p>政得平著；北民清進而一治在著試是歷始別個依白是影，不市無，改放兩作講上病知士代的推不得多，我代公過體表是因的法在之行，實了頭他，到受呢後大遊。</p>
+
+      <p>陸天考此日歡提檢大以明家未怕日打。</p>
+
+      <p>高深時，術長而半行的！經身著其刻天機和得些，初及以部道在，和教團天戲布圖味進料讀防奇王畫就推看推……之因大市的不包究。山上基雙……的源日能以之第、動山。</p>
+
+      <p>於聞是合開安，取這時把學們兩打消造沒雜能金唱學那麼的業大卻道期同，超天認……觀空此熱，都想愛死離一神進工？怎銀經臺子代新一，緊有國的遊以甚處過主國臺制目是做在生語山有東樣不十止學及作以，地民們標選長是同麼色路性熱賽調信，他運國代回不電們不：幾金相技民會過，安選向，年力府，象員有們、品清爭至推角他證學不。小作此足太二筆合生實十；歌公完灣，中出種當書孩知火來想般定職古男是來市存花形麼千；相那化照度知為人維健事兒不司弟河生美華……面求做！男父著！財賽我續風裡陽下界社禮而種構許很到於處本、根皮保點石看景的人草有星於八時亞斯生了政，何演科、實設器。容極時看克很他我道校公。</p>
+      <hr>
+
+      <p><a name="download"></a></p>
+
+      <h3 data-magellan-destination="download">相关下载</h3>
+
+      <p>進西的口小辦再正。來得些。林識童那生，臺英了狀！平的風能能單深個，見己細會加信國進自眾年非看大今結處了的葉行正及光利氣小字公，家球能民事機說臺且一或給不下安為起的不？的賣園不服香清盡它稱話管是著單復畫一或了調育朋後，環問文庭入度何濟會海那備！</p>
+
+      <p>受青題面在微自期都業的來河出活標無情過不，員女不、本頭人會然獎道如家。念西望一當：的負自他基破！交羅要，全不下管題方種來他成，年在制到經深我！轉毛登蘭演是曾會媽朋……時他戲本們保可、他個得國展？易增施過度業教能：到往一花，成去息時父請集道，香金好車市目雜原美：教展果支們自不魚用器弟己局有一市色東過受卻眼長屋蘭、是了生世遊古出力；園媽部界科自主三。真同條金她，格為一有在的清用多部原相位鄉報委社遊童事物都不有不視驗汽消定書球商時學家牛開、能都往朋育至類，不制四不春業發吃或同大市不力細力著正高人主沒修力笑們汽節真我分，收裝部間服之光開絕神他議完度真職想房女生知們形了體興病全到論形土說陽清來心夜小至！</p>
+
+      <p>層議改法道。提趣自議日中選式邊或女年個過自是美聽四上？可重自使以國元般相作電遊上上表心已傳來士不費看標山的，環子生國、究信做讀機面難；代要來！無上沒光球作小李政一有的工之依口士，料其風口生的都名。</p>
+
+      <p>王入心皮如們就還運星離技不小自友是下，出結參人望會南以的，風可電受南受演不心步居細的？</p>
+
+    </div>
+  </div>
+</div>
+</div>

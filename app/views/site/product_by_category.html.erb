@@ -1,0 +1,156 @@
+<div class="off-canvas-wrap docs-wrap" data-offcanvas>
+  <div class="inner-wrap">
+    <nav class="tab-bar show-for-small-only">
+      <section class="left-small"><a class="left-off-canvas-toggle menu-icon" href="#"><span></span></a></section>
+      <section class="middle tab-bar-section"><h1 class="title">激光器</h1></section>
+      <section class="right-small"><a class="right-off-canvas-toggle menu-icon" href="#"><span></span></a></section>
+    </nav>
+
+    <aside class="left-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>按产品类型</label></li>
+        <% $categories.each do |category| %>
+            <li><a href="/site/product_by_category?category_id=<%= category.id %>"><%= category.name %></a></li>
+        <% end %>
+      </ul>
+      <ul class="off-canvas-list">
+        <li><label><span>激光器</span> 查询条件：</label></li>
+      </ul>
+      <form>
+        <div class="row">
+          <div class="small-24">
+            <div class="row">
+              <div class="small-8 columns">
+                <label for="right-label" class="right inline">激励源</label>
+              </div>
+              <div class="small-16 columns">
+                <select>
+                  <option value="husker">全部</option>
+                  <option value="husker">准分子</option>
+                  <option value="husker">二氧化碳</option>
+                  <option value="husker">发光二极管</option>
+                  <option value="husker">激光</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="small-8 columns">
+                <label for="right-label-1" class="right inline">工作物质</label>
+              </div>
+              <div class="small-16 columns">
+                <select>
+                  <option value="husker">全部</option>
+                  <option value="husker">气体</option>
+                  <option value="husker">固体</option>
+                  <option value="husker">液体</option>
+                  <option value="husker">半导体</option>
+                </select>
+              </div>
+            </div>
+            <a aria-label="submit form" href="javascript:void(0);" class="button expand" id="ajax_filter_small">查询</a>
+          </div>
+        </div>
+      </form>
+    </aside>
+    <aside class="right-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>按产品应用</label></li>
+        <% $applications.each do |application| %>
+            <li><a href="product_by_application?application_id=<%= application.id %>"><%= application.name %></a></li>
+        <% end %>
+      </ul>
+    </aside>
+
+    <section class="main-section">
+      <div class="row">
+        <div class="large-6 medium-6 show-for-medium-up columns ETSC-main-panel">
+          <h3>◆　产品中心</h3>
+          <ul class="button-group round radius tabs" data-tab role="tablist">
+            <li class="tab-title active" role="presentational">
+              <a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" controls="panel2-1">按类型</a></li>
+            <li class="tab-title" role="presentational">
+              <a href="#panel2-2" role="tab" tabindex="0" aria-selected="false" controls="panel2-2">按应用</a></li>
+          </ul>
+          <div class="tabs-content">
+            <section role="tabpanel" aria-hidden="false" class="content active" id="panel2-1">
+              <ul class="ETSC-tree-ul">
+                <% $categories.each do |category| %>
+                    <li><a href="product_by_category?category_id=<%= category.id %>"><%= category.name %></a></li>
+                <% end %>
+              </ul>
+            </section>
+            <section role="tabpanel" aria-hidden="true" class="content" id="panel2-2">
+              <ul class="ETSC-tree-ul">
+                <% $applications.each do |application| %>
+                    <li><a href="product_by_application?application_id=<%= application.id %>"><%= application.name %></a></li>
+                <% end %>
+              </ul>
+            </section>
+          </div>
+        </div>
+
+        <div class="large-18 medium-18 small-24 columns normal-text">
+          <form class="show-for-medium-up" id="search_form">
+            <h3><span class="keyword">激光器</span> 查询条件：</h3>
+            <div class="row">
+              <div class="large-4 medium-4 columns">
+                <label class="right">激励源：</label></div>
+              <div class="large-20 medium-20 columns">
+                <input type="radio" name="excitation_source" value="0" id="source_type_0"><label for="source_type_0">全部</label>
+                <input type="radio" name="excitation_source" value="1" id="source_type_1"><label for="source_type_1">准分子</label>
+                <input type="radio" name="excitation_source" value="2" id="source_type_2"><label for="source_type_2">二氧化碳</label>
+                <input type="radio" name="excitation_source" value="3" id="source_type_3"><label for="source_type_3">发光二极管</label>
+                <input type="radio" name="excitation_source" value="4" id="source_type_4"><label for="source_type_4">激光</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 medium-4 columns">
+                <label class="right ">工作物质：</label></div>
+              <div class="large-20 medium-20 columns">
+                <input type="radio" name="working_material" value="0" id="material_type_0"><label for="material_type_0">全部</label>
+                <input type="radio" name="working_material" value="1" id="material_type_1"><label for="material_type_1">气体</label>
+                <input type="radio" name="working_material" value="2" id="material_type_2"><label for="material_type_2">固体</label>
+                <input type="radio" name="working_material" value="3" id="material_type_3"><label for="material_type_3">液体</label>
+                <input type="radio" name="working_material" value="4" id="material_type_4"><label for="material_type_4">半导体</label>
+              </div>
+            </div>
+            <div class="text-right">
+              <a role="button" aria-label="submit form" href="javascript:void(0);" class="button tiny" id="ajax_filter">查询</a>
+            </div>
+          </form>
+          <% rows = $products_per_page / 2 %>
+          <% 1.upto(rows) do |row| %>
+              <% if (@categorized_products.size + 1) / 2 > row - 1 %>
+                  <div class="row">
+                    <% 1.upto(2) do |column| %>
+                        <% product_index = 2 * (row - 1) + (column - 1) %>
+                        <% current_product = @categorized_products[product_index] %>
+                        <% if product_index < @categorized_products.size %>
+                            <div class="large-24 medium-24 small-12 columns clear-indent">
+                              <div class="row ETSC-product-list">
+                                <div class="large-8 medium-8 small-24 columns">
+                                  <a href="#"><img src="http://placehold.it/400x300"/></a>
+                                </div>
+                                <div class="large-16 medium-16 small-24 columns">
+                                  <h4><a href="/site/show_product?product_id=<%= current_product.id %>"><%= current_product.name %><%= current_product.brief %></a></h4>
+
+                                  <p>
+                                    <a href="/site/show_product?product_id=<%= current_product.id %>"><%= raw(current_product.description) %></a>
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                        <% end %>
+                    <% end %>
+                  </div>
+              <% end %>
+          <% end %>
+          <%= page_navigation_links @categorized_products %>
+        </div>
+      </div>
+    </section>
+
+    <a class="exit-off-canvas"></a>
+
+  </div>
+</div>

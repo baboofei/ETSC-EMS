@@ -257,4 +257,73 @@ class CustomerUnit < ActiveRecord::Base
         return {:success => true, :message => "#{item}#{message}", :id => customer_unit.id}
 
     end
+
+    def self.search_to_fix(wrong_name, right_name)
+        wrong_customer_unit = CustomerUnit.where("name = ?", wrong_name)[0]
+        right_customer_unit = CustomerUnit.where("name = ?", right_name)[0]
+        right_addr = CustomerUnitAddr.where("customer_units.name = ?", right_name).includes(:customer_unit)
+
+        wrong_customers = Customer.where("customer_units.name = ?", wrong_name).includes(:customer_unit_addr => :customer_unit)
+        p "正在判断客户…"
+        if wrong_customers.size > 0
+            wrong_customers.each do |customer|
+                p "现有客户#{customer.name}(id=#{customer.id})归于#{wrong_name}下"
+                p "正确的单位地址有：#{right_addr.map{|p| [p.id, p.addr]}}，请参考这个修改id=#{customer.id}的客户"
+            end
+        else
+            p "还好此单位下没客户。"
+        end
+        p "~~~~~~~~~~~"
+        wrong_salecases = Salecase.where("customer_units.name = ?", wrong_name).includes(:customer_units)
+        p "正在判断个案…"
+        if wrong_salecases.size > 0
+            wrong_salecases.each do |salecase|
+                p "现有个案#{salecase.number}(id=#{salecase.id})归于#{wrong_name}下"
+                p "请将customer_units_salecases表里salecase_id=   #{salecase.id}   对应的customer_unit_id改为   #{right_customer_unit.id}   "
+            end
+        else
+            p "还好没用此单位创建个案。"
+        end
+        p "~~~~~~~~~~~"
+        wrong_flow_sheets = FlowSheet.where("customer_units.name = ?", wrong_name).includes(:customer_units)
+        p "正在判断水单…"
+        if wrong_flow_sheets.size > 0
+            wrong_flow_sheets.each do |flow_sheet|
+                p "现有水单#{flow_sheet.number}(id=#{flow_sheet.id})归于#{wrong_name}下"
+                p "请将customer_units_flow_sheets表里flow_sheet_id=   #{flow_sheet.id}   对应的customer_unit_id改为   #{right_customer_unit.id}   "
+            end
+        else
+            p "还好没有此单位的水单。"
+        end
+        p "~~~~~~~~~~~"
+        wrong_quotes = Quote.where("customer_units.name = ?", wrong_name).includes(:customer_unit)
+        p "正在判断报价…"
+        if wrong_quotes.size > 0
+            wrong_quotes.each do |quote|
+                p "现有报价#{quote.number}(id=#{quote.id})归于#{wrong_name}下"
+                p "请修改其customer_unit_id为  #{right_customer_unit.id}"
+            end
+        else
+            p "还好没给此单位做报价。"
+        end
+        p "~~~~~~~~~~~"
+        wrong_contracts = Contract.where("customer_units.name = ?", wrong_name).includes(:customer_unit)
+        p "正在判断合同…"
+        if wrong_contracts.size > 0
+            wrong_contracts.each do |contract|
+                p "现有合同#{contract.number}(id=#{contract.id})归于#{wrong_name}下"
+                p "请修改其customer_unit_id为  #{right_customer_unit.id}"
+            end
+        else
+            p "还好没和此单位签合同。"
+        end
+        p "~~~~~~~~~~~"
+        wrong_aliases = CustomerUnitAlias.where("customer_units.name = ?", wrong_name).includes(:customer_unit)
+        p "正在判断别称…"
+        p "共计有以下别称：#{wrong_aliases.map{|p| [p.id, p.unit_alias]}.to_s}，都删了吧……或者复制给customer_unit_id=   #{right_customer_unit.id}   作为新别称"
+
+
+        p "都改完了就把#{wrong_customer_unit.name}(id:#{wrong_customer_unit.id})删了吧"
+        return true
+    end
 end

@@ -16,7 +16,8 @@ gem 'whenever', :require => false #定时任务
 gem 'state_machine', '1.1.2' #状态机
 gem 'nokogiri', '1.6.0' #扒网页
 gem 'spreadsheet', '0.9.0'
-gem 'will_paginate', '3.0.6'
+#gem 'will_paginate', '3.0.6'
+#gem 'kaminari', '0.16.1' #另一个分页
 
 # Gems used only for assets and not required
 # in production environments by default.

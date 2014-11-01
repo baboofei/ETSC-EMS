@@ -45,8 +45,8 @@ ActionMailer::Base.smtp_settings = {
     :address              => "smtpcom.263xmail.com",
     :port                 => 25,
     :domain               => "263.net",
-    :user_name            => "admin@etsc-tech.com",
-    :password             => "1 2 3 *#)^#",
+    :user_name            => "terrych@etsc-tech.com",
+    :password             => "1q2w3e4r2010",
     :authentication       => "login"
 #,
 #    :enable_starttls_auto => false

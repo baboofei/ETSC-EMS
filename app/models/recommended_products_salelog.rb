@@ -5,3 +5,4 @@ class RecommendedProductsSalelog < ActiveRecord::Base
     belongs_to :salelog
     belongs_to :vendor_unit
 end
+

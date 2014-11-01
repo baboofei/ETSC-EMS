@@ -22,9 +22,12 @@ class Customer < ActiveRecord::Base
     has_many :prod_applications, :through => :customers_prod_applications
     has_many :quotes
 
-    has_many :owned_contract, :class_name => 'Contract', :foreign_key => 'end_user_customer_id'
-    has_many :issued_contract, :class_name => 'Contract', :foreign_key => 'buyer_customer_id'
-
+    #has_many :owned_contract, :class_name => 'Contract', :foreign_key => 'end_user_customer_id'
+    #has_many :issued_contract, :class_name => 'Contract', :foreign_key => 'buyer_customer_id'
+    #现在合同和客户改成多对多了，因为可能真不止两个联系人--20140918
+    has_many :contracts_customers, :class_name => "ContractsCustomer", :foreign_key => 'contract_id'
+    has_many :contracts, :through => :contracts_customers, :source => :contract
+    
     #水单和客户多对多
     has_many :customers_flow_sheets, :class_name => 'CustomersFlowSheet', :foreign_key => :customer_id
     has_many :flow_sheets, :through => :customers_flow_sheets, :source => :flow_sheet
@@ -48,6 +51,10 @@ class Customer < ActiveRecord::Base
 
     def self.in_flow_sheet(flow_sheet_id)
         where("flow_sheets.id = ?", flow_sheet_id).includes(:flow_sheets)
+    end
+
+    def self.in_contract(contract_id)
+        where("contracts.id = ?", contract_id).includes(:contracts)
     end
 
     def self.last_month
@@ -141,7 +148,6 @@ class Customer < ActiveRecord::Base
             customer.user_id = user_id
             message = $etsc_create_ok
         end
-        binding.pry
         fields_to_be_updated = %w(customer_unit_addr_id name en_name email mobile phone fax im department position addr
             postcode en_addr lead_id comment group_id
         )
@@ -290,20 +296,25 @@ class Customer < ActiveRecord::Base
             #如果填了单位
             if !inquire.name.blank? && inquire.en_name.blank?
                 #只填了姓名，则列出此单位所有和姓名第一个字一样的人
-                customers += Customer.where("customer_unit_aliases.unit_alias like ? and customers.name like ?",
+                #TODO
+                #这里先把en_name算成一个条件，其实应该在创建的时候把en_name也加到别称里去，这样就只用查别称表了
+                customers += Customer.where("(customer_unit_aliases.unit_alias like ? or customer_units.en_name like ?) and customers.name like ?",
+                                            "%#{inquire.customer_unit_name}%",
                                             "%#{inquire.customer_unit_name}%",
                                             "#{inquire.name[0]}%"
                 ).includes(:customer_unit_addr => {:customer_unit => :unit_aliases})
             elsif inquire.name.blank? && !inquire.en_name.blank?
                 #只填了英文名，则列出此单位所有英文名里包含此姓或此名的人
                 if inquire.en_name.split(" ").size > 1
-                    customers += Customer.where("customer_unit_aliases.unit_alias like ? and (customers.en_name like ? or customers.en_name like ?)",
+                    customers += Customer.where("(customer_unit_aliases.unit_alias like ? or customer_units.en_name like ?) and (customers.en_name like ? or customers.en_name like ?)",
                                                 "%#{inquire.customer_unit_name}%",
-                        "#{inquire.en_name.split(" ")[0]}%",
-                        "#{inquire.en_name.split(" ")[1]}%"
+                                                "%#{inquire.customer_unit_name}%",
+                                                "#{inquire.en_name.split(" ")[0]}%",
+                                                "#{inquire.en_name.split(" ")[1]}%"
                     ).includes(:customer_unit_addr => {:customer_unit => :unit_aliases})
                 else
-                    customers += Customer.where("customer_unit_aliases.unit_alias like ? and customers.en_name like ?",
+                    customers += Customer.where("(customer_unit_aliases.unit_alias like ? or customer_units.en_name like ?) and customers.en_name like ?",
+                                                "%#{inquire.customer_unit_name}%",
                                                 "%#{inquire.customer_unit_name}%",
                                                 "#{inquire.en_name}%"
                     ).includes(:customer_unit_addr => {:customer_unit => :unit_aliases})
@@ -311,14 +322,16 @@ class Customer < ActiveRecord::Base
             elsif !inquire.name.blank? && !inquire.en_name.blank?
                 #中英文名都填了，则上面两种都列出
                 if inquire.en_name.split(" ").size > 1
-                    customers += Customer.where("customer_unit_aliases.unit_alias like ? and customers.name like ? and (customers.en_name like ? or customers.en_name like ?)",
+                    customers += Customer.where("(customer_unit_aliases.unit_alias like ? or customer_units.en_name like ?) and customers.name like ? and (customers.en_name like ? or customers.en_name like ?)",
+                                                "%#{inquire.customer_unit_name}%",
                                                 "%#{inquire.customer_unit_name}%",
                                                 "#{inquire.name[0]}%",
                                                 "#{inquire.en_name.split(" ")[0]}%",
                                                 "#{inquire.en_name.split(" ")[1]}%"
                     ).includes(:customer_unit_addr => {:customer_unit => :unit_aliases})
                 else
-                    customers += Customer.where("customer_unit_aliases.unit_alias like ? and customers.name like ? and customers.en_name like ?",
+                    customers += Customer.where("(customer_unit_aliases.unit_alias like ? or customer_units.en_name like ?) and customers.name like ? and customers.en_name like ?",
+                                                "%#{inquire.customer_unit_name}%",
                                                 "%#{inquire.customer_unit_name}%",
                                                 "#{inquire.name[0]}%",
                                                 "#{inquire.en_name}%"
@@ -326,7 +339,10 @@ class Customer < ActiveRecord::Base
                 end
             else
                 #都没填，列出该单位所有人
-                customers += Customer.where("customer_unit_aliases.unit_alias like ?", "%#{inquire.customer_unit_name}%").includes(:customer_unit_addr => {:customer_unit => :unit_aliases})
+                customers += Customer.where("(customer_unit_aliases.unit_alias like ? or customer_units.en_name like ?)",
+                                            "%#{inquire.customer_unit_name}%",
+                                            "%#{inquire.customer_unit_name}%"
+                ).includes(:customer_unit_addr => {:customer_unit => :unit_aliases})
             end
         else
             #如果没填单位

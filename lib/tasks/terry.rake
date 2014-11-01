@@ -294,10 +294,11 @@ LEFT JOIN users AS u2 ON gu2.user_id = u2.id").map(&:id) if sale.groups.to_s.mat
             .joins("LEFT JOIN products ON quote_items.product_id = products.id")\
             .joins("LEFT JOIN vendor_units ON products.producer_vendor_unit_id = vendor_units.id")
                 #p salecases.size
+                salecases.uniq!
 
                 #去掉签过合同的，process == 27
                 #去掉完结的，process == 15
-                salecases.uniq!.reject! do |salecase|
+                salecases.reject! do |salecase|
                     salelog_process = salecase.salelogs.map(&:process)
                     (salelog_process.include? 27) || (salelog_process.include? 15)
                 end

@@ -23,12 +23,12 @@ Ext.define('Ext.util.History', {
     useTopWindow: true,
 
     /**
-     * @property
+     * @property zzz
      * The id of the hidden field required for storing the current history token.
      */
     fieldId: Ext.baseCSSPrefix + 'history-field',
     /**
-     * @property
+     * @property zzz
      * The id of the iframe required by IE to manage the history stack.
      */
     iframeId: Ext.baseCSSPrefix + 'history-frame',

@@ -1,28 +1,27 @@
-/**
- * 小型的business_contact，用于个案里的商务相关联系人提示
- */
-Ext.define('EIM.view.business_contact.MiniGrid', {
+Ext.define('EIM.view.contract.CustomerGrid', {
     extend: 'Ext.grid.Panel',
-    alias: 'widget.business_contact_mini_grid',
+    alias: 'widget.contract_customer_grid',
 
-//    requires: 'Ext.ux.grid.FiltersFeature',
+    requires: 'Ext.ux.grid.FiltersFeature',
 
+    title: '客户联系人列表',
+    store: 'GridContractMiniCustomers',
     iconCls: 'ttl_grid',
+    multiSelect: true,
 
     initComponent: function() {
-        this.store = 'MiniBusinessContacts';
         this.columns = [
             {
-                header: '商务相关单位',
+                header: '单位',
+                dataIndex: 'customer_unit_name',
                 flex: 1,
-                sortable: false,
-                dataIndex: 'business_unit>name'
+                minWidth: 150
             },
             {
                 header: '姓名',
-                width: 50,
-                sortable: false,
-                dataIndex: 'name'
+                dataIndex: 'name',
+                width: 100,
+                sortable: false
             },
             {
                 header: '移动电话',
@@ -60,17 +59,15 @@ Ext.define('EIM.view.business_contact.MiniGrid', {
             }
         ];
 
-        this.addBusinessContactFromButton = Ext.create('Ext.Button', {
+        this.addCustomerFromButton = Ext.create('Ext.Button', {
             text: '添加联系人',
             iconCls: 'btn_add',
-            action: 'addBusinessContactFrom',
-            disabled: true
+            action: 'addCustomerFrom'
         });
-        this.deleteBusinessContactFromButton = Ext.create('Ext.Button', {
+        this.deleteCustomerFromButton = Ext.create('Ext.Button', {
             text: '删除联系人',
             iconCls: 'btn_delete',
-            action: 'deleteBusinessContactFrom',
-            disabled: true
+            action: 'deleteCustomerFrom'
         });
         this.pagingToolbar = Ext.create('Ext.PagingToolbar', {
             store: this.store,
@@ -79,19 +76,22 @@ Ext.define('EIM.view.business_contact.MiniGrid', {
             minWidth: 380
         });
 
-        this.features = [
-            {
-                ftype: 'filters',
-                encode: true
-            }
+        this.bbar = [
+            this.addCustomerFromButton,
+            this.deleteCustomerFromButton,
+            '-',
+            this.pagingToolbar
         ];
-
-        this.bbar = [this.addBusinessContactFromButton, this.deleteBusinessContactFromButton, '-', this.pagingToolbar];
 
         this.callParent(arguments);
     },
 
     getSelectedItem: function() {
         return this.getSelectionModel().getSelection()[0];
+    },
+
+    //可多选，加一个“s”的项
+    getSelectedItems: function() {
+        return this.getSelectionModel().getSelection();
     }
 });

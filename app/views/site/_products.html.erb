@@ -1,0 +1,51 @@
+<% rows = $products_per_page / 2 %>
+<% 1.upto(rows) do |row| %>
+    <% if (@products.size + 1) / 2 > row - 1 %>
+        <div class="row">
+          <% 1.upto(2) do |column| %>
+              <% product_index = 2 * (row - 1) + (column - 1) %>
+              <% current_product = @products[product_index] %>
+              <% if product_index < @products.size %>
+                  <div class="large-24 medium-24 small-12 columns clear-indent">
+                    <div class="row ETSC-product-list">
+                      <div class="large-8 medium-8 small-24 columns" name="image">
+                        <a href="#"><img src="http://placehold.it/400x300"/></a>
+                      </div>
+                      <div class="large-16 medium-16 small-24 columns">
+                        <h4><a href="/site/show_product?product_id=<%= current_product.id %>" name="brief"><%= current_product.name %><%= current_product.brief %></a></h4>
+
+                        <p>
+                          <a href="/site/show_product?product_id=<%= current_product.id %>" name="description"><%= raw(current_product.description.truncate(200)) %></a>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+              <% end %>
+          <% end %>
+        </div>
+    <% end %>
+<% end %>
+
+<div class="pagination-centered">
+  <ul class="pagination">
+    <li class="arrow unavailable"><a href="">&laquo;</a></li>
+    <li class="current"><a href="javascript:void(0);">1</a></li>
+    <% if @all_pages == 1 %>
+        <li class="arrow unavailable"><a href="">&raquo;</a></li>
+    <% elsif @all_pages <= $paginate_inner_window + $paginate_outer_window + 1 %>
+        <% 2.upto(@all_pages) do |i| %>
+            <li><a href="javascript:void(0);" target_page="<%= i %>"><%= i %></a></li>
+        <% end %>
+        <li class="arrow"><a href="javascript:void(0);">&raquo;</a></li>
+    <% else %>
+        <% 2.upto($paginate_inner_window + 1) do |i| %>
+            <li><a href="javascript:void(0);" target_page="<%= i %>"><%= i %></a></li>
+        <% end %>
+        <li class='unavailable'><a href='#'>&hellip;</a></li>
+        <% (@all_pages - $paginate_outer_window + 1).upto(@all_pages) do |i| %>
+            <li><a href="javascript:void(0);" target_page="<%= i %>"><%= i %></a></li>
+        <% end %>
+        <li class="arrow"><a href="javascript:void(0);">&raquo;</a></li>
+    <% end %>
+  </ul>
+</div>

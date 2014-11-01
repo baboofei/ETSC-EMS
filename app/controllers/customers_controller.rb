@@ -48,22 +48,42 @@ class CustomersController < ApplicationController
         end
     end
 
-    #因为体现到ExtJS里，是要查名为MiniCustomers的store与角色关联的数据，所以用service_mini_customers
+    #因为体现到ExtJS里，是要查名为ServiceMiniCustomers的store与角色关联的数据，所以用service_mini_customers
     def get_service_mini_customers
         user_id = session[:user_id]
         limit = params[:limit].to_i
         start = params[:start].to_i
-        filter = params[:filter]
         sort = params[:sort]
         target_store = action_name.camelize[3..-1]#根据方法名来取模型
 
         #这里多一个过滤条件就是“归属于某销售个案”
-        customers = Customer.valid.in_flow_sheet(params[:flow_sheet_id]).get_available_data(target_store, user_id).updated_filter_by(filter).updated_sort_by(sort, user_id)
+        customers = Customer.valid.in_flow_sheet(params[:flow_sheet_id]).get_available_data(target_store, user_id).updated_sort_by(sort, user_id)
         #binding.pry
         respond_to do |format|
             format.json {
                 render :json => {
                     :service_mini_customers => customers.limit(limit).offset(start.to_i).map{|p| p.for_mini_grid_json},
+                    :totalRecords => customers.size
+                }
+            }
+        end
+    end
+
+    #因为体现到ExtJS里，是要查名为GridContractMiniCustomers的store与角色关联的数据，所以用grid_contract_mini_customers
+    def get_grid_contract_mini_customers
+        user_id = session[:user_id]
+        limit = params[:limit].to_i
+        start = params[:start].to_i
+        sort = params[:sort]
+        target_store = action_name.camelize[3..-1]#根据方法名来取模型
+
+        #这里多一个过滤条件就是“归属于某合同”
+        customers = Customer.valid.in_contract(params[:contract_id]).get_available_data(target_store, user_id).updated_sort_by(sort, user_id)
+        #binding.pry
+        respond_to do |format|
+            format.json {
+                render :json => {
+                    :grid_contract_mini_customers => customers.limit(limit).offset(start.to_i).map{|p| p.for_mini_grid_json},
                     :totalRecords => customers.size
                 }
             }

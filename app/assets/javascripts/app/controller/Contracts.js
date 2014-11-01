@@ -13,7 +13,8 @@ Ext.define('EIM.controller.Contracts', {
         'Collections',
         'Receivables',
         'ComboQuoteSales',
-        'ComboGroups'
+        'ComboGroups',
+        'GridContractMiniCustomers'
     ],
     models: [
         'Contract',
@@ -24,7 +25,8 @@ Ext.define('EIM.controller.Contracts', {
         'Receivable',
         'ComboQuoteSale',
         'ComboUser',
-        'ComboGroup'
+        'ComboGroup',
+        'GridContractMiniCustomer'
     ],
 
     views: [
@@ -32,27 +34,35 @@ Ext.define('EIM.controller.Contracts', {
         'contract.Grid',
         'contract.Detail',
         'contract.Content',
+        'contract.ContactPanel',
         'contract.ItemGrid',
         'contract.HistoryGrid',
         'contract.CollectionPanel',
         'contract.CollectionGrid',
         'contract.ReceivableGrid',
-        'contract.TransferForm'
+        'contract.TransferForm',
+        'contract.ContactPanel',
+        'contract.CustomerGrid'
     ],
 
-    refs: [{
-        ref: 'grid',
-        selector: 'contract_grid'
-    }, {
-        ref: 'itemGrid',
-        selector: 'contract_item_grid'
-    }, {
-        ref: 'collectionGrid',
-        selector: 'contract_collection_grid'
-    }, {
-        ref: 'receivableGrid',
-        selector: 'contract_receivable_grid'
-    }],
+    refs: [
+        {
+            ref: 'grid',
+            selector: 'contract_grid'
+        },
+        {
+            ref: 'itemGrid',
+            selector: 'contract_item_grid'
+        },
+        {
+            ref: 'collectionGrid',
+            selector: 'contract_collection_grid'
+        },
+        {
+            ref: 'receivableGrid',
+            selector: 'contract_receivable_grid'
+        }
+    ],
 
     init: function() {
         var me = this;
@@ -110,7 +120,7 @@ Ext.define('EIM.controller.Contracts', {
                 change: function(combo) {
                     tool_tip1.setTarget(combo.getEl());
                     var selection = me.getGrid().getSelectedItem();
-                    if (selection) {
+                    if(selection) {
                         var name = selection.get('buyer>(name|en_name)');
                         var phone = selection.get('buyer>phone');
                         var mobile = selection.get('buyer>mobile');
@@ -122,7 +132,7 @@ Ext.define('EIM.controller.Contracts', {
                 change: function(combo) {
                     tool_tip2.setTarget(combo.getEl());
                     var selection = me.getGrid().getSelectedItem();
-                    if (selection) {
+                    if(selection) {
                         var name = selection.get('end_user>(name|en_name)');
                         var phone = selection.get('end_user>phone');
                         var mobile = selection.get('end_user>mobile');
@@ -134,7 +144,7 @@ Ext.define('EIM.controller.Contracts', {
                 change: function(combo) {
                     tool_tip3.setTarget(combo.getEl());
                     var selection = me.getGrid().getSelectedItem();
-                    if (selection) {
+                    if(selection) {
                         var name = selection.get('business_contact>(name|en_name)');
                         var phone = selection.get('business_contact>phone');
                         var mobile = selection.get('business_contact>mobile');
@@ -145,10 +155,15 @@ Ext.define('EIM.controller.Contracts', {
             'contract_content #privilege_container_update_contract_content_info button[text=确认修改]': {
                 click: this.submitContractInfo
             },
+            'contract_customer_grid button[action=addCustomerFrom]': {
+                click: this.addCustomerFrom
+            },
+
+
             'contract_item_grid': {
                 selectionchange: this.itemSelectionChange
                 /*,
-                itemdblclick: this.editContractItem*/
+                 itemdblclick: this.editContractItem*/
             },
             'contract_item_grid button[action=addContractItem]': {
                 click: this.addContractItem
@@ -219,7 +234,7 @@ Ext.define('EIM.controller.Contracts', {
             'contract_receivable_grid': {
                 selectionchange: this.receivableSelectionChange
                 /*,
-                itemdblclick: this.editReceivable*/
+                 itemdblclick: this.editReceivable*/
             },
             'contract_collection_grid button[action=addCollection]': {
                 click: this.addCollection
@@ -233,7 +248,7 @@ Ext.define('EIM.controller.Contracts', {
             'contract_collection_grid': {
                 selectionchange: this.collectionSelectionChange
                 /*,
-                itemdblclick: this.editCollection*/
+                 itemdblclick: this.editCollection*/
             },
             'contract_content amount_with_currency numberfield': {
                 change: this.calculateRmbWithAmount
@@ -262,7 +277,7 @@ Ext.define('EIM.controller.Contracts', {
         var contract_ids = Ext.Array.pluck(Ext.Array.pluck(selection, "data"), "id");
         var contract_ids_str = contract_ids.join("|");
 
-        if (form.form.isValid()) {
+        if(form.form.isValid()) {
             //防双击
             button.disable();
 
@@ -288,7 +303,7 @@ Ext.define('EIM.controller.Contracts', {
      */
     workflowSubmit: function(button) {
         var me = this;
-        switch (button.action) {
+        switch(button.action) {
             case "update":
                 Ext.Ajax.request({
                     url: 'contracts/process_workflow',
@@ -329,7 +344,7 @@ Ext.define('EIM.controller.Contracts', {
                 break;
             case "audit_refuse":
                 Ext.Msg.prompt("需要理由", "请输入驳回的理由", function(button, value) {
-                    if (button === "ok" && value != "") {
+                    if(button === "ok" && value != "") {
                         Ext.Ajax.request({
                             url: 'contracts/process_workflow',
                             params: {
@@ -545,7 +560,7 @@ Ext.define('EIM.controller.Contracts', {
      * @param grid
      */
     applyFilter: function(grid) {
-        if (!Ext.isEmpty(globeFilter)) {
+        if(!Ext.isEmpty(globeFilter)) {
             grid.filters.clearFilters();
             var gridFilter = grid.filters.addFilter({
                 active: true,
@@ -561,7 +576,7 @@ Ext.define('EIM.controller.Contracts', {
     selectionChange: function(selectionModel, selected, eOpts) {
         var me = this;
         var detail_area = Ext.ComponentQuery.query('contract_panel contract_detail')[0];
-        var info_form = detail_area.down('form[name=contract_info]', false);
+//        var info_form = detail_area.down('form[name=contract_info]', false);
         var content_form = detail_area.down('contract_content', false);
         var collection_form = detail_area.down('collection_panel', false);
 
@@ -579,14 +594,14 @@ Ext.define('EIM.controller.Contracts', {
         var btn_save_content_info = Ext.ComponentQuery.query('#privilege_container_update_contract_content_info button[text=确认修改]')[0];
         var btn_save_as = Ext.ComponentQuery.query('contract_panel button[action=save_as]')[0];
 
-        var customer_unit_field = info_form.down('[name=customer_unit_id] combo', false);
-        var buyer_customer_field = info_form.down('[name=buyer_customer_id] combo', false);
-        var end_user_customer_field = info_form.down('[name=end_user_customer_id] combo', false);
-        var business_unit_field = info_form.down('[name=business_unit_id] combo', false);
-        var business_contact_field = info_form.down('[name=business_contact_id] combo', false);
+//        var customer_unit_field = info_form.down('[name=customer_unit_id] combo', false);
+//        var buyer_customer_field = info_form.down('[name=buyer_customer_id] combo', false);
+//        var end_user_customer_field = info_form.down('[name=end_user_customer_id] combo', false);
+//        var business_unit_field = info_form.down('[name=business_unit_id] combo', false);
+//        var business_contact_field = info_form.down('[name=business_contact_id] combo', false);
         var pay_mode_field = content_form.down('expandable_pay_mode_combo combo', false);
-        if (selected.length === 1) {
-            info_form.loadRecord(selected[0]);
+        if(selected.length > 0) {
+//            info_form.loadRecord(selected[0]);
             content_form.loadRecord(selected[0]);
             collection_form.loadRecord(selected[0]);
 
@@ -595,7 +610,7 @@ Ext.define('EIM.controller.Contracts', {
 
             btn_transfer.enable();
 
-            if (selected[0].get("editable")) {
+            if(selected[0].get("editable")) {
                 //涉及权限的按钮全部hide起来，再根据流程show当前的
                 Ext.Array.each(Ext.ComponentQuery.query('contract_panel button[isInWorkflow=true]'), function(item) {
                     item.disable();
@@ -603,7 +618,7 @@ Ext.define('EIM.controller.Contracts', {
                 //审批中不能修改
                 btn_save_content_info.enable();
                 //                console.log(selected[0].get("editable"));
-                switch (selected[0].get("state")) {
+                switch(selected[0].get("state")) {
                     case "a_start":
                         btn_update.enable()
                         btn_cancel.enable();
@@ -632,45 +647,6 @@ Ext.define('EIM.controller.Contracts', {
                 btn_save_as.enable();
             }
 
-            //给combo做一个假的store以正确显示值
-            customer_unit_field.getStore().loadData([
-                [selected[0].get('customer_unit>id'), selected[0].get('customer_unit>(name|unit_aliases>unit_alias|en_name)')]
-            ]);
-            customer_unit_field.setValue(selected[0].get('customer_unit>id'));
-
-            buyer_customer_field.getStore().loadData([
-                [selected[0].get('buyer_customer_id'), selected[0].get('buyer>(name|en_name)')]
-            ]);
-            buyer_customer_field.setValue(selected[0].get('buyer_customer_id'));
-            buyer_customer_field.getStore().getProxy().setExtraParam('customer_unit_id', selected[0].get('customer_unit>id'));
-
-            end_user_customer_field.getStore().loadData([
-                [selected[0].get('end_user_customer_id'), selected[0].get('end_user>(name|en_name)')]
-            ]);
-            end_user_customer_field.setValue(selected[0].get('end_user_customer_id'));
-            end_user_customer_field.getStore().getProxy().setExtraParam('customer_unit_id', selected[0].get('customer_unit>id'));
-
-            if (selected[0].get('business_unit_id') === 0) {
-                business_unit_field.getStore().removeAll();
-                business_unit_field.setValue("");
-            } else {
-                business_unit_field.getStore().loadData([
-                    [selected[0].get('business_unit_id'), selected[0].get('business_unit>name')]
-                ]);
-                business_unit_field.setValue(selected[0].get('business_unit_id'));
-            }
-
-            if (selected[0].get('business_contact_id') === 0) {
-                business_contact_field.getStore().removeAll();
-                business_contact_field.setValue("");
-            } else {
-                business_contact_field.getStore().loadData([
-                    [selected[0].get('business_contact_id'), selected[0].get('business_contact>(name|en_name)')]
-                ]);
-                business_contact_field.setValue(selected[0].get('business_contact_id'));
-                business_contact_field.getStore().getProxy().setExtraParam('business_unit_id', selected[0].get('business_unit_id'))
-            }
-
             pay_mode_field.getStore().loadData([
                 [selected[0].get('pay_mode_id'), selected[0].get('pay_mode>name')]
             ]);
@@ -678,6 +654,13 @@ Ext.define('EIM.controller.Contracts', {
             pay_mode_field.validate();
 
             //几个表格store的读取
+            var contract_params = {
+                contract_id: selected[0].get("id")
+            };
+            Ext.getStore('GridContractMiniCustomers').load({
+                params: contract_params
+            });
+
             Ext.getStore("ContractItems").getProxy().setExtraParam('contract_id', selected[0].get("id"));
             Ext.getStore("ContractItems").load();
 
@@ -690,17 +673,23 @@ Ext.define('EIM.controller.Contracts', {
             Ext.getStore("ContractHistories").getProxy().setExtraParam('contract_id', selected[0].get("id"));
             Ext.getStore("ContractHistories").load();
 
+            //所有表格里按钮的可用/不可用切换
+            //TODO
+            //按钮有点多，在想出简单的办法来之前先不写吧，反正也不太容易误操作……
+
             //更新进度条
             var sum = Number(selected[0].get('sum'));
             var total_collection = Number(selected[0].get('total_collection'));
-            var percentage = (total_collection * 100.0 / sum).toFixed(2);
+            var percentage = (
+                total_collection * 100.0 / sum
+                ).toFixed(2);
             Ext.ComponentQuery.query('collection_panel progressbar')[0].updateProgress(total_collection / sum, percentage + "%", true);
         } else {
             Ext.Array.each(Ext.ComponentQuery.query('tooltip[title=联系方式]'), function(item) {
                 item.hide();
             });
 
-            info_form.form.reset();
+//            info_form.form.reset();
             content_form.form.reset();
 
             btn_transfer.disable();
@@ -710,10 +699,6 @@ Ext.define('EIM.controller.Contracts', {
                 item.disable();
             });
             btn_save_as.disable();
-
-            buyer_customer_field.getStore().getProxy().setExtraParam('customer_unit_id', null);
-
-            business_contact_field.getStore().getProxy().setExtraParam('business_unit_id', null);
 
             Ext.getStore("ContractItems").getProxy().setExtraParam('contract_id', null);
             Ext.getStore("ContractItems").removeAll();
@@ -759,6 +744,12 @@ Ext.define('EIM.controller.Contracts', {
         });
     },
 
+    addCustomerFrom: function() {
+        var me = this;
+        load_uniq_controller(me, 'Customers');
+        Ext.widget('customer_add_to_contract_mini_form').show();
+    },
+
     itemSelectionChange: function(selectionModel, selected, eOpts) {
         var grid = this.getItemGrid();
         var edit_btn = grid.down("[action=editContractItem]");
@@ -787,10 +778,12 @@ Ext.define('EIM.controller.Contracts', {
         btn_update.hide();
         //给combo做一个假的store以正确显示值
         var warranty_field = view.down('combo[name=warranty_term_id]', false);
-        warranty_field.getStore().loadData([{
-            id: 2,
-            name: '从出厂起12个月'
-        }]);
+        warranty_field.getStore().loadData([
+            {
+                id: 2,
+                name: '从出厂起12个月'
+            }
+        ]);
         warranty_field.setValue(2);
     },
 
@@ -823,7 +816,7 @@ Ext.define('EIM.controller.Contracts', {
         var btn_update = view.down('button[action=update]', false);
         btn_save.hide();
         btn_update.show();
-        if (Number(record['data']['send_status'] < 10)) record['data']['send_status'] = "0" + Number(record['data']['send_status']); //字典项超过10项后有点小麻烦
+        if(Number(record['data']['send_status'] < 10)) record['data']['send_status'] = "0" + Number(record['data']['send_status']); //字典项超过10项后有点小麻烦
         view.down('form', false).loadRecord(record);
 
         //给combo做一个假的store以正确显示值
@@ -835,10 +828,12 @@ Ext.define('EIM.controller.Contracts', {
         ]);
         vendor_unit_field.setValue(record.get('vendor_unit_id'));
 
-        product_field.getStore().loadData([{
-            id: record.get('product_id'),
-            model: record.get('product>model')
-        }]);
+        product_field.getStore().loadData([
+            {
+                id: record.get('product_id'),
+                model: record.get('product>model')
+            }
+        ]);
         product_field.setValue(record.get('product_id'));
         product_field.getStore().getProxy().setExtraParam('vendor_unit_id', record.get('vendor_unit_id'));
 
@@ -852,7 +847,7 @@ Ext.define('EIM.controller.Contracts', {
     deleteContractItem: function() {
         var me = this;
         Ext.Msg.prompt("需要理由", "请输入修改的理由", function(button, value) {
-            if (button === "ok" && value != "") {
+            if(button === "ok" && value != "") {
                 var contract_item_ids = Ext.Array.pluck(Ext.Array.pluck(me.getItemGrid().getSelectedItems(), "data"), "id").join("|");
                 Ext.Ajax.request({
                     url: 'contract_items/delete_contract_item',
@@ -949,7 +944,7 @@ Ext.define('EIM.controller.Contracts', {
     batchEditQuantity: function(button) {
         var me = this;
         Ext.Msg.prompt("需要理由", "请输入修改的理由", function(btn, value) {
-            if (btn === "ok" && value != "") {
+            if(btn === "ok" && value != "") {
                 me.unifiedBatchEdit(button, 'numberfield', value);
             }
         });
@@ -994,47 +989,56 @@ Ext.define('EIM.controller.Contracts', {
             bodyPadding: 4,
             modal: true,
 
-            items: [{
-                xtype: 'form',
-                bodyPadding: 4,
-                layout: 'anchor',
-                fieldDefaults: EIM_field_defaults,
-                items: [{
-                    xtype: 'container', //此container其实不用要，但为了和别的提交共用程序
-                    layout: 'hbox',
-                    items: [{
-                        fieldLabel: '条款',
-                        xtype: 'combo',
-                        store: 'Terms',
-                        mode: 'remote',
-                        vtype: 'term',
-                        valueField: 'id',
-                        displayField: 'name',
-                        emptyText: '请输入并选择质保条款，格式见下面↓',
-                        triggerAction: 'query',
-                        minChars: 1,
-                        hideTrigger: true,
-                        width: 400,
-                        //                                    anchor: '100%',
-                        allowBlank: false
-                    }, {
-                        xtype: 'hidden',
-                        value: 'warranty_term_id',
-                        hidden: true
-                    }, {
-                        xtype: 'button',
-                        text: '确定',
-                        handler: function(button) {
-                            me.unifiedBatchEdit(button, 'combo', null);
+            items: [
+                {
+                    xtype: 'form',
+                    bodyPadding: 4,
+                    layout: 'anchor',
+                    fieldDefaults: EIM_field_defaults,
+                    items: [
+                        {
+                            xtype: 'container', //此container其实不用要，但为了和别的提交共用程序
+                            layout: 'hbox',
+                            items: [
+                                {
+                                    fieldLabel: '条款',
+                                    xtype: 'combo',
+                                    store: 'Terms',
+                                    mode: 'remote',
+                                    vtype: 'term',
+                                    valueField: 'id',
+                                    displayField: 'name',
+                                    emptyText: '请输入并选择质保条款，格式见下面↓',
+                                    triggerAction: 'query',
+                                    minChars: 1,
+                                    hideTrigger: true,
+                                    width: 400,
+                                    //                                    anchor: '100%',
+                                    allowBlank: false
+                                },
+                                {
+                                    xtype: 'hidden',
+                                    value: 'warranty_term_id',
+                                    hidden: true
+                                },
+                                {
+                                    xtype: 'button',
+                                    text: '确定',
+                                    handler: function(button) {
+                                        me.unifiedBatchEdit(button, 'combo', null);
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'displayfield',
+                            fieldLabel: '质保条款格式',
+                            labelWidth: 100,
+                            value: '从[出厂|发货|到港|到货|客户验收|客户开始使用]起##个[月|小时]<br><span style="color: gray;">#表示数字，中括号表示选择支。</span>'
                         }
-                    }]
-                }, {
-                    xtype: 'displayfield',
-                    fieldLabel: '质保条款格式',
-                    labelWidth: 100,
-                    value: '从[出厂|发货|到港|到货|客户验收|客户开始使用]起##个[月|小时]<br><span style="color: gray;">#表示数字，中括号表示选择支。</span>'
-                }]
-            }]
+                    ]
+                }
+            ]
         }).show();
     },
     /**
@@ -1050,7 +1054,7 @@ Ext.define('EIM.controller.Contracts', {
         var selections = Ext.ComponentQuery.query('contract_item_grid')[0].getSelectedItems();
         var select_ids = Ext.Array.pluck(Ext.Array.pluck(selections, "data"), "id");
         //        console.log(field);
-        if (field.isValid()) {
+        if(field.isValid()) {
             Ext.Ajax.request({
                 url: 'contract_items/batch_edit_contract_item',
                 params: {
@@ -1068,8 +1072,8 @@ Ext.define('EIM.controller.Contracts', {
                     Ext.Msg.alert('错误', '可能是网络问题，请找Terry处理');
                 }
             });
-            if (menu) menu.up('menu').hide();
-            if (win) win.close();
+            if(menu) menu.up('menu').hide();
+            if(win) win.close();
         }
     },
 
@@ -1186,7 +1190,7 @@ Ext.define('EIM.controller.Contracts', {
     deleteReceivable: function() {
         var me = this;
         Ext.Msg.confirm('确认删除', '真的要删除选中的应收款项？', function(button) {
-            if (button === 'yes') {
+            if(button === 'yes') {
                 Ext.Ajax.request({
                     url: 'receivables/delete_receivable',
                     params: {
@@ -1241,7 +1245,7 @@ Ext.define('EIM.controller.Contracts', {
     deleteCollection: function() {
         var me = this;
         Ext.Msg.confirm('确认删除', '真的要删除选中的实收款项？', function(button) {
-            if (button === 'yes') {
+            if(button === 'yes') {
                 Ext.Ajax.request({
                     url: 'collections/delete_collection',
                     params: {
@@ -1257,7 +1261,9 @@ Ext.define('EIM.controller.Contracts', {
                         //更新进度条
                         var sum = Number(Ext.ComponentQuery.query('contract_grid')[0].getSelectedItem().get('sum'));
                         var total_collection = Number(msg.total_collection);
-                        var percentage = (total_collection * 100.0 / sum).toFixed(2);
+                        var percentage = (
+                            total_collection * 100.0 / sum
+                            ).toFixed(2);
                         Ext.ComponentQuery.query('collection_panel progressbar')[0].updateProgress(total_collection / sum, percentage + "%", true);
                     },
                     failure: function() {
@@ -1300,6 +1306,8 @@ Ext.define('EIM.controller.Contracts', {
         rmb_field.setValue(this.calculateRmb(newValue, amount_field.getValue()));
     },
     calculateRmb: function(amount, exchange_rate) {
-        return (amount * exchange_rate / 100.00).toFixed(2);
+        return (
+            amount * exchange_rate / 100.00
+            ).toFixed(2);
     }
 });

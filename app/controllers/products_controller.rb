@@ -60,4 +60,13 @@ class ProductsController < ApplicationController
 
         render :json => {:success => result[:success], :message => result[:message], :id => result[:id]}
     end
+
+    def for_site
+        per_page = $products_per_page
+        offset = per_page * (params['page'].to_i - 1)
+        @products = Series.order("id").offset(offset).limit(per_page)
+        #binding.pry
+        #products =
+        render :json => @products.to_json
+    end
 end

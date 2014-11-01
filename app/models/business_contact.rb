@@ -7,7 +7,10 @@ class BusinessContact < ActiveRecord::Base
                     :en_addr, :postcode, :position, :user_id
 
     belongs_to :business_unit
-    has_many :contracts
+    #has_many :contracts
+    #现在合同和进出口公司联系人改成多对多了，因为可能真不止两个联系人--20140918
+    has_many :business_contacts_contracts, :class_name => "BusinessContactsContract", :foreign_key => 'contract_id'
+    has_many :contracts, :through => :business_contacts_contracts, :source => :contract
 
     belongs_to :user
 

@@ -304,9 +304,10 @@ EIM_field_defaults = {
 
 /**
  * 需要同时校验的区域，校验未通过时的提示信息
- * @type {String}
  */
 EIM_multi_field_invalid = "表单中还有值没有填写完整，请检查！";
+
+
 /**
  * 修正chart组件中多种颜色时的legend图例显示颜色不对应问题
  */

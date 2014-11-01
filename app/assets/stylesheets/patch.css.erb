@@ -1,3 +1,9 @@
+/* 栏与栏之间无空隙 */
+.columns{
+    /*padding-left: 0rem;*/
+    /*padding-right: 0rem;*/
+}
+
 /* 头 */
 .ETSC-head {background-color: #fff;}
 .ETSC-head .head-small-txt {
@@ -65,7 +71,7 @@
 }
 
 /** 解决方案 **/
-.ETSC-solution *{
+.ETSC-solution * {
     font-size: .8rem;
     color: #666;
 }
@@ -73,7 +79,7 @@
     font-weight: bold;
     color: #333;
 }
-.ETSC-solution a{
+.ETSC-solution a {
     color: #666;
 }
 
@@ -151,4 +157,69 @@
     color: #FFF;
     text-align: center;
     margin-bottom: 0.5rem;
+}
+
+/* 标准正文 */
+.normal-text p,
+.normal-text dd {
+    font-size: 0.9rem;
+    text-indent: 2rem;
+}
+
+/* 搜索结果里浮在上面的相关新闻和解决方案 */
+.ETSC-mini-panel {
+    border: 1px solid #D8D8D8;
+    padding: 3px 3px 10px;
+    background-color: #F2F2F2;
+    margin-bottom: 0;
+}
+.ETSC-mini-panel a {
+    color: #333;
+;
+}
+.ETSC-mini-panel h3 {
+    background: none repeat scroll 0 0 #bbc0c3;
+    color: #474747;
+    font-weight: bold;
+    height: 36px;
+    line-height: 36px;
+    padding-left: 18px;
+    font-size: .8rem;
+}
+.ETSC-mini-panel li {
+    list-style: none;
+    font-size: .8rem;
+}
+
+/* 产品列表 */
+.ETSC-product-list {
+    /*margin: 1rem;*/
+    padding: 1rem 0;
+    border-bottom: 1px solid #CCC;
+}
+.ETSC-product-list * {
+    font-size: .8rem;
+    color: #666;
+}
+.ETSC-product-list a {
+    color: #666;
+}
+.ETSC-product-list h4 * {
+    font-weight: bold;
+    color: #333;
+}
+
+
+/* 搜索表单 */
+#dynamic_form * {
+    font-size: 0.9rem;
+}
+#dynamic_form h3 {
+    background-color: #ccf;
+    line-height: 3rem;
+    padding-left: 1.5em;
+}
+/* 两边off-canvas里的字体 */
+.left-off-canvas-menu form label {
+    color: #ffffff;
 }

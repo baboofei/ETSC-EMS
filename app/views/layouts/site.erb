@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh" xml:lang="zh">
 <head>
   <%= stylesheet_link_tag 'foundation' %>
   <%= stylesheet_link_tag 'patch' %>
@@ -21,8 +21,8 @@ location and included with correspondent include tab
 <div class="ETSC-head">
   <div class="row" data-equalizer>
     <div class="large-12 medium-12 small-12 columns">
-      <span class="show-for-medium-up"><img src="<%= asset_path("site/logo.jpg") %>" alt="ETSC" /></span>
-      <span class="show-for-small-only"><img src="<%= asset_path("site/logo-pic.jpg") %>" alt="ETSC" /></span>
+      <span class="show-for-medium-up"><a href="/"><img src="<%= asset_path("site/logo.jpg") %>" alt="ETSC" /></a></span>
+      <span class="show-for-small-only"><a href="/"><img src="<%= asset_path("site/logo-pic.jpg") %>" alt="ETSC" /></a></span>
     </div>
     <div class="large-12 medium-12 small-12 columns text-right">
       <a href="#"><img src="<%= asset_path("silk_icon/flag_cn.png") %>" width="20px" alt="中文"><span class="show-for-medium-up head-small-txt"> 中文</span></a>
@@ -41,34 +41,25 @@ location and included with correspondent include tab
         <li class="has-dropdown"><a href="/site/about_us.html">关于我们</a>
           <ul class="dropdown">
             <li><a href="/site/about_us.html">公司简介</a></li>
-            <li><a href="#">客户信息</a></li>
-            <li><a href="#">合作伙伴</a></li>
+            <li><a href="/site/customers.html">客户信息</a></li>
+            <li><a href="/site/partners.html">合作伙伴</a></li>
           </ul>
         </li>
-        <li class="has-dropdown"><a href="#">产品世界</a>
+        <li class="has-dropdown"><a href="/site/product.html">产品世界</a>
           <ul class="dropdown">
             <li><label>分类方法</label></li>
             <li class="has-dropdown"><a href="#">按产品类型</a>
               <ul class="dropdown">
-                <li class="has-dropdown"><a href="#">光学器件及精密微动机械</a>
-                  <ul class="dropdown">
-                    <li><label>光学器件及精密微动机械</label></li>
-                    <li class="has-dropdown"><a href="#">光学元件</a>
-                      <ul class="dropdown">
-                        <li><a href="#">第四级测试</a></li>
-                        <li><a href="#">第四级测试1</a></li>
-                      </ul>
-                    </li>
-                    <li><a href="#">微调架和微动平台</a></li>
-                    <li><a href="#">半导体激光器</a></li>
-                  </ul>
-                </li>
+                <% $categories.each do |category| %>
+                    <li><a href="/site/product_by_category?category_id=<%= category.id %>"><%= category.name %></a></li>
+                <% end %>
               </ul>
             </li>
             <li class="has-dropdown"><a href="#">按产品应用</a>
               <ul class="dropdown">
-                <li><a href="#">光无源器件性能测试</a></li>
-                <li><a href="#">激光测试</a></li>
+                <% $applications.each do |application| %>
+                    <li><a href="/site/product_by_application?application_id=<%= application.id %>"><%= application.name %></a></li>
+                <% end %>
               </ul>
             </li>
           </ul>
@@ -124,10 +115,12 @@ location and included with correspondent include tab
 <%= javascript_include_tag 'jquery/jquery-2.1.1.min' %>
 <%= javascript_include_tag 'foundation' %>
 <%= javascript_include_tag 'foundation/foundation.orbit' %>
+<%= javascript_include_tag 'jquery/site-patch' %>
 
 <!--<script src="js/foundation.min.js"></script>-->
 <script>
     $(document).foundation();
+    init_site_interact();
 </script>
 </body>
 </html>

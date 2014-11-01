@@ -29,7 +29,8 @@ Ext.define('EIM.controller.Customers', {
         //        'express_sheet.Form',
         //        'express_sheet.SimpleForm',
         'customer.ShareForm',
-        'customer.TransferForm'
+        'customer.TransferForm',
+        'customer.AddToContractMiniForm'
     ],
 
     refs: [{

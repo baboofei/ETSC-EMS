@@ -13,6 +13,9 @@
           <th>客户</th>
           <th>报价号</th>
           <th>报价描述</th>
+          <th>币种</th>
+          <th>金额</th>
+          <th>折合RMB</th>
           <th>报价日期</th>
           <th>成案率</th>
         </tr>
@@ -24,6 +27,9 @@
           <td><%= quote.customer.name %></td>
           <td><%= quote.number %></td>
           <td><%= quote.summary %></td>
+          <td><%= quote.currency.name %></td>
+          <td><%= "%.2f" % quote.total.to_f %></td>
+          <td><%= "%.2f" % quote.rmb.to_f %></td>
           <td><%= quote.created_at.strftime("%Y-%m-%d") %></td>
           <td><%= quote.quotable.class.name == "Salelog" ? quote.quotable.salecase.feasible : "-" %></td>
         </tr>

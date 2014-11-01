@@ -48,7 +48,24 @@ Ext.define('EIM.controller.CustomerUnits', {
     saveCustomerUnit: function(button) {
         var win = button.up('window');
         var form = win.down('form', false);
-        if (form.form.isValid()) {
+        var tab_panel = form.down('tabpanel');
+        var tabs = tab_panel.items.items;
+        var all_tabs_valid = true;
+        var tab_count = tabs.length;
+        if(tab_count > 2) {//其实是一个标签，但“+”也要算一个……
+            Ext.Array.each(tabs, function(item, index) {
+                if(item.xtype === "addr_for_unit" && Ext.isEmpty(item.down('[grossName=addr_name]', false).getValue())) {
+                    Ext.example.msg("错误", "请为现有地址添加一个“描述”！");
+                    tab_panel.setActiveTab(index);
+                    all_tabs_valid = false;
+                    return false;
+                }
+            });
+            for(var i = 0; i < tab_count - 1; i++) {
+                form.down('tabpanel').setActiveTab(i);
+            }
+        }
+        if (form.form.isValid() && all_tabs_valid) {
             //防双击
             button.disable();
             form.submit({
@@ -129,7 +146,7 @@ Ext.define('EIM.controller.CustomerUnits', {
         var me = this;
         Ext.Array.each(tabs, function(item, index) {
             if(item.xtype === "addr_for_unit" && Ext.isEmpty(item.down('[grossName=addr_name]', false).getValue())) {
-                Ext.example.msg("错误", "请先把现有地址信息填写完整！");
+                Ext.example.msg("错误", "请为现有地址添加一个“描述”！");
                 tab_panel.setActiveTab(index);
                 return false;
             } else {

@@ -3,9 +3,9 @@
  * 有“选择客户单位”、“+”和“选择客户”、“+”的组件
  * 还有“移动电话”、“固定电话”和“传真”的显示，但不可以修改
  */
-Ext.define('EIM.view.customer.AddToMiniForm', {
+Ext.define('EIM.view.customer.AddToContractMiniForm', {
     extend: 'Ext.window.Window',
-    alias: 'widget.customer_add_to_mini_form',
+    alias: 'widget.customer_add_to_contract_mini_form',
 
     title: '添加客户联系人',
     layout: 'fit',
@@ -51,15 +51,15 @@ Ext.define('EIM.view.customer.AddToMiniForm', {
                         fieldLabel: '传真',
                         name: 'fax',
                         disabled: true
-                    },
-                    {
-                        xtype: 'datefield',
-                        name: 'contact_at',
-                        format: 'Y-m-d',
-                        fieldLabel: '联系日期',
-                        emptyText: '请选择此条日志实际发生的日期(比如事后填写的情况)',
-                        value: new Date(),
-                        allowBlank: false
+//                    },
+//                    {
+//                        xtype: 'datefield',
+//                        name: 'contact_at',
+//                        format: 'Y-m-d',
+//                        fieldLabel: '联系日期',
+//                        emptyText: '请选择此条日志实际发生的日期(比如事后填写的情况)',
+//                        value: new Date(),
+//                        allowBlank: false
                     }
                 ]
             }

@@ -1,154 +1,85 @@
-<div class="main">
-    <div class="left f_l left_one">
-        <h2> <b class="ico"></b>
-            产品中心
-        </h2>
-        <div class="left_list border">
-            <div class="left_list_one">
-                <h3> <b class="ico_one"></b>
-                    激光及光谱
-                </h3>
-                <ul>
+<div class="off-canvas-wrap docs-wrap" data-offcanvas>
+  <div class="inner-wrap">
+    <nav class="tab-bar show-for-small-only">
+      <section class="left-small"><a class="left-off-canvas-toggle menu-icon" href="#"><span></span></a></section>
+      <section class="middle tab-bar-section"><h1 class="title">产品世界</h1></section>
+      <section class="right-small"><a class="right-off-canvas-toggle menu-icon" href="#"><span></span></a></section>
+    </nav>
+
+    <aside class="left-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>按产品类型</label></li>
+        <% $categories.each do |category| %>
+            <li><a href="/site/product_by_category?category_id=<%= category.id %>"><%= category.name %></a></li>
+        <% end %>
+      </ul>
+    </aside>
+    <aside class="right-off-canvas-menu">
+      <ul class="off-canvas-list">
+        <li><label>按产品应用</label></li>
+        <% $applications.each do |application| %>
+            <li><a href="/site/product_by_application?application_id=<%= application.id %>"><%= application.name %></a>
+            </li>
+        <% end %>
+      </ul>
+    </aside>
+
+    <section class="main-section">
+      <div class="row">
+        <div class="large-6 medium-6 show-for-medium-up columns ETSC-main-panel">
+          <h3>◆　产品中心</h3>
+          <ul class="button-group round radius tabs" data-tab role="tablist">
+            <li class="tab-title active" role="presentational">
+              <a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" controls="panel2-1">按类型</a></li>
+            <li class="tab-title" role="presentational">
+              <a href="#panel2-2" role="tab" tabindex="0" aria-selected="false" controls="panel2-2">按应用</a></li>
+          </ul>
+          <div class="tabs-content">
+            <section role="tabpanel" aria-hidden="false" class="content active" id="panel2-1">
+              <ul class="ETSC-tree-ul">
+                <li><a href="javascript:void(0);" id="ajax_trigger">AAA</a></li>
+                <% $categories.each do |category| %>
+                    <li><a href="/site/product_by_category?category_id=<%= category.id %>"><%= category.name %></a></li>
+                <% end %>
+              </ul>
+            </section>
+            <section role="tabpanel" aria-hidden="true" class="content" id="panel2-2">
+              <ul class="ETSC-tree-ul">
+                <% $applications.each do |application| %>
                     <li>
-                        <a href="javascript:" title="">激光</a>
+                      <a href="/site/product_by_application?application_id=<%= application.id %>"><%= application.name %></a>
                     </li>
-                    <li>
-                        <a href="javascript:" title="">太阳能激光器</a>
-                    </li>
-                    <li>
-                        <a href="javascript:" title="">激光测量</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="left_list_one">
-                <h3>
-                    <b class="ico_one"></b>
-                    光通讯
-                </h3>
-                <ul>
-                    <li>
-                        <a href="javascript:" title="">原材料销售</a>
-                    </li>
-                    <li>
-                        <a href="javascript:" title="">装备及测试，老化夹具</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="left_list_one">
-                <h3>
-                    <b class="ico_one"></b>
-                    微加工
-                </h3>
-                <ul>
-                    <li>
-                        <a href="javascript:" title="">IPGM</a>
-                    </li>
-                    <li>
-                        <a href="javascript:" title="">郭琛小组项目</a>
-                    </li>
-                    <li>
-                        <a href="javascript:" title="">Passat代理激光器</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="left_list_one">
-                <h3>
-                    <b class="ico_one"></b>
-                    光纤传感
-                </h3>
-                <ul>
-                    <li>
-                        <a href="javascript:" title="">光纤传感</a>
-                    </li>
-                    <li>
-                        <a href="javascript:" title="">光纤气体传感</a>
-                    </li>
-                </ul>
-            </div>
+                <% end %>
+              </ul>
+            </section>
+          </div>
         </div>
-    </div>
-    <div class="content f_l main_one">
-        <div class="bread">您所在的位置：产品世界</div>
-        <div class="about">
-            <div id="right_2">
-
-                <div id="right_21">
-                    <dl>
-                        <dt>
-                            <a href="#">激光及光谱</a>
-                        </dt>
-                        <dd>
-
-                            <a href="javascript:" title="">激光</a>
-                            <a href="javascript:" title="">太阳能激光器</a>
-                            <a href="javascript:" title="">激光测量</a>
-
-                            <span>
-                                <dd>
-                                    <a href="#"  >更多...</a>
-                                </dd>
-                            </span>
-                        </dd>
-                    </dl>
-                </div>
-
-                <div id="right_21">
-                    <dl>
-                        <dt>
-                            <a href="#">光通讯</a>
-                        </dt>
-                        <dd>
-
-                            <a href="javascript:" title="">原材料销售</a>
-                            <a href="javascript:" title="">装备及测试，老化夹具</a>
-
-                            <span>
-                                <dd>
-                                    <a href="#"  >更多...</a>
-                                </dd>
-                            </span>
-                        </dd>
-                    </dl>
-                </div>
-
-                <div id="right_21">
-                    <dl>
-                        <dt>
-                            <a href="#">微加工</a>
-                        </dt>
-                        <dd>
-
-                            <a href="javascript:" title="">IPGM</a>
-                            <a href="javascript:" title="">郭琛小组项目</a>
-                            <a href="javascript:" title="">Passat代理激光器</a>
-
-                            <span>
-                                <dd>
-                                    <a href="Product_127.html"  >更多...</a>
-                                </dd>
-                            </span>
-                        </dd>
-                    </dl>
-                </div>
-
-                <div id="right_22">
-                    <dl>
-                        <dt>
-                            <a href="ProductClass_415.html">系统</a>
-                        </dt>
-                        <dd>
-
-                            <a href="javascript:" title="">光纤传感</a>
-                            <a href="javascript:" title="">光纤气体传感</a>
-                            <span>
-                                <dd>
-                                    <a href="#"  >更多...</a>
-                                </dd>
-                            </span>
-                        </dd>
-                    </dl>
-                </div>
+        <div class="large-18 medium-18 small-24 columns normal-text">
+          <form id="dynamic_form">
+            <div class="row hide" name="category"><%= render :partial => "site/products/category1" %></div>
+            <div class="row hide" name="category"><%= render :partial => "site/products/category1" %></div>
+          </form>
+          <div class="row" data-equalizer>
+            <div class="large-12 medium-12 small-24 columns panel ETSC-mini-panel" data-equalizer-watch>
+                <h3><a href="#">相关新闻</a></h3>
+                <ul class="normal-text">
+                  <li><a href="#">111</a></li>
+                  <li><a href="#">222</a></li>
+                </ul>
             </div>
+            <div class="large-12 medium-12 small-24 columns panel ETSC-mini-panel" data-equalizer-watch>
+                <h3>解决方案</h3>
+                <ul class="normal-text">
+                  <li>222</li>
+                </ul>
+            </div>
+          </div>
+          <div id="products"><%= render :partial => "products" %></div>
         </div>
-    </div>
+      </div>
+    </section>
+
+    <a class="exit-off-canvas"></a>
+
+  </div>
 </div>

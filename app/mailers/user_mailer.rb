@@ -13,7 +13,7 @@ class UserMailer < ActionMailer::Base
     #default :from => "etsc@qq.com"         #公司QQ邮箱，可用
     #default :from => "1163726690@qq.com"         #商务QQ邮箱，可用
     #default :from => "hexawing@qq.com"         #私人QQ邮箱，可用
-    default :from => $inner_sender   #263企业邮箱，可用
+    default :from => "admin@etsc-tech.com"   #263企业邮箱，可用
     #default :from => "hexawing@163.com"        #163私人邮箱，可用
 
     def welcome_email(user, sex, department, position)
@@ -246,7 +246,7 @@ class UserMailer < ActionMailer::Base
         end_at = 0.weeks.ago.strftime("%Y-%m-%d")
         @quotes = quotes
         mail(:to => to_user.map{|p| User.find(p).etsc_email},
-             :subject => "#{vendor_unit.name}产品已报价未成案情况表(截止至#{end_at})"
+             :subject => "#{vendor_unit.name}产品已报价情况表(截止至#{end_at})"
         )
         sleep 3
     end
@@ -410,11 +410,14 @@ class UserMailer < ActionMailer::Base
     end
 
     #推广邮件测试
-    def promotion_test_email(addr)
-        mail(:to => "marian@etsc-tech.com",
-        #mail(:to => addr,
-            #:cc => ["terrych@etsc-tech.com", "61519373@qq.com", "martinl@etsc-tech.com"],
-            :subject => "Base64"
+    def promotion_test_email(group_receivers)
+        #binding.pry
+        p group_receivers[0..0]
+        p group_receivers[1..-1]
+        mail(:from => $outer_sender,
+             :to => group_receivers[0..0],
+             #:bcc => group_receivers[1..-1],
+             :subject => "NEL新品推荐——NEL太赫兹发生器"
         )
     end
 
@@ -585,18 +588,68 @@ class UserMailer < ActionMailer::Base
         .where("receivables.expected_receive_at >= ? and receivables.expected_receive_at <= ? and
         receivables.is_history is null", @start_at, pre_end_at)\
         .where("contracts.signed_at >= ? and contracts.signed_at <= ?", @start_at, pre_end_at)\
-        #.where("contracts.signer_user_id = ?", sender.id)\
+        .where("contracts.signer_user_id = ?", sender.id)\
         .order("contracts.number")
         #发所有人的总表话，注释掉sender_id那一行
 
+        @currencies = Currency.where("id > 10").order("id").map(&:name)
+        @rmb_array = []
+
+        @unpaid_contracts.each do |contract|
+            #binding.pry
+            currency_name = contract.currency.name
+            case currency_name
+                when @currencies[0]
+                    collections = contract.check_collection(@end_at)
+                    collections.each do |collection|
+                        add_to_rmb_big_array(collection, currency_name)
+                    end
+                when @currencies[1]
+                    collections = contract.check_collection(@end_at)
+                    collections.each do |collection|
+                        add_to_rmb_big_array(collection, currency_name)
+                    end
+                when @currencies[2]
+                    collections = contract.check_collection(@end_at)
+                    collections.each do |collection|
+                        add_to_rmb_big_array(collection, currency_name)
+                    end
+                when @currencies[3]
+                    collections = contract.check_collection(@end_at)
+                    collections.each do |collection|
+                        add_to_rmb_big_array(collection, currency_name)
+                    end
+                when @currencies[4]
+                    collections = contract.check_collection(@end_at)
+                    collections.each do |collection|
+                        add_to_rmb_big_array(collection, currency_name)
+                    end
+                when @currencies[5]
+                    collections = contract.check_collection(@end_at)
+                    collections.each do |collection|
+                        add_to_rmb_big_array(collection, currency_name)
+                    end
+                when @currencies[6]
+                    collections = contract.check_collection(@end_at)
+                    collections.each do |collection|
+                        add_to_rmb_big_array(collection, currency_name)
+                    end
+                when @currencies[7]
+                    collections = contract.check_collection(@end_at)
+                    collections.each do |collection|
+                        add_to_rmb_big_array(collection, currency_name)
+                    end
+            end
+        end
+
         if @unpaid_contracts.size > 0
-            mail(:to => "terrych@etsc-tech.com",
-            #mail(:to => receiver_ids.map{|p| User.find(p).etsc_email},
+            #mail(:to => "terrych@etsc-tech.com",
+            mail(:to => receiver_ids.map{|p| User.find(p).etsc_email},
                 :subject => "合同应收款项_截止至#{@end_at}_#{sender.name}"
             )
         else
-            mail(:to => "terrych@etsc-tech.com",
-            #mail(:to => receiver_ids.map{|p| User.find(p).etsc_email},
+            #mail(:to => "terrych@etsc-tech.com",
+            mail(:to => receiver_ids.map{|p| User.find(p).etsc_email},
                  :subject => "合同应收款项_截止至#{@end_at}_#{sender.name}(无应收款项)"
             )
         end
@@ -641,8 +694,8 @@ class UserMailer < ActionMailer::Base
 
         @array = $urge_payment_big_array
 
-        mail(:to => "terrych@etsc-tech.com",
-        #mail(:to => receiver_ids.map{|p| User.find(p).etsc_email},
+        #mail(:to => "terrych@etsc-tech.com",
+        mail(:to => receiver_ids.map{|p| User.find(p).etsc_email},
              :subject => "合同应催收款项_截止至#{@end_at}"
         )
     end
@@ -788,7 +841,6 @@ class UserMailer < ActionMailer::Base
     def add_to_big_array(collection, line)
         case collection[1]
             when 1..30
-                #p "30 days"
                 $urge_payment_big_array[line][0] += collection[0]
             when 31..60
                 $urge_payment_big_array[line][1] += collection[0]
@@ -816,6 +868,35 @@ class UserMailer < ActionMailer::Base
             #p "+了#{collection[0]}，汇率为#{real_exchange_rate}，折#{collection[0] * real_exchange_rate / 100}"
             $total_rmb += (collection[0] * real_exchange_rate / 100)
         end
+    end
+
+    #针对每个销售统计其应催款折合人民币时用到的方法
+    def add_to_rmb_big_array(collection, currency_name)
+        receivable_date = @end_at.to_date
+        #按账龄前推，如果推至小于2013-07-27则用2013-07-27的(从那天开始爬数据的……)
+        use_date = (receivable_date.strftime("%Y-%m-%d") < "2013-07-27" ? "2013-07-27" : receivable_date.strftime("%Y-%m-%d"))
+        if currency_name == "RMB"
+            real_exchange_rate = 100
+        else
+            #binding.pry
+            real_exchange_rate = RealExchangeRate.where("date = ?", use_date)[0][currency_name.downcase].to_f
+        end
+
+        case collection[1]
+            when 1..30
+                @rmb_array[0] = @rmb_array[0].to_f + (collection[0] * real_exchange_rate / 100)
+            when 31..60
+                @rmb_array[1] = @rmb_array[1].to_f + (collection[0] * real_exchange_rate / 100)
+            when 61..90
+                @rmb_array[2] = @rmb_array[2].to_f + (collection[0] * real_exchange_rate / 100)
+            when 91..120
+                @rmb_array[3] = @rmb_array[3].to_f + (collection[0] * real_exchange_rate / 100)
+            when 121..360
+                @rmb_array[4] = @rmb_array[4].to_f + (collection[0] * real_exchange_rate / 100)
+            when 361..99999
+                @rmb_array[5] = @rmb_array[5].to_f + (collection[0] * real_exchange_rate / 100)
+        end
+
     end
 end
 

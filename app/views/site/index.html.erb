@@ -25,12 +25,11 @@
 </div>
 
 <div class="row" data-equalizer>
-
-  <div class="large-5 medium-8 columns ETSC-main-panel" data-equalizer-watch>
+  <div class="large-5 medium-8 show-for-medium-up columns ETSC-main-panel" data-equalizer-watch>
     <h3>◆　产品中心</h3>
     <ul class="button-group round radius tabs" data-tab role="tablist">
       <li class="tab-title active" role="presentational">
-        <a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" controls="panel2-1">按产品</a></li>
+        <a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" controls="panel2-1">按类型</a></li>
       <li class="tab-title" role="presentational">
         <a href="#panel2-2" role="tab" tabindex="0" aria-selected="false" controls="panel2-2">按应用</a></li>
     </ul>
@@ -67,6 +66,40 @@
       </section>
     </div>
   </div>
+  <div class="show-for-small-only columns ETSC-main-panel" data-equalizer-watch data-equalizer>
+    <h3>◆　产品中心</h3>
+    <div class="small-12 columns panel" data-equalizer-watch>
+    <ul class="ETSC-tree-ul">
+      <li><a href="#">激光及光谱</a>
+        <ul>
+          <li><a href="#">激光</a></li>
+          <li><a href="#">太阳能激光器</a></li>
+          <li><a href="#">激光测量</a></li>
+        </ul>
+      </li>
+      <li><a href="#">微加工</a>
+        <ul>
+          <li><a href="#">IPGM</a></li>
+        </ul>
+      </li>
+    </ul>
+    </div>
+    <div class="small-12 columns panel" data-equalizer-watch>
+    <ul class="ETSC-tree-ul">
+      <li><a href="#">航空</a>
+        <ul>
+          <li><a href="#">气体检测</a></li>
+        </ul>
+      </li>
+      <li><a href="#">工业</a>
+        <ul>
+          <li><a href="#">IPGM</a></li>
+        </ul>
+      </li>
+    </ul>
+    </div>
+  </div>
+
   <div class="large-7 medium-8 columns ETSC-main-panel" data-equalizer-watch>
     <h3>◆　解决方案</h3>
 
@@ -166,18 +199,22 @@
         <li class="th"><a href="#"><img src="http://placehold.it/160x120"/></a></li>
         <li class="th"><a href="#"><img src="http://placehold.it/160x120"/></a></li>
         <li class="th"><a href="#"><img src="http://placehold.it/160x120"/></a></li>
+        <li class="th"><a href="#"><img src="http://placehold.it/160x120"/></a></li>
+        <li class="th"><a href="#"><img src="http://placehold.it/160x120"/></a></li>
       </ul>
     </li>
-    <li></li>
   </ul>
 </div>
 
 <div class="row ETSC-link-panel">
   <h3>友情链接</h3>
+
   <div>
     <ul>
       <% @links.each do |link| %>
-          <li class="th"><a href="<%= link.link_to %>" target="_blank"><img src="<%= asset_path("site/links/#{link.image_url}") %>" width="150px" alt="<%= link.description %>" /></a></li>
+          <li class="th">
+            <a href="<%= link.link_to %>" target="_blank"><img src="<%= asset_path("site/links/#{link.image_url}") %>" width="150px" alt="<%= link.description %>"/></a>
+          </li>
       <% end %>
     </ul>
   </div>

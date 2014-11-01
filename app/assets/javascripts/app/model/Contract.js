@@ -50,7 +50,7 @@ Ext.define('EIM.model.Contract', {
             type: 'int'
         },
         {
-            name: 'end_user>(name|en_name)',
+            name: 'customers>(name|en_name)',
             type: 'string'
         },
         {
@@ -90,7 +90,7 @@ Ext.define('EIM.model.Contract', {
             type: 'int'
         },
         {
-            name: 'business_contact>(name|en_name)',
+            name: 'business_contacts>(name|en_name)',
             type: 'string'
         },
         {

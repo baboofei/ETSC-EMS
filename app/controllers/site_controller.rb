@@ -1,9 +1,15 @@
 # encoding: UTF-8
 class SiteController < ApplicationController
-    layout "site", :except => "show_original_image"
+    layout "site", :except => ["show_original_image", :product, :ajax_filter]
     before_filter :append_allow_edit, :only => [:show_product]
 
-    require "will_paginate"
+    #require "will_paginate"
+    $categories = SortByCategory.where("true")
+    $applications = SortByApplication.where("true")
+
+    $products_per_page = 6
+    $paginate_inner_window = 3
+    $paginate_outer_window = 2
 
     def append_allow_edit
         #视权限在页面里加上“[编辑]”链接，方便管理操作
@@ -114,45 +120,45 @@ class SiteController < ApplicationController
         @recent_solutions = Solution.order("created_at DESC").limit(5)
     end
 
-    def show_product
-        @big_types = ProdBType.find(:all)
-        @serial = Serial.find(params[:id])
-        if @serial.prod_s_type_id
-            @current_sml_type = ProdSType.find(@serial.prod_s_type_id)
-            @current_mid_type = ProdMType.find(@current_sml_type.prod_m_type_id)
-        else
-            @current_mid_type = ProdMType.find(@serial.prod_m_type_id)
-        end
-        @current_big_type = ProdBType.find(@current_mid_type.prod_b_type_id)
-
-        all_images = Accessory.images.where("serial_id = ?", params[:id]).order("id").uniq
-        @main_image = all_images[0]
-        @other_images = (all_images.size>1) ? (all_images[1..-1]) : nil
-
-        unless @serial.related_serials.blank?
-            #说明存在与其相关的从产品系列，返回从系列ID数组
-            @related_serials = @serial.related_serials
-        else
-            #说明没有相关产品系列
-            @related_serials = nil
-        end
-
-        #系列所包含的产品
-        @involve_products = (@serial.products.size > 0 ? @serial.products : nil)
-
-        #    全都是系列了，不存在这项。20110815
-        #    if @serial.serial
-        #      #说明属于某系列，返回一个剔除掉自身的数组
-        #      @serial_products = @serial.serial.products.reject{|e| e.id == @serial.id}
-        #    else
-        #      #说明不属于任何系列
-        #      @serial_products = nil
-        #    end
-
-        #新版网站加上的“最新产品”和“解决方案”的侧边栏--20100506
-        @recent_serials = Serial.recent_5
-        @recent_solutions = Solution.order("created_at DESC").limit(5)
-    end
+    #def show_product
+    #    @big_types = ProdBType.find(:all)
+    #    @serial = Serial.find(params[:id])
+    #    if @serial.prod_s_type_id
+    #        @current_sml_type = ProdSType.find(@serial.prod_s_type_id)
+    #        @current_mid_type = ProdMType.find(@current_sml_type.prod_m_type_id)
+    #    else
+    #        @current_mid_type = ProdMType.find(@serial.prod_m_type_id)
+    #    end
+    #    @current_big_type = ProdBType.find(@current_mid_type.prod_b_type_id)
+    #
+    #    all_images = Accessory.images.where("serial_id = ?", params[:id]).order("id").uniq
+    #    @main_image = all_images[0]
+    #    @other_images = (all_images.size>1) ? (all_images[1..-1]) : nil
+    #
+    #    unless @serial.related_serials.blank?
+    #        #说明存在与其相关的从产品系列，返回从系列ID数组
+    #        @related_serials = @serial.related_serials
+    #    else
+    #        #说明没有相关产品系列
+    #        @related_serials = nil
+    #    end
+    #
+    #    #系列所包含的产品
+    #    @involve_products = (@serial.products.size > 0 ? @serial.products : nil)
+    #
+    #    #    全都是系列了，不存在这项。20110815
+    #    #    if @serial.serial
+    #    #      #说明属于某系列，返回一个剔除掉自身的数组
+    #    #      @serial_products = @serial.serial.products.reject{|e| e.id == @serial.id}
+    #    #    else
+    #    #      #说明不属于任何系列
+    #    #      @serial_products = nil
+    #    #    end
+    #
+    #    #新版网站加上的“最新产品”和“解决方案”的侧边栏--20100506
+    #    @recent_serials = Serial.recent_5
+    #    @recent_solutions = Solution.order("created_at DESC").limit(5)
+    #end
 
     def show_original_image
         @image = Accessory.find(params[:id])
@@ -434,10 +440,66 @@ class SiteController < ApplicationController
     ##############################################################
     def index
         @links = Link.where("1=1")
-        render :layout => "site"
+        #render :layout => "site"
     end
 
     def about_us
 
+    end
+
+    def product
+        @all_products = Series.scoped.order("id")
+        @all_pages = (@all_products.size / $products_per_page) + 1
+        #@all_pages = 9
+        @products = @all_products.limit($products_per_page)
+        #if params['field1'] == 'xx'
+        #    @products = Series.where("id > 18109").order("id").paginate :page => params[:page], :per_page => $products_per_page
+        #else
+        #    @products = Series.where("id > 18109").order("id").paginate :page => params[:page], :per_page => $products_per_page
+        #end
+        #@products = Series.scoped.paginate :page => params[:page], :per_page => $products_per_page
+        #@products = Series.page params[:page]
+        #p @products.size
+        #p @products.map(&:id)
+        #p params[:page]
+        #p '~~~~'
+        #respond_to do |format|
+        #    format.html
+        #    format.js
+        ##    #format.xml  {render :xml  => @products}
+        ##    #format.json {render :json => @products}
+        #end
+    end
+
+    def product_by_category
+        @categorized_products = Series.where("sort_by_category_id = ?", params['category_id']).order("id").paginate :page => params[:page], :per_page => $products_per_page
+        #binding.pry
+    end
+
+    def product_by_application
+
+    end
+
+    def show_product
+
+    end
+
+    def ajax_filter
+        #binding.pry
+        #render :text => ('a'..'z').to_a.shuffle[0..7].join
+        #@categorized_products = Series.where("true").paginate :page => params[:page], :per_page => $products_per_page
+        #render :layout => "site/product_by_category"
+        #@products = Series.where("true").paginate(:order =>"name ASC" ,:page => params[:page], :per_page => 10)
+        render :json => Series.last.to_json
+    end
+
+    def ajax_filter_small
+        prod = Series.where("id > 1").order("id")
+        #render json: prod
+    end
+
+    def test_a
+        @products = Series.where("1 = 1").order("id").paginate :page => params[:page], :per_page => $products_per_page
+        #@categorized_products = Series.where("sort_by_category_id = ?", params['category_id']).order("id").paginate :page => params[:page], :per_page => $products_per_page
     end
 end

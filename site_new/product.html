@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <% if params[:controller] == "site" && params[:action] == "show_product" %>
-      <meta name="keywords" content="<%= (s = Serial.find(params[:id])) ? s.keywords.map{|p| p.keyword}.join(",") : "武汉东隆科技" %>" />
+      <meta name="keywords" content="<%= (s = Serial.find(params[:id])) ? s.keywords.map{|p| p.keyword}.join(',') : '武汉东隆科技' %>" />
 <% else %>
       <meta name="keywords" content="武汉东隆科技" />
 <% end %>
@@ -106,7 +106,7 @@
   <div class="about">
 			<div id="right_2">
                     
-                            <div id="right_21">
+                            <div>
                                 <dl>
                                     <dt><a href="#">激光及光谱</a></dt>
                                     <dd>
@@ -122,7 +122,7 @@
                                 </dl>
                             </div>
                         
-                            <div id="right_21">
+                            <div>
                                 <dl>
                                     <dt><a href="#">光通讯</a></dt>
                                     <dd>

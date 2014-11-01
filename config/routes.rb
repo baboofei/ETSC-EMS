@@ -83,10 +83,10 @@ EIMV5::Application.routes.draw do
   match ':controller/:action'
   match 'application/download/:file_type/:file_name' => 'application#download'
   
-  match '/product.html' => 'site#show_product_new'
-  #TODO 想一个比较合适的staff名字
+  #match '/product.html' => 'site#show_product_new'
   match 'login' => 'index#index'
   match 'test' => 'site#test'
+  match '/site/product' => 'site#product'
 
   resources :users
   root :to => 'site#index'
