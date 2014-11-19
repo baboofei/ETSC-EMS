@@ -11,6 +11,9 @@ class SiteController < ApplicationController
     $paginate_inner_window = 3
     $paginate_outer_window = 2
 
+    filter_generator_config = File.read("#{Rails.root}/app/views/site/filter_generator.json")
+    $filter_generator_config = JSON.parse(filter_generator_config, :symbolize_names => true)
+
     def append_allow_edit
         #视权限在页面里加上“[编辑]”链接，方便管理操作
         @allow_edit = false
@@ -440,6 +443,7 @@ class SiteController < ApplicationController
     ##############################################################
     def index
         @links = Link.where("1=1")
+
         #render :layout => "site"
     end
 

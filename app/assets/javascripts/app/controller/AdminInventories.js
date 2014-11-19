@@ -198,7 +198,7 @@ Ext.define('EIM.controller.AdminInventories', {
             exchange_unit_button.disable();
             change_location_button.disable();
             change_ownership_button.disable();
-            modify_button.disable();
+            modify_button.enable();//TODO 将来库存整好了要改回来的
         }
         if (selection.length === 1 && selection[0].get('state') === 'x_damaged') {
             fix_button.enable();

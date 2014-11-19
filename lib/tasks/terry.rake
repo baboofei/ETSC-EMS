@@ -260,6 +260,8 @@ LEFT JOIN users AS u2 ON gu2.user_id = u2.id").map(&:id) if sale.groups.to_s.mat
                     Salelog.where("vendor_units.short_code = ?", vendor_unit_code)\
             .where("salelogs.created_at < ?", end_at)\
             .includes(:recommend_factories))
+
+                salelogs.uniq!
                 #去掉签过合同的，process == 27
                 #去掉完结的，process == 15
                 salelogs.uniq!.reject! do |now_salelog|
@@ -278,7 +280,7 @@ LEFT JOIN users AS u2 ON gu2.user_id = u2.id").map(&:id) if sale.groups.to_s.mat
     desc '发送报价项中含下列工厂产品但未签合同的报价详情邮件'
     task :send_quoted_vendor_unit_no_contract_mail => :environment do
         if Time.now.strftime("%U").to_i % 2 == 1
-            vendor_unit_array = %w(COH PIC PRM)
+            vendor_unit_array = %w(COH PIC PRM ILX LUN)
             #start_at = "2010-01-01"#2.weeks.ago.strftime("%Y-%m-%d")
             end_at = 0.weeks.ago.strftime("%Y-%m-%d")
 
@@ -324,7 +326,7 @@ LEFT JOIN users AS u2 ON gu2.user_id = u2.id").map(&:id) if sale.groups.to_s.mat
     desc '发送报价项中含下列工厂产品且已预签合同的报价详情邮件'
     task :send_quoted_vendor_unit_pre_contract_mail => :environment do
         #if Time.now.strftime("%U").to_i % 2 == 1
-            vendor_unit_array = %w(COH PIC PRM ILX)
+            vendor_unit_array = %w(COH PIC PRM ILX LUN)
             #start_at = "2010-01-01"#2.weeks.ago.strftime("%Y-%m-%d")
             end_at = 0.weeks.ago.strftime("%Y-%m-%d")
 
@@ -347,6 +349,8 @@ LEFT JOIN users AS u2 ON gu2.user_id = u2.id").map(&:id) if sale.groups.to_s.mat
                 salecases.select! { |salecase| salecase.salelogs.map(&:process).include? 10 }
                 #再剔除掉已经签了合同的，process == 27
                 salecases.reject! { |salecase| salecase.salelogs.map(&:process).include? 27 }
+                #以及另外一种形式写的“已签订合同并结案”的
+                salecases.reject! { |salecase| salecase.salelogs.map(&:complete_reason).include? 6 }
                 #p salecases.size
                 #binding.pry
 
@@ -370,7 +374,7 @@ LEFT JOIN users AS u2 ON gu2.user_id = u2.id").map(&:id) if sale.groups.to_s.mat
     desc '发送合同项中含下列工厂产品且合同已签订但合同项尚未下单的合同详情邮件'
     task :send_contracted_vendor_unit_no_order_mail => :environment do
         if Time.now.strftime("%U").to_i % 2 == 1
-            vendor_unit_array = %w(COH PIC PRM ILX)
+            vendor_unit_array = %w(COH PIC PRM ILX LUN)
             #start_at = "2010-01-01"#2.weeks.ago.strftime("%Y-%m-%d")
             end_at = 0.weeks.ago.strftime("%Y-%m-%d")
 

@@ -95,12 +95,14 @@ location and included with correspondent include tab
     </section>
   </nav>
   <div class="row collapse ETSC-search-collapse">
+    <form>
     <div class="small-20 columns">
-      <input type="text" placeholder="想搜什么产品">
+      <input type="text" placeholder="想搜什么产品" name="big-keyword">
     </div>
     <div class="small-4 columns">
-      <a href="#" class="alert button postfix">搜</a>
+      <a href="javascript:void(0);" class="alert button postfix">搜</a>
     </div>
+    </form>
   </div>
 </div>
 <%= yield %>
@@ -113,9 +115,11 @@ location and included with correspondent include tab
 </div>
 
 <%= javascript_include_tag 'jquery/jquery-2.1.1.min' %>
+<%= javascript_include_tag 'jquery/jquery-ui-1.10.4' %>
 <%= javascript_include_tag 'foundation' %>
 <%= javascript_include_tag 'foundation/foundation.orbit' %>
 <%= javascript_include_tag 'jquery/site-patch' %>
+<%= stylesheet_link_tag 'jquery/jquery-ui-1.10.4' %>
 
 <!--<script src="js/foundation.min.js"></script>-->
 <script>

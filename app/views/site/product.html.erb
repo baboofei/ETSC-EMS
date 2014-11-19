@@ -37,9 +37,8 @@
           <div class="tabs-content">
             <section role="tabpanel" aria-hidden="false" class="content active" id="panel2-1">
               <ul class="ETSC-tree-ul">
-                <li><a href="javascript:void(0);" id="ajax_trigger">AAA</a></li>
                 <% $categories.each do |category| %>
-                    <li><a href="/site/product_by_category?category_id=<%= category.id %>"><%= category.name %></a></li>
+                    <li><a href="javascript:void(0);" name="trigger_category_search_panel" category_id="<%= category.id %>"><%= category.name %></a></li>
                 <% end %>
               </ul>
             </section>
@@ -56,8 +55,9 @@
         </div>
         <div class="large-18 medium-18 small-24 columns normal-text">
           <form id="dynamic_form">
-            <div class="row hide" name="category"><%= render :partial => "site/products/category1" %></div>
-            <div class="row hide" name="category"><%= render :partial => "site/products/category1" %></div>
+            <% $categories.each_with_index do |item, index| %>
+            <div class="row hide" name="category" id="category_<%= index + 1 %>"><%= render :partial => "site/products/category#{index + 1}" %></div>
+            <% end %>
           </form>
           <div class="row" data-equalizer>
             <div class="large-12 medium-12 small-24 columns panel ETSC-mini-panel" data-equalizer-watch>

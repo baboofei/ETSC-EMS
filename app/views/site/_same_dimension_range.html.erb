@@ -1,0 +1,15 @@
+<div class="row collapse ETSC-range-slider">
+  <div class="large-3 columns for-slider">
+    <input type="text" name="<%= name[:code] %>-min-value" placeholder="<%= min[:cn] %>" class="for-slider">
+  </div>
+  <div class="large-12 show-for-medium-up columns" name="range-slider" name_in_code="<%= name[:code] %>">
+    <ul>
+          <li><%= min[:value] %></li>
+          <li><%= max[:value] %></li>
+    </ul>
+  </div>
+  <div class="large-3 columns for-slider">
+    <input type="text" name="<%= name[:code] %>-max-value" placeholder="<%= max[:cn] %>" class="for-slider">
+  </div>
+  <div class="large-6 columns"><%= dimension[:cn] %></div>
+</div>

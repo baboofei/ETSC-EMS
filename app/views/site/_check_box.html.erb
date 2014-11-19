@@ -1,0 +1,5 @@
+<% options.each_with_index do |option, index| %>
+    <div style="display:inline-block;">
+      <input type="checkbox" name="<%= name[:code] %>[]" value="<%= index + 1 %>" id="<%= name[:code] %>_<%= index + 1 %>"><label for="<%= name[:code] %>_<%= index + 1 %>"><%= option[:cn] %></label>
+    </div>
+<% end %>

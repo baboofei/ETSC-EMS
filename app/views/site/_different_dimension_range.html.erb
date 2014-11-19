@@ -1,0 +1,39 @@
+<div class="row collapse ETSC-range-slider">
+  <div class="large-3 columns for-slider">
+    <input type="text" name="<%= name[:code] %>-min-value" placeholder="<%= min[:cn] %>" class="for-slider">
+  </div>
+  <div class="large-3 columns for-slider">
+    <select class="for-slider" name="<%= name[:code] %>-min-combo">
+      <% options.each do |option| %>
+        <option value="<%= option[:value] %>" <%= option[:value].to_i == 0 ? "selected" : "" %>><%= option[:cn] %></option>
+      <% end %>
+    </select>
+  </div>
+  <div class="large-12 show-for-medium-up columns" name="range-slider" dimension="<%= radix %>" name_in_code="<%= name[:code] %>">
+    <ul>
+      <% spaces = options.size - 1 %>
+      <% if spaces % 3 == 0 %>
+          <% 0.upto(spaces / 3) do |index| %>
+              <li><%= options[index * 3][:en] %></li>
+          <% end %>
+      <% elsif space % 2 == 0 %>
+          <% 0.upto(spaces / 2) do |index| %>
+              <li><%= options[index * 2][:en] %></li>
+          <% end %>
+      <% else %>
+          <li><%= options[0][:en] %></li>
+          <li><%= options[options.size][:en] %></li>
+      <% end %>
+    </ul>
+  </div>
+  <div class="large-3 columns for-slider">
+    <input type="text" name="<%= name[:code] %>-max-value" placeholder="<%= max[:cn] %>" class="for-slider">
+  </div>
+  <div class="large-3 columns for-slider">
+    <select class="for-slider" name="<%= name[:code] %>-max-combo">
+      <% options.each do |option| %>
+          <option value="<%= option[:value] %>" <%= option[:value].to_i == 0 ? "selected" : "" %>><%= option[:cn] %></option>
+      <% end %>
+    </select>
+  </div>
+</div>

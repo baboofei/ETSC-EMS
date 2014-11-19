@@ -1,0 +1,238 @@
+{
+    "category1": {
+        "name": {
+            "cn": "激光器",
+            "en": "laser",
+            "code": "laser"
+        },
+        "properties": [
+            {
+                "type": "check_box",
+                "name": {
+                    "cn": "工作物质",
+                    "en": "Active Material",
+                    "code": "active_material"
+                },
+                "options": [
+                    {
+                        "cn": "红宝石",
+                        "en": "ruby",
+                        "value": 1
+                    },
+                    {
+                        "cn": "蓝宝石",
+                        "en": "sapphire",
+                        "value": 2
+                    },
+                    {
+                        "cn": "染料",
+                        "en": "dye",
+                        "value": 3
+                    },
+                    {
+                        "cn": "砷化镓",
+                        "en": "GaAs",
+                        "value": 4
+                    }
+                ]
+            },
+            {
+                "type": "radio_box",
+                "name": {
+                    "cn": "可调Q",
+                    "en": "Q-Switchable",
+                    "code": "q_switchable"
+                },
+                "options": [
+                    {
+                        "cn": "是",
+                        "en": "yes",
+                        "value": 1
+                    },
+                    {
+                        "cn": "否",
+                        "en": "no",
+                        "value": 2
+                    }
+                ]
+            },
+            {
+                "type": "different_dimension_range",
+                "name": {
+                    "cn": "功率",
+                    "en": "Power",
+                    "code": "power"
+                },
+                "radix": 1000,
+                "min": {
+                    "cn": "最小值",
+                    "en": "minimum"
+                },
+                "max": {
+                    "cn": "最大值",
+                    "en": "maximum"
+                },
+                "options": [
+                    {
+                        "cn": "皮瓦(pW)",
+                        "en": "pW",
+                        "value": -12
+                    },
+                    {
+                        "cn": "纳瓦(nW)",
+                        "en": "nW",
+                        "value": -9
+                    },
+                    {
+                        "cn": "微瓦(μW)",
+                        "en": "&mu;W",
+                        "value": -6
+                    },
+                    {
+                        "cn": "毫瓦(mW)",
+                        "en": "mW",
+                        "value": -3
+                    },
+                    {
+                        "cn": "瓦(W)",
+                        "en": "W",
+                        "value": 0
+                    },
+                    {
+                        "cn": "千瓦(kW)",
+                        "en": "kW",
+                        "value": 3
+                    },
+                    {
+                        "cn": "兆瓦(MW)",
+                        "en": "MW",
+                        "value": 6
+                    },
+                    {
+                        "cn": "吉瓦(GW)",
+                        "en": "GW",
+                        "value": 9
+                    },
+                    {
+                        "cn": "太瓦(TW)",
+                        "en": "TW",
+                        "value": 12
+                    },
+                    {
+                        "cn": "拍瓦(PW)",
+                        "en": "PW",
+                        "value": 15
+                    }
+                ]
+            },
+            {
+                "type": "same_dimension_range",
+                "name": {
+                    "cn": "波长",
+                    "en": "Wavelength",
+                    "code": "wavelength"
+                },
+                "dimension": {
+                    "cn": "纳米(nm)",
+                    "en": "nm"
+                },
+                "min": {
+                    "cn": "最小值",
+                    "en": "minimum",
+                    "value": 500
+                },
+                "max": {
+                    "cn": "最大值",
+                    "en": "maximum",
+                    "value": 1500
+                }
+            },
+            {
+                "type": "input",
+                "name": {
+                    "cn": "关键字",
+                    "en": "keyword",
+                    "code": "keyword"
+                },
+                "placeholder": {
+                    "cn": "请输入关键字，回车键确认",
+                    "en": "Please input any keyword, press 'Enter' to search.",
+                    "code": "keyword"
+                }
+            }
+        ]
+    },
+    "category2": {
+        "name": {
+            "cn": "光学元件",
+            "en": "optic component",
+            "code": "optic_component"
+        },
+        "properties": [
+            {
+                "type": "check_box",
+                "name": {
+                    "cn": "波段",
+                    "en": "band",
+                    "code": "band"
+                },
+                "options": [
+                    {
+                        "cn": "C波段",
+                        "en": "C-band",
+                        "value": 1
+                    },
+                    {
+                        "cn": "L波段",
+                        "en": "L-band",
+                        "value": 2
+                    },
+                    {
+                        "cn": "O波段",
+                        "en": "O-band",
+                        "value": 3
+                    }
+                ]
+            },
+            {
+                "type": "different_dimension_range",
+                "name": {
+                    "cn": "长度",
+                    "en": "Length",
+                    "code": "length"
+                },
+                "radix": 10,
+                "min": {
+                    "cn": "最小值",
+                    "en": "minimum"
+                },
+                "max": {
+                    "cn": "最大值",
+                    "en": "maximum"
+                },
+                "options": [
+                    {
+                        "cn": "毫米(mm)",
+                        "en": "mm",
+                        "value": -3
+                    },
+                    {
+                        "cn": "厘米(cm)",
+                        "en": "cm",
+                        "value": -2
+                    },
+                    {
+                        "cn": "分米(dm)",
+                        "en": "dm",
+                        "value": -1
+                    },
+                    {
+                        "cn": "米(m)",
+                        "en": "m",
+                        "value": 0
+                    }
+                ]
+            }
+        ]
+   }
+}

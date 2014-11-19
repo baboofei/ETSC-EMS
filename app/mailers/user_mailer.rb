@@ -201,6 +201,20 @@ class UserMailer < ActionMailer::Base
     #以下是临时
     #
     ###############################
+
+    def top_products_email
+        year = "2014"
+        top_number = 50
+        @products = ContractItem.where(
+            "contracts.signed_at >= ? and
+           contract_items.is_history is null and vendor_units.is_partner = 1 and vendor_units.id != 144",
+            "#{year}-01-01"
+        ).includes(:contract).includes(:product => :seller).order("contract_items.quantity DESC").limit(top_number)
+        mail(:to => "terrych@etsc-tech.com",
+             :subject => "#{year}年产品销售top #{top_number}"
+        )
+    end
+
     #每两周查一次PInquire，按工厂分邮件，发给对应的采购
     def lead_updating_from_vendor_unit_email(inquire, to_user)
         @vendor_unit = VendorUnit.find(inquire[0])
